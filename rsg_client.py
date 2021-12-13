@@ -23,8 +23,6 @@ class RSG_client(object):
         # create random client ID
         self.ID = randrange(3e5, 1e6)
         self.cxn = cxn
-        # self.gui = GraphWindow(reactor, cxn=self.cxn, root=self)
-        # self.gui.setWindowTitle('Real Simple Grapher')
         self.reactor = reactor
         self.servers = ['Data Vault', 'Parameter Vault']
         #self.servers = ['Real Simple Grapher', 'Data Vault', 'Parameter Vault']

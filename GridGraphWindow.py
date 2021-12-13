@@ -1,5 +1,5 @@
 '''
-Window containing a grid of graphs
+Window containing a grid of graphs.
 '''
 
 import sys

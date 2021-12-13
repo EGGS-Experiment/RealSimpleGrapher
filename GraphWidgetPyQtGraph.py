@@ -128,8 +128,8 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                     index = params.index
                     current_update = ds.updateCounter
                     if params.last_update < current_update:
-                        x = ds.data[:,0]
-                        y = ds.data[:,index+1]
+                        x = ds.data[:, 0]
+                        y = ds.data[:, index+1]
                         params.last_update = current_update
                         params.artist.setData(x,y)
                 except: pass
