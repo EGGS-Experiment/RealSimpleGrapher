@@ -131,7 +131,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                         x = ds.data[:, 0]
                         y = ds.data[:, index+1]
                         params.last_update = current_update
-                        params.artist.setData(x,y)
+                        params.artist.setData(x, y)
                 except: pass
 
     def add_artist(self, ident, dataset, index, no_points = False):
@@ -144,7 +144,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             line = self.pw.plot([], [], symbol='o', symbolBrush=self.getItemColor(new_color),
                                 name=ident, pen = self.getItemColor(new_color), connect=self.scatter_plot)
         else:
-            line = self.pw.plot([], [], pen = self.getItemColor(new_color), name = ident)
+            line = self.pw.plot([], [], pen = self.getItemColor(new_color), name=ident)
         if self.grid_on:
             self.pw.showGrid(x=True, y=True)
         self.artists[ident] = artistParameters(line, dataset, index, True)
@@ -184,9 +184,8 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                 pass
 
     def rangeChanged(self):
-
         lims = self.pw.viewRange()
-        self.pointsToKeep =  lims[0][1] - lims[0][0]
+        self.pointsToKeep = lims[0][1] - lims[0][0]
         self.current_limits = [lims[0][0], lims[0][1]]
 
     @inlineCallbacks
@@ -197,6 +196,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             remove_ds = self.dataset_queue.get()
             self.remove_dataset(remove_ds)
             self.dataset_queue.put(dataset, block=False)
+
         labels = yield dataset.getLabels()
         for i, label in enumerate(labels):
             self.add_artist(label, dataset, i)

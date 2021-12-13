@@ -1,6 +1,6 @@
-#imports
-from PyQt5.QtGui import QColor
+# imports
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QMenu
 
 from FitWindowWidget import FitWindow
@@ -9,6 +9,7 @@ from DataVaultListWidget import DataVaultList
 from PredictSpectrumWidget import PredictSpectrum
 
 from GUIConfig import traceListConfig
+
 
 class TraceList(QListWidget):
     """
@@ -88,8 +89,8 @@ class TraceList(QListWidget):
                     self.parent.remove_artist(ident)
             elif action == exportallAction:
                 print('export all')
-                pass
-
+                #dataset = self.parent.artists[ident].dataset
+                #da
         else:
             ident = str(item.text())
             parametersAction = menu.addAction('Parameters')
@@ -97,6 +98,7 @@ class TraceList(QListWidget):
             fitAction = menu.addAction('Fit')
             removeAction = menu.addAction('Remove')
             exportAction = menu.addAction('Export')
+            # color menu
             selectColorMenu = menu.addMenu("Select color")
             redAction = selectColorMenu.addAction("Red")
             greenAction = selectColorMenu.addAction("Green")

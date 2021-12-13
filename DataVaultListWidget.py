@@ -61,7 +61,6 @@ class DataVaultList(QtWidgets.QWidget):
             except:
                 path = yield self.dv.cd()
                 if self.root is not None:
-                    # root_ID = self.root.ID
                     yield self.root.do_plot((path, str(item)), self.tracename, False)
                 else:
                     yield self.grapher.plot((path, str(item)), self.tracename, False)
