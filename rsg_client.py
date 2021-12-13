@@ -26,7 +26,8 @@ class RSG_client(object):
         # self.gui = GraphWindow(reactor, cxn=self.cxn, root=self)
         # self.gui.setWindowTitle('Real Simple Grapher')
         self.reactor = reactor
-        self.servers = ['Real Simple Grapher', 'Data Vault', 'Parameter Vault']
+        self.servers = ['Data Vault', 'Parameter Vault']
+        #self.servers = ['Real Simple Grapher', 'Data Vault', 'Parameter Vault']
         # initialization sequence
         d = self.connect()
         d.addCallback(self.initializeGUI)

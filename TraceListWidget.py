@@ -66,28 +66,32 @@ class TraceList(QListWidget):
     def popupMenu(self, pos):
         menu = QMenu()
         item = self.itemAt(pos)
-        if (item == None): 
+        if item is None:
             dataaddAction = menu.addAction('Add Data Set')
             spectrumaddAction = menu.addAction('Add Predicted Spectrum')
+            removeallAction = menu.addAction('Remove All Traces')
 
+            # process actions
             action = menu.exec_(self.mapToGlobal(pos))
             if action == dataaddAction:
                 dvlist = DataVaultList(self.parent.name, root=self.root)
                 self.windows.append(dvlist)
                 dvlist.show()
-
-            if action == spectrumaddAction:
+            elif action == spectrumaddAction:
                 ps = PredictSpectrum(self)
                 self.windows.append(ps)
                 ps.show()
-
-
+            elif action == removeallAction:
+                for index in reversed(range(self.count())):
+                    ident = str(self.item(index).text())
+                    self.parent.remove_artist(ident)
 
         else:
             ident = str(item.text())
             parametersAction = menu.addAction('Parameters')
             togglecolorsAction = menu.addAction('Toggle colors')
             fitAction = menu.addAction('Fit')
+            removeAction = menu.addAction('Remove')
             selectColorMenu = menu.addMenu("Select color")
             redAction = selectColorMenu.addAction("Red")
             greenAction = selectColorMenu.addAction("Green")
@@ -105,32 +109,31 @@ class TraceList(QListWidget):
                 pl = ParameterList(dataset)
                 self.windows.append(pl)
                 pl.show()
-
-            if action == togglecolorsAction:               
+            elif action == togglecolorsAction:
                 # option to change color of line
                 new_color = self.parent.colorChooser.next()
-                #self.parent.artists[ident].artist.setData(color = new_color, symbolBrush = new_color)
+                #self.parent.artists[ident].artist.setData(color=new_color, symbolBrush=new_color)
                 self.parent.artists[ident].artist.setPen(new_color)
                 if self.parent.show_points:
-                    self.parent.artists[ident].artist.setData(pen = new_color, symbolBrush = new_color)
+                    self.parent.artists[ident].artist.setData(pen=new_color, symbolBrush=new_color)
                     self.changeTraceListColor(ident, new_color)
                 else:
-                    self.parent.artists[ident].artist.setData(pen = new_color)
+                    self.parent.artists[ident].artist.setData(pen=new_color)
                     self.changeTraceListColor(ident, new_color)
-
-            if action == fitAction:
+            elif action == fitAction:
                 dataset = self.parent.artists[ident].dataset
                 index = self.parent.artists[ident].index
                 fw = FitWindow(dataset, index, self)
                 self.windows.append(fw)
                 fw.show()
-
-            if action in colorActionDict.keys():
+            elif action in colorActionDict.keys():
                 new_color = colorActionDict[action]
                 self.parent.artists[ident].artist.setPen(new_color)
                 if self.parent.show_points:
-                    self.parent.artists[ident].artist.setData(pen = new_color, symbolBrush = new_color)
+                    self.parent.artists[ident].artist.setData(pen=new_color, symbolBrush=new_color)
                     self.changeTraceListColor(ident, new_color)
                 else:
-                    self.parent.artists[ident].artist.setData(pen = new_color)
+                    self.parent.artists[ident].artist.setData(pen=new_color)
                     self.changeTraceListColor(ident, new_color)
+            elif action == removeAction:
+                self.parent.remove_artist(ident)

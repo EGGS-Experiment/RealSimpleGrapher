@@ -22,27 +22,27 @@ class Dataset(QObject):
 
     @inlineCallbacks
     def connectDataVault(self):
-        yield self.data_vault.cd(self.dataset_location[0], context = self.context)
-        path, dataset_name = yield self.data_vault.open(self.dataset_location[1], context = self.context)
+        yield self.data_vault.cd(self.dataset_location[0], context=self.context)
+        path, dataset_name = yield self.data_vault.open(self.dataset_location[1], context=self.context)
         self.dataset_name = dataset_name
 
     @inlineCallbacks
     def setupListeners(self):
-        yield self.data_vault.signal__data_available(11111, context = self.context)
-        yield self.data_vault.addListener(listener = self.updateData, source = None, ID = 11111, context = self.context)
+        yield self.data_vault.signal__data_available(11111, context=self.context)
+        yield self.data_vault.addListener(listener=self.updateData, source=None, ID=11111, context=self.context)
 
 
     @inlineCallbacks
     def openDataset(self):
-        yield self.data_vault.cd(self.dataset_location[0], context = self.context)
-        yield self.data_vault.open(self.dataset_location[1], context = self.context)
+        yield self.data_vault.cd(self.dataset_location[0], context=self.context)
+        yield self.data_vault.open(self.dataset_location[1], context=self.context)
 
     @inlineCallbacks
     def getParameters(self):
-        parameters = yield self.data_vault.parameters(context = self.context)
+        parameters = yield self.data_vault.parameters(context=self.context)
         parameterValues = []
         for parameter in parameters:
-            parameterValue = yield self.data_vault.get_parameter(parameter, context = self.context)
+            parameterValue = yield self.data_vault.get_parameter(parameter, context=self.context)
             parameterValues.append( (parameter, parameterValue) )
         returnValue(parameterValues)
 
@@ -52,7 +52,7 @@ class Dataset(QObject):
 
     @inlineCallbacks
     def getData(self):
-        Data = yield self.data_vault.get(100, context = self.context)
+        Data = yield self.data_vault.get(100, context=self.context)
         if (self.data is None):
             yield self.accessingData.acquire()
             try:
@@ -72,7 +72,7 @@ class Dataset(QObject):
     def getLabels(self):
         labels = []
         yield self.openDataset()
-        _, all_dep = yield self.data_vault.variables(context = self.context)
+        _, all_dep = yield self.data_vault.variables(context=self.context)
         for i in range(len(all_dep)):
             label_tmp = all_dep[i][0] + ' - ' + self.dataset_name
             if label_tmp in labels:
@@ -82,4 +82,4 @@ class Dataset(QObject):
 
     @inlineCallbacks
     def disconnectDataSignal(self):
-        yield self.data_vault.removeListener(listener = self.updateData, source = None, ID = 11111, context = self.context)
+        yield self.data_vault.removeListener(listener=self.updateData, source=None, ID=11111, context=self.context)
