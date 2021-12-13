@@ -8,7 +8,6 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
 
-from Dataset import Dataset
 from TraceListWidget import TraceList
 
 import sys

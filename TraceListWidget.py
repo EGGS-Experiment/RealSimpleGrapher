@@ -70,6 +70,7 @@ class TraceList(QListWidget):
             dataaddAction = menu.addAction('Add Data Set')
             spectrumaddAction = menu.addAction('Add Predicted Spectrum')
             removeallAction = menu.addAction('Remove All Traces')
+            exportallAction = menu.addAction('Export All Traces')
 
             # process actions
             action = menu.exec_(self.mapToGlobal(pos))
@@ -85,6 +86,9 @@ class TraceList(QListWidget):
                 for index in reversed(range(self.count())):
                     ident = str(self.item(index).text())
                     self.parent.remove_artist(ident)
+            elif action == exportallAction:
+                print('export all')
+                pass
 
         else:
             ident = str(item.text())
@@ -92,6 +96,7 @@ class TraceList(QListWidget):
             togglecolorsAction = menu.addAction('Toggle colors')
             fitAction = menu.addAction('Fit')
             removeAction = menu.addAction('Remove')
+            exportAction = menu.addAction('Export')
             selectColorMenu = menu.addMenu("Select color")
             redAction = selectColorMenu.addAction("Red")
             greenAction = selectColorMenu.addAction("Green")
@@ -101,8 +106,8 @@ class TraceList(QListWidget):
             whiteAction = selectColorMenu.addAction("White")
             colorActionDict = {redAction:"r", greenAction:"g", yellowAction:"y", cyanAction:"c", magentaAction:"m", whiteAction:"w"}
 
+            # process actions
             action = menu.exec_(self.mapToGlobal(pos))
-            
             if action == parametersAction:
                 # option to show parameters in separate window
                 dataset = self.parent.artists[ident].dataset
@@ -137,3 +142,6 @@ class TraceList(QListWidget):
                     self.changeTraceListColor(ident, new_color)
             elif action == removeAction:
                 self.parent.remove_artist(ident)
+            elif action == exportAction:
+                print('export')
+                pass

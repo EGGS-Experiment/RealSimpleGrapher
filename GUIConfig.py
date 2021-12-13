@@ -19,7 +19,7 @@ class graphConfig():
     Config for an individual graph within a GridGraphWindow.
     Sets graphing-related settings such as axes limits and horizontal/vertical lines.
     """
-    def __init__(self, name, ylim=[0,1], isScrolling=False, max_datasets=20,
+    def __init__(self, name, ylim=[0, 1], isScrolling=False, max_datasets=20,
                  show_points=True, grid_on=False, scatter_plot='all', isImages=False,
                  isHist=False, line_param=None, vline=None, vline_param=None, hline=None, hline_param=None):
         self.name = name
@@ -60,7 +60,7 @@ tabs = [
     gridGraphConfig('SLS', [graphConfig('SLS Locking Output', max_datasets=3), 0, 0]),
     gridGraphConfig('RGA', [graphConfig('RGA Sweeps', max_datasets=3), 0, 0]),
     gridGraphConfig('PMT', [graphConfig('pmt', ylim=[0, 30], isScrolling=True, max_datasets=1, show_points=False), 0, 0]),
-    gridGraphConfig('local_stark', [
+    gridGraphConfig('tmp', [
                       graphConfig('ms_local_stark'), 0, 0,
                       graphConfig('ms_local_stark_detuning'), 1, 0,
                       graphConfig('vaet_local_stark'), 0, 1,
