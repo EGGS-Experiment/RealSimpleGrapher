@@ -1,7 +1,7 @@
 # imports
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QMenu
+from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QMenu, QFileDialog
 
 from FitWindowWidget import FitWindow
 from ParameterListWidget import ParameterList
@@ -10,6 +10,8 @@ from PredictSpectrumWidget import PredictSpectrum
 
 from GUIConfig import traceListConfig
 
+import os
+import numpy as np
 
 class TraceList(QListWidget):
     """
@@ -88,9 +90,19 @@ class TraceList(QListWidget):
                     ident = str(self.item(index).text())
                     self.parent.remove_artist(ident)
             elif action == exportallAction:
-                print('export all')
-                #dataset = self.parent.artists[ident].dataset
-                #da
+                # get all datasets
+                datasets_all = set()
+                for index in range(self.count()):
+                    ident = self.item(index).text()
+                    dataset_tmp = self.parent.artists[ident].dataset
+                    datasets_all.add(dataset_tmp)
+                # export all datasets
+                for dataset in datasets_all:
+                    try:
+                        filename = QFileDialog.getSaveFileName(self, 'Open File', os.getenv('HOME'), "CSV (*.csv)")
+                        np.savetxt(filename[0], dataset.data, delimiter=',')
+                    except Exception as e:
+                        pass
         else:
             ident = str(item.text())
             parametersAction = menu.addAction('Parameters')
@@ -145,5 +157,14 @@ class TraceList(QListWidget):
             elif action == removeAction:
                 self.parent.remove_artist(ident)
             elif action == exportAction:
-                print('export')
-                pass
+                # get datasets and index
+                dataset = self.parent.artists[ident].dataset.data
+                index = self.parent.artists[ident].index
+                # get trace from dataset
+                trace = dataset[:, (0, index)]
+                # export trace
+                try:
+                    filename = QFileDialog.getSaveFileName(self, 'Open File', os.getenv('HOME'), "CSV (*.csv)")
+                    np.savetxt(filename[0], trace, delimiter=',')
+                except Exception as e:
+                    pass

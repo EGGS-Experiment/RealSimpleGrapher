@@ -20,17 +20,20 @@ class Dataset(QObject):
         self.context = context
         self.connectDataVault()
         self.setupListeners()
+
+        # dataset storage variables
         self.points_per_grab = 1000
         self.last_index = 0
-        self.dataset_shape = None
+
+        # startup sequence
+        self.connectDataVault()
+        self.setupListeners()
 
     @inlineCallbacks
     def connectDataVault(self):
         yield self.data_vault.cd(self.dataset_location[0], context=self.context)
         path, dataset_name = yield self.data_vault.open(self.dataset_location[1], context=self.context)
         self.dataset_name = dataset_name
-        dataset_shape = yield self.data_vault.shape()
-        self.data = np.empty(dataset_shape)
 
     @inlineCallbacks
     def setupListeners(self):
@@ -52,21 +55,29 @@ class Dataset(QObject):
         returnValue(parameterValues)
 
     def updateData(self, x, y):
-        print('yzde')
         self.updateCounter += 1
         self.getData()
 
     @inlineCallbacks
     def getData(self):
         """
-        todo: maybe this is RLS
+        Gets data in bunches at a time and adds
+        them to self.data which holds the dataset.
         """
-        Data = yield self.data_vault.get(self.points_per_grab, context=self.context)
         yield self.accessingData.acquire()
-        try:
-            self.data = np.append(self.data, Data.asarray, 0)
-        except:
-            self.data = np.append(self.data, Data, 0)
+        # get data from the datavault
+        Data = yield self.data_vault.get(self.points_per_grab, context=self.context)
+        Data = np.array(Data)
+        rows = np.shape(Data)[0]
+        # acquire communication
+        if self.data is not None:
+            self.data[self.last_index: self.last_index + rows] = Data
+            self.last_index += rows
+        else:
+            dataset_shape = yield self.data_vault.shape(context=self.context)
+            self.data = np.zeros(dataset_shape)
+            self.data[self.last_index: self.last_index + rows] = Data
+            self.last_index += rows
         self.accessingData.release()
 
     @inlineCallbacks

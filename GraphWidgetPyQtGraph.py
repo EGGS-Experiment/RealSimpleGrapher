@@ -132,7 +132,8 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                         y = ds.data[:, index+1]
                         params.last_update = current_update
                         params.artist.setData(x, y)
-                except: pass
+                except:
+                    pass
 
     def add_artist(self, ident, dataset, index, no_points = False):
         '''
