@@ -25,7 +25,6 @@ class RSG_client(object):
         self.cxn = cxn
         self.reactor = reactor
         self.servers = ['Data Vault', 'Parameter Vault']
-        #self.servers = ['Real Simple Grapher', 'Data Vault', 'Parameter Vault']
         # initialization sequence
         d = self.connect()
         d.addCallback(self.initializeGUI)
@@ -33,8 +32,7 @@ class RSG_client(object):
     @inlineCallbacks
     def connect(self):
         """
-        Creates an asynchronous connection to pump servers
-        and relevant labrad servers
+        Creates an asynchronous connection to labrad.
         """
         # create labrad connection
         if not self.cxn:
@@ -74,13 +72,13 @@ class RSG_client(object):
         server_name = message[1]
         if server_name in self.servers:
             print(server_name + ' reconnected, enabling widget.')
-            self.setEnabled(True)
+            self.gui.setEnabled(True)
 
     def on_disconnect(self, c, message):
         server_name = message[1]
         if server_name in self.servers:
             print(server_name + ' disconnected, disabling widget.')
-            self.setEnabled(False)
+            self.gui.setEnabled(False)
 
 
     # PLOTTING
