@@ -1,7 +1,7 @@
 """
 A normal graph widget. The "base unit" of the RSG.
 """
-#imports
+# imports
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtWidgets, QtGui
 
@@ -14,6 +14,7 @@ import sys
 import queue
 import itertools
 
+
 sys.settrace(None)
 class artistParameters():
     def __init__(self, artist, dataset, index, shown):
@@ -21,9 +22,10 @@ class artistParameters():
         self.dataset = dataset
         self.index = index
         self.shown = shown
-        self.last_update = 0 # update counter in the Dataset object
-                             # only redraw if the dataset has a higher
-                             # update count
+        # update counter in the Dataset object
+        # only redraw if the dataset has a higher update count
+        self.last_update = 0
+
 
 class Graph_PyQtGraph(QtWidgets.QWidget):
     def __init__(self, config, reactor, cxn=None, parent=None, root=None):
