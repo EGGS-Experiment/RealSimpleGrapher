@@ -1,14 +1,13 @@
-'''
-Parent class for datasets.
-'''
-
 import numpy as np
 from PyQt5.QtCore import QObject
 from twisted.internet.defer import inlineCallbacks, returnValue, DeferredLock
 
 
 class Dataset(QObject):
-    
+    '''
+    Parent class for datasets.
+    '''
+
     def __init__(self, data_vault, context, dataset_location, reactor):
         super(Dataset, self).__init__()
         self.data = None
@@ -29,11 +28,12 @@ class Dataset(QObject):
         self.connectDataVault()
         self.setupListeners()
 
+
+    # SETUP CONNECTION
     @inlineCallbacks
     def connectDataVault(self):
         yield self.data_vault.cd(self.dataset_location[0], context=self.context)
-        path, dataset_name = yield self.data_vault.open(self.dataset_location[1], context=self.context)
-        self.dataset_name = dataset_name
+        _, self.dataset_name = yield self.data_vault.open(self.dataset_location[1], context=self.context)
 
     @inlineCallbacks
     def setupListeners(self):
@@ -41,10 +41,16 @@ class Dataset(QObject):
         yield self.data_vault.addListener(listener=self.updateData, source=None, ID=11111, context=self.context)
 
     @inlineCallbacks
+    def disconnectDataSignal(self):
+        yield self.data_vault.removeListener(listener=self.updateData, source=None, ID=11111, context=self.context)
+
+    @inlineCallbacks
     def openDataset(self):
         yield self.data_vault.cd(self.dataset_location[0], context=self.context)
         yield self.data_vault.open(self.dataset_location[1], context=self.context)
 
+
+    # GETTERS
     @inlineCallbacks
     def getParameters(self):
         parameters = yield self.data_vault.parameters(context=self.context)
@@ -53,32 +59,6 @@ class Dataset(QObject):
             parameterValue = yield self.data_vault.get_parameter(parameter, context=self.context)
             parameterValues.append((parameter, parameterValue))
         returnValue(parameterValues)
-
-    def updateData(self, x, y):
-        self.updateCounter += 1
-        self.getData()
-
-    @inlineCallbacks
-    def getData(self):
-        """
-        Gets data in bunches at a time and adds
-        them to self.data which holds the dataset.
-        """
-        yield self.accessingData.acquire()
-        # get data from the datavault
-        Data = yield self.data_vault.get(self.points_per_grab, context=self.context)
-        Data = np.array(Data)
-        rows = np.shape(Data)[0]
-        # acquire communication
-        if self.data is not None:
-            self.data[self.last_index: self.last_index + rows] = Data
-            self.last_index += rows
-        else:
-            dataset_shape = yield self.data_vault.shape(context=self.context)
-            self.data = np.zeros(dataset_shape)
-            self.data[self.last_index: self.last_index + rows] = Data
-            self.last_index += rows
-        self.accessingData.release()
 
     @inlineCallbacks
     def getLabels(self):
@@ -92,6 +72,31 @@ class Dataset(QObject):
             labels.append(label_tmp)
         returnValue(labels)
 
+    def updateData(self, c, msg):
+        self.updateCounter += 1
+        self.getData()
+
     @inlineCallbacks
-    def disconnectDataSignal(self):
-        yield self.data_vault.removeListener(listener=self.updateData, source=None, ID=11111, context=self.context)
+    def getData(self):
+        """
+        Gets data in bunches at a time and adds
+        them to self.data, which holds the dataset.
+        """
+        # acquire communication
+        yield self.accessingData.acquire()
+        # get data from the datavault
+        Data = yield self.data_vault.get(self.points_per_grab, context=self.context)
+        Data = np.array(Data)
+        rows = np.shape(Data)[0]
+        # add data to dataset
+        if self.data is not None:
+            self.data[self.last_index: self.last_index + rows] = Data
+            self.last_index += rows
+        # create new dataset
+        else:
+            dataset_shape = yield self.data_vault.shape(context=self.context)
+            self.data = np.zeros(dataset_shape)
+            self.data[self.last_index: self.last_index + rows] = Data
+            self.last_index += rows
+        # release communication
+        self.accessingData.release()

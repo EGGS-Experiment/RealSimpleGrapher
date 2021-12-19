@@ -1,2 +1,14 @@
+#GUIConfig.py
 
-*.pyc
+# files in all folders
+**/*.pyc
+**/.DS_Store
+**/__pycache__
+**/*.pyon
+**/*.h5
+**/*.pyc
+
+# all of .idea (pycharm's config files)
+.idea
+**/.idea
+.idea/** 
