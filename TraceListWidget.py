@@ -11,7 +11,8 @@ from PredictSpectrumWidget import PredictSpectrum
 from GUIConfig import traceListConfig
 
 import os
-import numpy as np
+from numpy import savetxt
+
 
 class TraceList(QListWidget):
     """
@@ -100,7 +101,7 @@ class TraceList(QListWidget):
                 for dataset in datasets_all:
                     try:
                         filename = QFileDialog.getSaveFileName(self, 'Open File', os.getenv('HOME'), "CSV (*.csv)")
-                        np.savetxt(filename[0], dataset.data, delimiter=',')
+                        savetxt(filename[0], dataset.data, delimiter=',')
                     except Exception as e:
                         pass
         else:
@@ -118,7 +119,7 @@ class TraceList(QListWidget):
             cyanAction = selectColorMenu.addAction("Cyan")
             magentaAction = selectColorMenu.addAction("Magenta")
             whiteAction = selectColorMenu.addAction("White")
-            colorActionDict = {redAction:"r", greenAction:"g", yellowAction:"y", cyanAction:"c", magentaAction:"m", whiteAction:"w"}
+            colorActionDict = {redAction: "r", greenAction: "g", yellowAction:"y", cyanAction: "c", magentaAction: "m", whiteAction: "w"}
 
             # process actions
             action = menu.exec_(self.mapToGlobal(pos))
@@ -165,6 +166,6 @@ class TraceList(QListWidget):
                 # export trace
                 try:
                     filename = QFileDialog.getSaveFileName(self, 'Open File', os.getenv('HOME'), "CSV (*.csv)")
-                    np.savetxt(filename[0], trace, delimiter=',')
+                    savetxt(filename[0], trace, delimiter=',')
                 except Exception as e:
                     pass
