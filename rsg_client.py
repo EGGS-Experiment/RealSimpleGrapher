@@ -1,8 +1,8 @@
-#import GUI elements
+# import GUI elements
 from Dataset import Dataset
 from GraphWindow import GraphWindow
 
-#import server libraries
+# import server libraries
 from twisted.internet.threads import deferToThread
 from twisted.internet.defer import returnValue, Deferred, inlineCallbacks
 

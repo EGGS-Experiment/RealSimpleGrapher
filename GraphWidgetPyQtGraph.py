@@ -98,7 +98,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.setLayout(hbox)
         #self.legend = self.pw.addLegend()
         self.tracelist.itemChanged.connect(self.checkboxChanged)
-        self.pw.plot([],[])
+        self.pw.plot([], [])
         vb = self.pw.plotItem.vb
         self.img = pg.ImageItem()
         vb.addItem(self.img)
@@ -250,6 +250,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         units = param.units
         val = self.U(val, units)
         yield self.pv.set_parameter(self.hline_param[0], self.hline_param[1], val)
+
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
