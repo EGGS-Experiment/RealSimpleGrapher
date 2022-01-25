@@ -2,11 +2,6 @@ import numpy as np
 from PyQt5.QtCore import QObject
 from twisted.internet.defer import inlineCallbacks, returnValue, DeferredLock
 
-from datetime import datetime
-
-def forceEvaluate(callback, func, *args):
-    func(*args)
-    return callback
 
 class Dataset(QObject):
     '''
