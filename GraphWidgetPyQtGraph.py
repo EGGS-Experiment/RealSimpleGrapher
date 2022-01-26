@@ -137,15 +137,16 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                 except:
                     pass
 
-    def add_artist(self, ident, dataset, index, no_points = False):
+    def add_artist(self, ident, dataset, index, no_points=False):
         '''
         no_points is an override parameter to the global show_points setting.
         It is to allow data fits to be plotted without points
         '''
         new_color = next(self.colorChooser)
         if self.show_points and not no_points:
-            line = self.pw.plot([], [], symbol='o', symbolBrush=self.getItemColor(new_color),
-                                name=ident, pen=self.getItemColor(new_color), connect=self.scatter_plot)
+            line = self.pw.plot([], [], symbol=None, symbolBrush=self.getItemColor(new_color),
+                                name=ident, pen=self.getItemColor(new_color), connect=self.scatter_plot,
+                                setSkipFiniteCheck=True)
         else:
             line = self.pw.plot([], [], pen=self.getItemColor(new_color), name=ident)
         if self.grid_on:

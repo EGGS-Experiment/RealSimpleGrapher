@@ -2,6 +2,10 @@
 <module version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
+<<<<<<< HEAD
+=======
+    <orderEntry type="inheritedJdk" />
+>>>>>>> 95f4fe473d2c8fe38f77bc08ec859e619e01ef7a
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">

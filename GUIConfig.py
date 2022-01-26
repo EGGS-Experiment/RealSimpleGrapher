@@ -4,15 +4,28 @@ Configuration settings for the RSG.
 
 import pyqtgraph as pg
 
-# set global config options
+
+"""
+Set global configuration options.
+"""
 pg.setConfigOption('background', 'k')
 pg.setConfigOption('foreground', 'y')
+pg.setConfigOption('antialias', False)
+pg.setConfigOption('useOpenGL', True)
+#pg.setConfigOption('useNumba', True)
+pg.setConfigOption('enableExperimental', True)
+
+
+"""
+Configuration classes for the different graph widget types.
+"""
 
 
 class traceListConfig():
     """
     Config for the traceList widget. Mostly concerns its color.
     """
+
     def __init__(self, background_color='black', use_trace_color=False):
         self.background_color = background_color
         self.use_trace_color = use_trace_color
@@ -23,6 +36,7 @@ class graphConfig():
     Config for an individual graph within a GridGraphWindow.
     Sets graphing-related settings such as axes limits and horizontal/vertical lines.
     """
+
     def __init__(self, name, ylim=[0, 1], isScrolling=False, max_datasets=20,
                  show_points=True, grid_on=False, scatter_plot='all', isImages=False,
                  isHist=False, line_param=None, vline=None, vline_param=None, hline=None, hline_param=None):
@@ -60,6 +74,7 @@ class gridGraphConfig():
 """
 The actual config of the RSG is set here.
 """
+
 tabs = [
     gridGraphConfig('Temperature', [graphConfig('Lakeshore 336 Temperature', max_datasets=5), 0, 0]),
     gridGraphConfig('Pressure', [graphConfig('Pressure', max_datasets=5), 0, 0]),
