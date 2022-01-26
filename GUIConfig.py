@@ -3,8 +3,11 @@ Configuration settings for the RSG.
 '''
 
 import pyqtgraph as pg
+
+# set global config options
 pg.setConfigOption('background', 'k')
 pg.setConfigOption('foreground', 'y')
+
 
 class traceListConfig():
     """
@@ -13,6 +16,7 @@ class traceListConfig():
     def __init__(self, background_color='black', use_trace_color=False):
         self.background_color = background_color
         self.use_trace_color = use_trace_color
+
 
 class graphConfig():
     """
@@ -38,6 +42,7 @@ class graphConfig():
         self.hline = hline
         self.hline_param = hline_param
 
+
 class gridGraphConfig():
     """
     Config for a GridGraphWindow (i.e. a tab).
@@ -51,14 +56,15 @@ class gridGraphConfig():
         self.graphs = len(self.config_list)
 
 
+
 """
 The actual config of the RSG is set here.
 """
 tabs = [
-    gridGraphConfig('Temperature', [graphConfig('Lakeshore 336 Temperature', max_datasets=2), 0, 0]),
+    gridGraphConfig('Temperature', [graphConfig('Lakeshore 336 Temperature', max_datasets=5), 0, 0]),
     gridGraphConfig('Pressure', [graphConfig('Pressure', max_datasets=5), 0, 0]),
-    gridGraphConfig('SLS', [graphConfig('SLS Locking Output', max_datasets=3), 0, 0]),
-    gridGraphConfig('RGA', [graphConfig('RGA Sweeps', max_datasets=3), 0, 0]),
+    gridGraphConfig('SLS', [graphConfig('SLS Locking Output', max_datasets=5), 0, 0]),
+    gridGraphConfig('RGA', [graphConfig('RGA Sweeps', max_datasets=5), 0, 0]),
     gridGraphConfig('PMT', [graphConfig('pmt', ylim=[0, 30], isScrolling=True, max_datasets=1, show_points=False), 0, 0]),
     gridGraphConfig('tmp', [
                       graphConfig('ms_local_stark'), 0, 0,

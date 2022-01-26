@@ -145,9 +145,9 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         new_color = next(self.colorChooser)
         if self.show_points and not no_points:
             line = self.pw.plot([], [], symbol='o', symbolBrush=self.getItemColor(new_color),
-                                name=ident, pen = self.getItemColor(new_color), connect=self.scatter_plot)
+                                name=ident, pen=self.getItemColor(new_color), connect=self.scatter_plot)
         else:
-            line = self.pw.plot([], [], pen = self.getItemColor(new_color), name=ident)
+            line = self.pw.plot([], [], pen=self.getItemColor(new_color), name=ident)
         if self.grid_on:
             self.pw.showGrid(x=True, y=True)
         self.artists[ident] = artistParameters(line, dataset, index, True)
