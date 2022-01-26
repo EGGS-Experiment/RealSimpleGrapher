@@ -11,4 +11,4 @@
 # all of .idea (pycharm's config files)
 .idea
 **/.idea
-.idea/** 
+.idea/**
