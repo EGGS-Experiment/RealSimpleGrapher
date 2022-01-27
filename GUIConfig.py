@@ -1,8 +1,8 @@
 '''
 Configuration settings for the RSG.
 '''
-
 import pyqtgraph as pg
+import importlib.util import find_spec
 
 
 """
@@ -11,9 +11,9 @@ Set global configuration options.
 pg.setConfigOption('background', 'k')
 pg.setConfigOption('foreground', 'y')
 pg.setConfigOption('antialias', False)
-pg.setConfigOption('useOpenGL', True)
-#pg.setConfigOption('useNumba', True)
-pg.setConfigOption('enableExperimental', True)
+if find_spec('OpenGL'):
+    pg.setConfigOption('useOpenGL', True)
+    pg.setConfigOption('enableExperimental', True)
 
 
 """
