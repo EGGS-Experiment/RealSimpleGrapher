@@ -9,6 +9,7 @@ from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
 
 from TraceListWidget import TraceList
+from DataVaultListWidget import DataVaultList
 
 import sys
 import queue
@@ -28,6 +29,12 @@ class artistParameters():
 
 
 class Graph_PyQtGraph(QtWidgets.QWidget):
+    """
+    A normal graph widget. The "base unit" of the RSG. Contains a
+    PlotWidget for plotting data, a TraceListWidget for managing
+    displayed datasets, and a DataVaultListWidget for selecting datasets.
+    """
+
     def __init__(self, config, reactor, cxn=None, parent=None, root=None):
         super(Graph_PyQtGraph, self).__init__(parent)
         self.root = root
@@ -58,8 +65,14 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     @inlineCallbacks
     def initUI(self):
+        """
+        Draws the UI.
+        """
+        # import constituent widgets
         self.tracelist = TraceList(self, root=self.root)
+        self.dv = DataVaultList(self.name, root=self.root)
         self.pw = pg.PlotWidget()
+        # configure lines
         if self.vline_name:
             self.inf = pg.InfiniteLine(movable=True, angle=90,
                                        label=self.vline_name + '{value:0.0f}',
@@ -70,7 +83,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             init_value = yield self.get_init_vline()
             self.inf.setValue(init_value)
             self.inf.setPen(width=5.0)
-
         if self.hline_name:
             self.inf = pg.InfiniteLine(movable=True, angle=0,
                                        label=self.hline_name + '{value:0.0f}',
@@ -81,24 +93,31 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             init_value = yield self.get_init_hline()
             self.inf.setValue(init_value)
             self.inf.setPen(width=5.0)
-
+        # layout widgets
+        lsplitter = QtWidgets.QSplitter()
+        lsplitter.setOrientation(QtCore.Qt.Vertical)
+        lsplitter.addWidget(self.tracelist)
+        lsplitter.addWidget(self.dv)
+        splitter = QtWidgets.QSplitter()
+        splitter.addWidget(lsplitter)
+        hbox = QtWidgets.QHBoxLayout()
+        hbox.addWidget(splitter)
+        # frame/vbox is everything on RHS
+        frame = QtWidgets.QFrame()
+        vbox = QtWidgets.QVBoxLayout()
         self.coords = QtWidgets.QLabel('')
         self.title = QtWidgets.QLabel(self.name)
-        frame = QtWidgets.QFrame()
-        splitter = QtWidgets.QSplitter()
-        splitter.addWidget(self.tracelist)
-        hbox = QtWidgets.QHBoxLayout()
-        vbox = QtWidgets.QVBoxLayout()
         vbox.addWidget(self.title)
         vbox.addWidget(self.pw)
         vbox.addWidget(self.coords)
         frame.setLayout(vbox)
         splitter.addWidget(frame)
-        hbox.addWidget(splitter)
+        # set layout
         self.setLayout(hbox)
         #self.legend = self.pw.addLegend()
         self.tracelist.itemChanged.connect(self.checkboxChanged)
         self.pw.plot([], [])
+        # setup viewbox
         vb = self.pw.plotItem.vb
         self.img = pg.ImageItem()
         vb.addItem(self.img)
@@ -134,6 +153,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                         y = ds.data[:, index+1]
                         params.last_update = current_update
                         params.artist.setData(x, y)
+                        self.pw.autoRange()
                 except:
                     pass
 

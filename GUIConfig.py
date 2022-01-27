@@ -2,7 +2,7 @@
 Configuration settings for the RSG.
 '''
 import pyqtgraph as pg
-import importlib.util import find_spec
+from importlib.util import find_spec
 
 
 """
@@ -82,8 +82,8 @@ tabs = [
     gridGraphConfig('RGA', [graphConfig('RGA Sweeps', max_datasets=5), 0, 0]),
     gridGraphConfig('PMT', [graphConfig('pmt', ylim=[0, 30], isScrolling=True, max_datasets=1, show_points=False), 0, 0]),
     gridGraphConfig('tmp', [
-                      graphConfig('ms_local_stark'), 0, 0,
-                      graphConfig('ms_local_stark_detuning'), 1, 0,
-                      graphConfig('vaet_local_stark'), 0, 1,
-                      graphConfig('vaet_local_stark_detuning'), 1, 1])
+        graphConfig('ms_local_stark'), 0, 0,
+        graphConfig('ms_local_stark_detuning'), 1, 0,
+        graphConfig('vaet_local_stark'), 0, 1,
+        graphConfig('vaet_local_stark_detuning'), 1, 1])
 ]

@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QMenu, QFileDialog
 
 from FitWindowWidget import FitWindow
 from ParameterListWidget import ParameterList
-from DataVaultListWidget import DataVaultList
 from PredictSpectrumWidget import PredictSpectrum
 
 from GUIConfig import traceListConfig
@@ -71,18 +70,13 @@ class TraceList(QListWidget):
         menu = QMenu()
         item = self.itemAt(pos)
         if item is None:
-            dataaddAction = menu.addAction('Add Data Set')
             spectrumaddAction = menu.addAction('Add Predicted Spectrum')
             removeallAction = menu.addAction('Remove All Traces')
             exportallAction = menu.addAction('Export All Traces')
 
             # process actions
             action = menu.exec_(self.mapToGlobal(pos))
-            if action == dataaddAction:
-                dvlist = DataVaultList(self.parent.name, root=self.root)
-                self.windows.append(dvlist)
-                dvlist.show()
-            elif action == spectrumaddAction:
+            if action == spectrumaddAction:
                 ps = PredictSpectrum(self)
                 self.windows.append(ps)
                 ps.show()
@@ -100,7 +94,7 @@ class TraceList(QListWidget):
                 # export all datasets
                 for dataset in datasets_all:
                     try:
-                        filename = QFileDialog.getSaveFileName(self, 'Open File', os.getenv('HOME'), "CSV (*.csv)")
+                        filename = QFileDialog.getSaveFileName(self, 'Save Dataset: ' + dataset.dataset_name, os.getenv('HOME'), "CSV (*.csv)")
                         savetxt(filename[0], dataset.data, delimiter=',')
                     except Exception as e:
                         pass
@@ -165,7 +159,7 @@ class TraceList(QListWidget):
                 trace = dataset[:, (0, index)]
                 # export trace
                 try:
-                    filename = QFileDialog.getSaveFileName(self, 'Open File', os.getenv('HOME'), "CSV (*.csv)")
+                    filename = QFileDialog.getSaveFileName(self, 'Save Dataset: ' + ident, os.getenv('HOME'), "CSV (*.csv)")
                     savetxt(filename[0], trace, delimiter=',')
                 except Exception as e:
                     pass

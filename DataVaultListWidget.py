@@ -15,6 +15,7 @@ class DataVaultList(QtWidgets.QWidget):
         self.cxn = cxn
         self.parent = parent
         self.root = root
+        # self.setStyleSheet("background-color:gray")
         self.connect()
 
     @inlineCallbacks
@@ -30,9 +31,16 @@ class DataVaultList(QtWidgets.QWidget):
             self.initializeGUI()
 
     def initializeGUI(self):
-        mainLayout = QtWidgets.QVBoxLayout()
+        mainLayout = QtWidgets.QGridLayout()
+        self.directoryString = ['Home']
+        self.directoryLabel = QtWidgets.QLabel('\\'.join(self.directoryString))
         self.dataListWidget = QtWidgets.QListWidget()
         self.dataListWidget.doubleClicked.connect(self.onDoubleclick)
+        self.dataListWidgetScroll = QtWidgets.QScrollArea()
+        self.dataListWidgetScroll.setWidget(self.directoryLabel)
+        self.dataListWidgetScroll.setWidgetResizable(True)
+        self.dataListWidgetScroll.setFixedHeight(40)
+        mainLayout.addWidget(self.dataListWidgetScroll)
         mainLayout.addWidget(self.dataListWidget)
         self.setWindowTitle('Data Vault')
         self.setLayout(mainLayout)
@@ -41,9 +49,11 @@ class DataVaultList(QtWidgets.QWidget):
 
     @inlineCallbacks
     def populate(self):
+        # remove old directories
         self.dataListWidget.clear()
-        ls = yield self.dv.dir()
         self.dataListWidget.addItem('...')
+        # get new directory
+        ls = yield self.dv.dir()
         self.dataListWidget.addItems(sorted(ls[0]))
         if ls[1] is not None:
             self.dataListWidget.addItems(sorted(ls[1]))
@@ -51,14 +61,22 @@ class DataVaultList(QtWidgets.QWidget):
     @inlineCallbacks
     def onDoubleclick(self, item):
         item = self.dataListWidget.currentItem().text()
+        # previous directory
         if item == '...':
             yield self.dv.cd(1)
+            if len(self.directoryString) > 1:
+                self.directoryString.pop()
+                self.directoryLabel.setText('\\'.join(self.directoryString))
             self.populate()
         else:
             try:
+                # next directory
                 yield self.dv.cd(str(item))
+                self.directoryString.append(str(item))
+                self.directoryLabel.setText('\\'.join(self.directoryString))
                 self.populate()
             except:
+                # plot if no directories left
                 path = yield self.dv.cd()
                 if self.root is not None:
                     yield self.root.do_plot((path, str(item)), self.tracename, False)
