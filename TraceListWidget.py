@@ -100,6 +100,7 @@ class TraceList(QListWidget):
                         pass
         else:
             ident = str(item.text())
+            removeallAction = menu.addAction('Remove All Traces')
             parametersAction = menu.addAction('Parameters')
             togglecolorsAction = menu.addAction('Toggle colors')
             fitAction = menu.addAction('Fit')
@@ -117,7 +118,11 @@ class TraceList(QListWidget):
 
             # process actions
             action = menu.exec_(self.mapToGlobal(pos))
-            if action == parametersAction:
+            if action == removeallAction:
+                for index in reversed(range(self.count())):
+                    ident = str(self.item(index).text())
+                    self.parent.remove_artist(ident)
+            elif action == parametersAction:
                 # option to show parameters in separate window
                 dataset = self.parent.artists[ident].dataset
                 pl = ParameterList(dataset)

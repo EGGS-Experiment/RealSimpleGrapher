@@ -39,7 +39,9 @@ class RSG_client(object):
             import os
             LABRADHOST = os.environ['LABRADHOST']
             from labrad.wrappers import connectAsync
-            self.cxn = yield connectAsync(LABRADHOST, name=self.name)
+            localname = self.name + ''
+            # set self name to rsg client + node name + number (if multiple)
+            self.cxn = yield connectAsync(LABRADHOST, name=localname)
 
         # try to get servers
         try:
@@ -66,6 +68,7 @@ class RSG_client(object):
         # GUI creation needs to be here since the connection needs to be established
         self.gui = GraphWindow(self.reactor, cxn=self.cxn, root=self)
         self.gui.setWindowTitle('Real Simple Grapher - Client')
+
 
     # SIGNALS
     def on_connect(self, c, message):
