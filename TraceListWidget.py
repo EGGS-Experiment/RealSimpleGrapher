@@ -106,6 +106,16 @@ class TraceList(QListWidget):
             fitAction = menu.addAction('Fit')
             removeAction = menu.addAction('Remove')
             exportAction = menu.addAction('Export')
+            # log mode
+            logAction = menu.addMenu('Set Log Mode')
+            logXaction = logAction.addAction('X-axis')
+            logXaction.setCheckable(True)
+            if self.parent.artists[ident].logModeX:
+                logXaction.setChecked(True)
+            logYaction = logAction.addAction('Y-axis')
+            logYaction.setCheckable(True)
+            if self.parent.artists[ident].logModeY:
+                logYaction.setChecked(True)
             # color menu
             selectColorMenu = menu.addMenu("Select color")
             redAction = selectColorMenu.addAction("Red")
@@ -122,6 +132,20 @@ class TraceList(QListWidget):
                 for index in reversed(range(self.count())):
                     ident = str(self.item(index).text())
                     self.parent.remove_artist(ident)
+            elif action == logXaction:
+                if self.parent.artists[ident].logModeX:
+                    self.parent.artists[ident].artist.setLogMode(False, None)
+                    self.parent.artists[ident].logModeX = False
+                else:
+                    self.parent.artists[ident].artist.setLogMode(True, None)
+                    self.parent.artists[ident].logModeX = True
+            elif action == logYaction:
+                if self.parent.artists[ident].logModeY:
+                    self.parent.artists[ident].artist.setLogMode(None, False)
+                    self.parent.artists[ident].logModeY = False
+                else:
+                    self.parent.artists[ident].artist.setLogMode(None, True)
+                    self.parent.artists[ident].logModeY = True
             elif action == parametersAction:
                 # option to show parameters in separate window
                 dataset = self.parent.artists[ident].dataset
@@ -130,14 +154,14 @@ class TraceList(QListWidget):
                 pl.show()
             elif action == togglecolorsAction:
                 # option to change color of line
-                new_color = self.parent.colorChooser.next()
+                new_color = next(self.parent.colorChooser)
                 #self.parent.artists[ident].artist.setData(color=new_color, symbolBrush=new_color)
                 self.parent.artists[ident].artist.setPen(new_color)
                 if self.parent.show_points:
-                    self.parent.artists[ident].artist.setData(pen=new_color, symbolBrush=new_color)
+                    self.parent.artists[ident].artist.setData(pen=new_color, symbolBrush=new_color, symbol=None)
                     self.changeTraceListColor(ident, new_color)
                 else:
-                    self.parent.artists[ident].artist.setData(pen=new_color)
+                    self.parent.artists[ident].artist.setData(pen=new_color, symbol=None)
                     self.changeTraceListColor(ident, new_color)
             elif action == fitAction:
                 dataset = self.parent.artists[ident].dataset
@@ -149,10 +173,10 @@ class TraceList(QListWidget):
                 new_color = colorActionDict[action]
                 self.parent.artists[ident].artist.setPen(new_color)
                 if self.parent.show_points:
-                    self.parent.artists[ident].artist.setData(pen=new_color, symbolBrush=new_color)
+                    self.parent.artists[ident].artist.setData(pen=new_color, symbolBrush=new_color, symbol=None)
                     self.changeTraceListColor(ident, new_color)
                 else:
-                    self.parent.artists[ident].artist.setData(pen=new_color)
+                    self.parent.artists[ident].artist.setData(pen=new_color, symbol=None)
                     self.changeTraceListColor(ident, new_color)
             elif action == removeAction:
                 self.parent.remove_artist(ident)

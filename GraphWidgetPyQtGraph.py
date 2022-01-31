@@ -27,6 +27,9 @@ class artistParameters():
         # update counter in the Dataset object
         # only redraw if the dataset has a higher update count
         self.last_update = 0
+        # keep track of log mode
+        self.logModeX = False
+        self.logModeY = False
 
 
 class Graph_PyQtGraph(QtWidgets.QWidget):
