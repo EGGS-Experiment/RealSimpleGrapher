@@ -9,10 +9,11 @@ class DataVaultList(QtWidgets.QWidget):
     Creates a client connection to LabRAD to access the datavault and grapher servers.
     """
 
-    def __init__(self, tracename, cxn=None, parent=None, root=None):
+    def __init__(self, tracename, cxn=None, parent=None, root=None, cntx=None):
         super(DataVaultList, self).__init__()
         self.tracename = tracename
         self.cxn = cxn
+        self.cntx = cntx
         self.parent = parent
         self.root = root
         # self.setStyleSheet("background-color:gray")
@@ -20,15 +21,19 @@ class DataVaultList(QtWidgets.QWidget):
 
     @inlineCallbacks
     def connect(self):
+        # connect to labrad
         if not self.cxn:
             from labrad.wrappers import connectAsync
             self.cxn = yield connectAsync(name=socket.gethostname() + ' Data Vault Client')
-            try:
-                self.dv = yield self.cxn.data_vault
-                #self.grapher = yield self.cxn.real_simple_grapher
-            except Exception as e:
-                print('Data vault not connected.')
-            self.initializeGUI()
+        # get the data vault server
+        try:
+            self.dv = yield self.cxn.data_vault
+            #self.grapher = yield self.cxn.real_simple_grapher
+        except Exception as e:
+            print('Data vault not connected.')
+        self.initializeGUI()
+        # elif not self.cntx:
+        #     self.cntx = self.cxn.
 
     def initializeGUI(self):
         mainLayout = QtWidgets.QGridLayout()
