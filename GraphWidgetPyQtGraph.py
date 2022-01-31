@@ -14,6 +14,7 @@ from DataVaultListWidget import DataVaultList
 import sys
 import queue
 import itertools
+from time import time
 
 
 sys.settrace(None)
@@ -61,6 +62,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
         colors = ['r', 'g', 'y', 'c', 'm', 'w']
         self.colorChooser = itertools.cycle(colors)
+        self.autoRangeEnable = True
         self.initUI()
 
     @inlineCallbacks
@@ -154,8 +156,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                         y = ds.data[:, index + 1]
                         params.last_update = current_update
                         params.artist.setData(x, y)
-                        # todo: only autorange after we first load or click viewall, don't autorange if we're moving things around
-                        self.pw.autoRange()
                 except:
                     pass
 
@@ -238,7 +238,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     # SLOTS
     def rangeChanged(self):
-        print('yzde')
         lims = self.pw.viewRange()
         self.pointsToKeep = lims[0][1] - lims[0][0]
         self.current_limits = [lims[0][0], lims[0][1]]
@@ -249,10 +248,13 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         string = '(' + str(pnt.x()) + ' , ' + str(pnt.y()) + ')'
         self.coords.setText(string)
 
-    def mouseClicked(self, *args, **kwargs):
-        print(*args)
-        print(**kwargs)
-        print('mouse clicked')
+    def mouseClicked(self, mouseClickEvent):
+        if mouseClickEvent.button() == 1:
+            self.autoRangeEnable = not self.autoRangeEnable
+            if self.autoRangeEnable:
+                self.pw.enableAutoRange()
+            else:
+                self.pw.disableAutoRange()
 
     @inlineCallbacks
     def get_init_vline(self):
