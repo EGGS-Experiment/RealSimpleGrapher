@@ -121,16 +121,17 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         vb = self.pw.plotItem.vb
         self.img = pg.ImageItem()
         vb.addItem(self.img)
+        # connect signals to slots
         if self.vline_name:
             vb.addItem(self.inf)
             self.inf.sigPositionChangeFinished.connect(self.vline_changed)
-
         if self.hline_name:
             vb.addItem(self.inf)
             self.inf.sigPositionChangeFinished.connect(self.hline_changed)
-
         self.pw.scene().sigMouseMoved.connect(self.mouseMoved)
         self.pw.sigRangeChanged.connect(self.rangeChanged)
+        # sigrangechanged and sigmouseclicked and return graphics scene
+        self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
 
     def getItemColor(self, color):
         color_dict = {"r": QtGui.QColor(QtCore.Qt.red).lighter(130),
@@ -208,11 +209,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             except KeyError:
                 pass
 
-    def rangeChanged(self):
-        lims = self.pw.viewRange()
-        self.pointsToKeep = lims[0][1] - lims[0][0]
-        self.current_limits = [lims[0][0], lims[0][1]]
-
     @inlineCallbacks
     def add_dataset(self, dataset):
         try:
@@ -239,11 +235,24 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
     def set_ylimits(self, limits):
         self.pw.setYRange(limits[0],limits[1])
 
+
+    # SLOTS
+    def rangeChanged(self):
+        print('yzde')
+        lims = self.pw.viewRange()
+        self.pointsToKeep = lims[0][1] - lims[0][0]
+        self.current_limits = [lims[0][0], lims[0][1]]
+
     def mouseMoved(self, pos):
         #print("Image position:", self.img.mapFromScene(pos))
         pnt = self.img.mapFromScene(pos)
         string = '(' + str(pnt.x()) + ' , ' + str(pnt.y()) + ')'
         self.coords.setText(string)
+
+    def mouseClicked(self, *args, **kwargs):
+        print(*args)
+        print(**kwargs)
+        print('mouse clicked')
 
     @inlineCallbacks
     def get_init_vline(self):
