@@ -8,6 +8,7 @@ from twisted.internet.defer import returnValue, Deferred, inlineCallbacks
 
 import sys
 from random import randrange
+from socket import gethostname
 
 
 class RSG_client(object):
@@ -39,8 +40,8 @@ class RSG_client(object):
             import os
             LABRADHOST = os.environ['LABRADHOST']
             from labrad.wrappers import connectAsync
-            localname = self.name + ''
             # set self name to rsg client + node name + number (if multiple)
+            localname = gethostname() + ' ' + self.name
             self.cxn = yield connectAsync(LABRADHOST, name=localname)
 
         # try to get servers

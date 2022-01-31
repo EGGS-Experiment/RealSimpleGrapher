@@ -1,5 +1,5 @@
-import socket
 from PyQt5 import QtWidgets
+from socket import gethostname
 from twisted.internet.defer import inlineCallbacks
 
 
@@ -24,16 +24,15 @@ class DataVaultList(QtWidgets.QWidget):
         # connect to labrad
         if not self.cxn:
             from labrad.wrappers import connectAsync
-            self.cxn = yield connectAsync(name=socket.gethostname() + ' Data Vault Client')
+            self.cxn = yield connectAsync(name=gethostname() + ' Data Vault Client')
         # get the data vault server
         try:
             self.dv = yield self.cxn.data_vault
+            self._context = yield self.dv.context()
             #self.grapher = yield self.cxn.real_simple_grapher
         except Exception as e:
             print('Data vault not connected.')
         self.initializeGUI()
-        # elif not self.cntx:
-        #     self.cntx = self.cxn.
 
     def initializeGUI(self):
         mainLayout = QtWidgets.QGridLayout()
@@ -58,7 +57,7 @@ class DataVaultList(QtWidgets.QWidget):
         self.dataListWidget.clear()
         self.dataListWidget.addItem('...')
         # get new directory
-        ls = yield self.dv.dir()
+        ls = yield self.dv.dir(context=self._context)
         self.dataListWidget.addItems(sorted(ls[0]))
         if ls[1] is not None:
             self.dataListWidget.addItems(sorted(ls[1]))
@@ -68,7 +67,7 @@ class DataVaultList(QtWidgets.QWidget):
         item = self.dataListWidget.currentItem().text()
         # previous directory
         if item == '...':
-            yield self.dv.cd(1)
+            yield self.dv.cd(1, context=self._context)
             if len(self.directoryString) > 1:
                 self.directoryString.pop()
                 self.directoryLabel.setText('\\'.join(self.directoryString))
@@ -76,13 +75,13 @@ class DataVaultList(QtWidgets.QWidget):
         else:
             try:
                 # next directory
-                yield self.dv.cd(str(item))
+                yield self.dv.cd(str(item), context=self._context)
                 self.directoryString.append(str(item))
                 self.directoryLabel.setText('\\'.join(self.directoryString))
                 self.populate()
             except:
                 # plot if no directories left
-                path = yield self.dv.cd()
+                path = yield self.dv.cd(context=self._context)
                 if self.root is not None:
                     yield self.root.do_plot((path, str(item)), self.tracename, False)
                 else:
