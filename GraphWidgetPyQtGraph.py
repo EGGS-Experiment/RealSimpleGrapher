@@ -159,8 +159,8 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                         y = ds.data[:, index + 1]
                         params.last_update = current_update
                         params.artist.setData(x, y)
-                        if x > 2000:
-                            params.artist.setData(symbol=None)
+                        if x < 500:
+                            params.artist.setData(symbol='o')
                 except Exception as e:
                     pass
 
@@ -171,11 +171,11 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         '''
         new_color = next(self.colorChooser)
         if self.show_points and not no_points:
-            line = self.pw.plot([], [], symbolBrush=self.getItemColor(new_color),
+            line = self.pw.plot([], [], symbol=None, symbolBrush=self.getItemColor(new_color),
                                 name=ident, pen=self.getItemColor(new_color), connect=self.scatter_plot,
                                 setSkipFiniteCheck=True)
         else:
-            line = self.pw.plot([], [], pen=self.getItemColor(new_color), name=ident)
+            line = self.pw.plot([], [], symbol=None, pen=self.getItemColor(new_color), name=ident)
         if self.grid_on:
             self.pw.showGrid(x=True, y=True)
         self.artists[ident] = artistParameters(line, dataset, index, True)
