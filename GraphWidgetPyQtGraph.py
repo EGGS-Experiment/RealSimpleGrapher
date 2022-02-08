@@ -14,7 +14,6 @@ from DataVaultListWidget import DataVaultList
 import sys
 import queue
 import itertools
-from time import time
 
 
 sys.settrace(None)
@@ -110,13 +109,22 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         # frame/vbox is everything on RHS
         frame = QtWidgets.QFrame()
         vbox = QtWidgets.QVBoxLayout()
-        self.coords = QtWidgets.QLabel('')
         self.title = QtWidgets.QLabel(self.name)
         vbox.addWidget(self.title)
         vbox.addWidget(self.pw)
-        vbox.addWidget(self.coords)
         frame.setLayout(vbox)
         splitter.addWidget(frame)
+        # create bottom buttons
+        pwButtons = QtWidgets.QWidget()
+        pwButtons_layout = QtWidgets.QHBoxLayout()
+        pwButtons.setLayout(pwButtons_layout)
+        self.coords = QtWidgets.QLabel('')
+        self.autorangebutton = QtWidgets.QPushButton('Autorange')
+        self.autorangebutton.setCheckable(True)
+        self.autorangebutton.toggled.connect(lambda: self.toggleAutoRange(self.autorangebutton.isChecked()))
+        pwButtons_layout.addWidget(self.coords)
+        pwButtons_layout.addWidget(self.autorangebutton)
+        vbox.addWidget(pwButtons)
         # set layout
         self.setLayout(hbox)
         #self.legend = self.pw.addLegend()
@@ -136,7 +144,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.pw.scene().sigMouseMoved.connect(self.mouseMoved)
         self.pw.sigRangeChanged.connect(self.rangeChanged)
         # sigrangechanged and sigmouseclicked and return graphics scene
-        self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
+        #self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
 
     def getItemColor(self, color):
         color_dict = {"r": QtGui.QColor(QtCore.Qt.red).lighter(130),
@@ -253,13 +261,11 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         string = '(' + str(pnt.x()) + ' , ' + str(pnt.y()) + ')'
         self.coords.setText(string)
 
-    def mouseClicked(self, mouseClickEvent):
-        if mouseClickEvent.button() == 1:
-            self.autoRangeEnable = not self.autoRangeEnable
-            if self.autoRangeEnable:
-                self.pw.enableAutoRange()
-            else:
-                self.pw.disableAutoRange()
+    def toggleAutoRange(self, autorangeEnable):
+        if autorangeEnable:
+            self.pw.enableAutoRange()
+        else:
+            self.pw.disableAutoRange()
 
     @inlineCallbacks
     def get_init_vline(self):
