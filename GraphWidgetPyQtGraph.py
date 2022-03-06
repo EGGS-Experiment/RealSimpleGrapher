@@ -62,7 +62,12 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.live_update_loop = LoopingCall(self.update_figure)
         self.live_update_loop.start(0)
 
-        colors = ['r', 'g', 'y', 'c', 'm', 'w']
+        colors = [QtGui.QColor(QtCore.Qt.red).lighter(130),
+                      QtGui.QColor(QtCore.Qt.green),
+                      QtGui.QColor(QtCore.Qt.yellow),
+                      QtGui.QColor(QtCore.Qt.cyan),
+                      QtGui.QColor(QtCore.Qt.magenta).lighter(120),
+                      QtGui.QColor(QtCore.Qt.white)]
         self.colorChooser = itertools.cycle(colors)
         self.autoRangeEnable = True
         self.initUI()
@@ -76,6 +81,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.tracelist = TraceList(self, root=self.root)
         self.dv = DataVaultList(self.name, cxn=self.cxn, root=self.root)
         self.pw = pg.PlotWidget()
+        tracelistLabel = QtWidgets.QLabel('Dataset Traces:')
         # configure lines
         if self.vline_name:
             self.inf = pg.InfiniteLine(movable=True, angle=90,
@@ -100,6 +106,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         # layout widgets
         lsplitter = QtWidgets.QSplitter()
         lsplitter.setOrientation(QtCore.Qt.Vertical)
+        lsplitter.addWidget(tracelistLabel)
         lsplitter.addWidget(self.tracelist)
         lsplitter.addWidget(self.dv)
         splitter = QtWidgets.QSplitter()
@@ -146,15 +153,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         # sigrangechanged and sigmouseclicked and return graphics scene
         #self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
 
-    def getItemColor(self, color):
-        color_dict = {"r": QtGui.QColor(QtCore.Qt.red).lighter(130),
-                      "g": QtGui.QColor(QtCore.Qt.green),
-                      "y": QtGui.QColor(QtCore.Qt.yellow),
-                      "c": QtGui.QColor(QtCore.Qt.cyan),
-                      "m": QtGui.QColor(QtCore.Qt.magenta).lighter(120),
-                      "w": QtGui.QColor(QtCore.Qt.white)}
-        return color_dict[color]
-
     def update_figure(self):
         for ident, params in self.artists.items():
             if params.shown:
@@ -179,11 +177,11 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         '''
         new_color = next(self.colorChooser)
         if self.show_points and not no_points:
-            line = self.pw.plot([], [], symbol=None, symbolBrush=self.getItemColor(new_color),
-                                name=ident, pen=self.getItemColor(new_color), connect=self.scatter_plot,
+            line = self.pw.plot([], [], symbol=None, symbolBrush=new_color,
+                                name=ident, pen=new_color, connect=self.scatter_plot,
                                 setSkipFiniteCheck=True)
         else:
-            line = self.pw.plot([], [], symbol=None, pen=self.getItemColor(new_color), name=ident)
+            line = self.pw.plot([], [], symbol=None, pen=new_color, name=ident)
         if self.grid_on:
             self.pw.showGrid(x=True, y=True)
         self.artists[ident] = artistParameters(line, dataset, index, True)
