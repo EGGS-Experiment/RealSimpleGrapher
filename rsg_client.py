@@ -1,14 +1,9 @@
-# import GUI elements
 from Dataset import Dataset
 from GraphWindow import GraphWindow
+from PyQt5.QtGui import QIcon
+from twisted.internet.defer import inlineCallbacks
 
-# import server libraries
-from twisted.internet.threads import deferToThread
-from twisted.internet.defer import returnValue, Deferred, inlineCallbacks
-
-import sys
 from random import randrange
-from socket import gethostname
 
 
 class RSG_client(object):
@@ -35,6 +30,7 @@ class RSG_client(object):
         """
         Creates an asynchronous connection to labrad.
         """
+        from socket import gethostname
         # create labrad connection
         if not self.cxn:
             import os
@@ -56,8 +52,8 @@ class RSG_client(object):
 
         # connect to signals
             # rsg signal
-        #yield self.rsg.signal__plot_update(self.ID)
-        #yield self.rsg.addListener(listener=self., source=None, ID=self.ID)
+        # yield self.rsg.signal__plot_update(self.ID)
+        # yield self.rsg.addListener(listener=self., source=None, ID=self.ID)
             # server connections
         yield self.cxn.manager.subscribe_to_named_message('Server Connect', 9898989, True)
         yield self.cxn.manager.addListener(listener=self.on_connect, source=None, ID=9898989)
@@ -69,6 +65,7 @@ class RSG_client(object):
         # GUI creation needs to be here since the connection needs to be established
         self.gui = GraphWindow(self.reactor, cxn=self.cxn, root=self)
         self.gui.setWindowTitle('Real Simple Grapher - Client')
+        self.gui.setWindowIcon(QIcon('C:\\Users\\EGGS1\\Documents\\Code\\RealSimpleGrapher\\rsg_icon.JPG'))
 
 
     # SIGNALS
@@ -113,6 +110,7 @@ class RSG_client(object):
 
 
 if __name__ == '__main__':
+    import sys
     from PyQt5.QtWidgets import QApplication
     app = QApplication(sys.argv)
     import qt5reactor
