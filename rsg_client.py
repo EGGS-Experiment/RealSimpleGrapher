@@ -65,7 +65,7 @@ class RSG_client(object):
         # GUI creation needs to be here since the connection needs to be established
         self.gui = GraphWindow(self.reactor, cxn=self.cxn, root=self)
         self.gui.setWindowTitle('Real Simple Grapher - Client')
-        self.gui.setWindowIcon(QIcon('C:\\Users\\EGGS1\\Documents\\Code\\RealSimpleGrapher\\rsg_icon.JPG'))
+        self.gui.setWindowIcon(QIcon('rsg_icon.JPG'))
 
 
     # SIGNALS
