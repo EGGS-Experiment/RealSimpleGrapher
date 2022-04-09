@@ -1,4 +1,4 @@
-import numpy as np
+from numpy import pi, abos, cos
 from labrad import units as U, types as T
 
 
@@ -6,7 +6,8 @@ class lamb_dicke(object):
 
     @classmethod
     def lamb_dicke(self, trap_frequency, projection_angle, laser_wavelength=T.Value(729, 'nm'), amumass=40):
-        '''computes the lamb dicke parameter
+        '''
+        Computes the lamb-dicke parameter.
         @var theta: angle between the laser and the mode of motion. 90 degrees is perpendicular
         @var laser_wavelength: laser wavelength
         @var trap_frequency: trap frequency
@@ -15,8 +16,8 @@ class lamb_dicke(object):
         theta = projection_angle
         frequency = trap_frequency
         mass = amumass * U.amu
-        k = 2. * np.pi / laser_wavelength
-        eta = k * (U.hbar / (2 * mass * 2 * np.pi * frequency)) ** .5 * np.abs(np.cos(theta * 2. * np.pi / 360.0))
+        k = 2. * pi / laser_wavelength
+        eta = k * (U.hbar / (2 * mass * 2 * pi * frequency)) ** .5 * abs(cos(theta * 2. * pi / 360.0))
         eta = eta.inBaseUnits().value
         return eta
 

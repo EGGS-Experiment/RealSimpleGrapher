@@ -7,7 +7,7 @@ class rabi_coupling(object):
     @classmethod
     def compute_rabi_coupling(cls, eta, sideband_order, nmax):
         '''
-        Rabi couplings, see Leibfried (2003), eq:70
+        Rabi couplings, see Leibfried (2003), eq:70.
         '''
 
         if sideband_order == 0:
