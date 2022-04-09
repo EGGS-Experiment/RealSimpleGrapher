@@ -2,19 +2,15 @@
 The main GUI which holds everything and puts everything together.
 """
 import GUIConfig
-from PyQt5.QtWidgets import QWidget, QTabWidget
-
-from pyqtgraph_widgets import ImageWidget as ImageGraph
-from pyqtgraph_widgets import Hist_PyQtGraph as Hist
-from pyqtgraph_widgets import Graph_PyQtGraph as Graph
-from pyqtgraph_widgets import ScrollingGraph_PyQtGraph as ScrollingGraph
+from pyqtgraph_widgets import *
+from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout
 
 
 class GridGraphWindow(QWidget):
-    '''
+    """
     Window containing a grid of graphs.
     Holds an individual RSG tab page.
-    '''
+    """
 
     def __init__(self, g_list, row_list, column_list, reactor, parent=None):
         super(GridGraphWindow, self).__init__(parent)
@@ -67,19 +63,19 @@ class GraphWindow(QTabWidget):
                 name = config.name
                 # max_ds = config.max_datasets
                 if config.isScrolling:
-                    graph_tmp = ScrollingGraph(config, reactor, cxn=self.cxn, root=self.root)
+                    graph_tmp = ScrollingGraph_PyQtGraph(config, reactor, cxn=self.cxn, root=self.root)
                 elif config.isImages:
-                    graph_tmp = ImageGraph(config, reactor)
+                    graph_tmp = ImageWidget(config, reactor)
                     self.graphDict[name] = graph_tmp
                     gli.append(graph_tmp)
                     continue
                 elif config.isHist:
-                    graph_tmp = Hist(config, reactor, cxn=self.cxn, root=self.root)
+                    graph_tmp = Hist_PyQtGraph(config, reactor, cxn=self.cxn, root=self.root)
                     self.graphDict[name] = graph_tmp
                     gli.append(graph_tmp)
                     continue
                 else:
-                    graph_tmp = Graph(config, reactor, cxn=self.cxn, root=self.root)
+                    graph_tmp = Graph_PyQtGraph(config, reactor, cxn=self.cxn, root=self.root)
                 graph_tmp.set_ylimits(config.ylim)
                 self.graphDict[name] = graph_tmp
                 gli.append(graph_tmp)
@@ -89,7 +85,7 @@ class GraphWindow(QTabWidget):
             self.setMovable(True)
 
     def insert_tab(self, tab):
-        graph_tmp = Graph(tab, reactor, cxn=self.cxn, root=self.root)
+        graph_tmp = Graph_PyQtGraph(tab, reactor, cxn=self.cxn, root=self.root)
         self.graphDict[tab] = graph_tmp
         self.addTab(graph_tmp, tab)
         
@@ -98,5 +94,6 @@ class GraphWindow(QTabWidget):
 
 
 if __name__ == '__main__':
-    #from EGGS_labrad.clients import runGUI
-    runGUI(GraphWindow)
+    pass
+    from EGGS_labrad.clients import runGUI
+    #runGUI(GraphWindow)

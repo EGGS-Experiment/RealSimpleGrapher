@@ -89,6 +89,6 @@ class ImageWidget(QWidget):
 
 
 if __name__ == '__main__':
-    ##from EGGS_labrad.clients import runGUI
-    #runGUI(ImageWidget, 'Example')
-    main = ImageWidget('Example', reactor)
+    from EGGS_labrad.clients import runGUI
+    runGUI(ImageWidget, 'Example')
+    #main = ImageWidget('Example', reactor)

@@ -1,9 +1,16 @@
-from PyQt5.QtGui import QIcon
-from GraphWindow import GraphWindow
-from twisted.internet.defer import inlineCallbacks
-from DataVaultListWidget import Dataset
+# install qt5reactor
+from PyQt5.QtWidgets import QApplication
+import sys
+app = QApplication(sys.argv)
+import qt5reactor
+qt5reactor.install()
 
 from random import randrange
+from PyQt5.QtGui import QIcon
+from GraphWindow import GraphWindow
+from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks
+from DataVaultListWidget import Dataset
 
 
 class RSG_client(object):
@@ -110,12 +117,7 @@ class RSG_client(object):
 
 
 if __name__ == '__main__':
-    import sys
-    from PyQt5.QtWidgets import QApplication
-    app = QApplication(sys.argv)
-    import qt5reactor
-    qt5reactor.install()
-    from twisted.internet import reactor
-    client = RSG_client(reactor)
-    #sys.exit(app.exec_())
-    reactor.run()
+    rsg_client = RSG_client(reactor)
+    reactor.callWhenRunning(app.exec)
+    #reactor.addSystemEventTrigger('after', 'shutdown', rsg_client.close)
+    reactor.runReturn()
