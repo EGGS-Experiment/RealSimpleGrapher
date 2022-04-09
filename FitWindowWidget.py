@@ -2,15 +2,17 @@ from PyQt5 import QtCore, QtWidgets
 from analysis.fitting import FitWrapper
 
 
-class RowInfo():
+class RowInfo(object):
     '''
     Container for the widgets with
     each row in the parameters table
     '''
+
     def __init__(self, vary, manual_value, fitted_value):
         self.vary_select = vary
         self.manual_value = manual_value
         self.fitted_value = fitted_value
+
 
 class FitWindow(QtWidgets.QWidget):
 
@@ -65,7 +67,7 @@ class FitWindow(QtWidgets.QWidget):
 
         params = self.fw.getParameters()
         self.parameterTable.setRowCount(len(params))
-        for i,p in enumerate(params):
+        for i, p in enumerate(params):
 
             vary_select = QtWidgets.QTableWidgetItem()
             label = QtWidgets.QLabel(p)
@@ -74,7 +76,7 @@ class FitWindow(QtWidgets.QWidget):
 
             self.row_info_dict[p] = RowInfo(vary_select, manual_value, fitted_value)
 
-            vary_select.setFlags(QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
+            vary_select.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
             if self.fw.getVary(p):
                 vary_select.setCheckState(QtCore.Qt.Checked)
             else:
@@ -86,8 +88,8 @@ class FitWindow(QtWidgets.QWidget):
             manual_value.setValue(manualValue)
 
             fittedValue = self.fw.getFittedValue(p)
-            #fitted_value.setDecimals(6)
-            #fitted_value.setRange(-1000000000, 1000000000)
+            # fitted_value.setDecimals(6)
+            # fitted_value.setRange(-1000000000, 1000000000)
             fitted_value.setText(str(fittedValue))
             self.parameterTable.setItem(i, 0, vary_select)
             self.parameterTable.setCellWidget(i, 1, label)
@@ -115,9 +117,8 @@ class FitWindow(QtWidgets.QWidget):
         for p in params:
             row = self.row_info_dict[p]
             fitted_value = self.fw.getFittedValue(p)
-            row.fitted_value.setText( str(fitted_value) )
-            row.manual_value.setValue( fitted_value )
-
+            row.fitted_value.setText(str(fitted_value))
+            row.manual_value.setValue(fitted_value)
 
     def plotFit(self):
         '''
@@ -130,14 +131,15 @@ class FitWindow(QtWidgets.QWidget):
             def __init__(self, data):
                 self.data = data
                 self.updateCounter = 1
+
         data = self.fw.evaluateFittedParameters()
         ds = dataset(data)
         try:
             # remove the previous fit
             self.parent.parent.remove_artist(self.ident)
-            self.parent.parent.add_artist(self.ident, ds, 0, no_points = True)
+            self.parent.parent.add_artist(self.ident, ds, 0, no_points=True)
         except:
-            self.parent.parent.add_artist(self.ident, ds, 0, no_points = True)
+            self.parent.parent.add_artist(self.ident, ds, 0, no_points=True)
 
     def onActivated(self):
         '''
@@ -179,10 +181,9 @@ class FitWindow(QtWidgets.QWidget):
         try:
             # remove the previous plot
             self.parent.parent.remove_artist(self.ident)
-            self.parent.parent.add_artist(self.ident, ds, 0, no_points = True)
+            self.parent.parent.add_artist(self.ident, ds, 0, no_points=True)
         except:
-            self.parent.parent.add_artist(self.ident, ds, 0, no_points = True)
-
+            self.parent.parent.add_artist(self.ident, ds, 0, no_points=True)
 
     def closeEvent(self, event):
         self.parent.parent.remove_artist(self.ident)

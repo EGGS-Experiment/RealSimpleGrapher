@@ -1,9 +1,9 @@
 '''
-The main GUI which holds everything.
+The main GUI which holds everything and puts everything together.
 '''
+
 import sys
 import GUIConfig
-
 from PyQt5.QtWidgets import QTabWidget, QApplication
 
 from GridGraphWindow import GridGraphWindow
