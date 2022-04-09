@@ -1,9 +1,8 @@
-'''
+"""
 The main GUI which holds everything and puts everything together.
-'''
-import sys
+"""
 import GUIConfig
-from PyQt5.QtWidgets import QTabWidget, QApplication
+from PyQt5.QtWidgets import QWidget, QTabWidget
 
 from pyqtgraph_widgets import ImageWidget as ImageGraph
 from pyqtgraph_widgets import Hist_PyQtGraph as Hist

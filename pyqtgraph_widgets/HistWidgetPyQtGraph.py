@@ -1,11 +1,10 @@
-import sys
 from itertools import cycle
 from queue import Queue, Full as QueueFull
 
 import pyqtgraph as pg
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QWidget, QLabel, QFrame, QSplitter, QVBoxLayout, QHBoxLayout, QApplication
+from PyQt5.QtWidgets import QWidget, QLabel, QFrame, QSplitter, QVBoxLayout, QHBoxLayout
 
 from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
@@ -36,7 +35,7 @@ class Hist_PyQtGraph(QWidget):
         self.vline_name = config.vline
         self.vline_param = config.vline_param
 
-        self.dataset_queue = queue.Queue(config.max_datasets)
+        self.dataset_queue = Queue(config.max_datasets)
 
         self.live_update_loop = LoopingCall(self.update_figure)
         self.live_update_loop.start(0)
@@ -173,7 +172,7 @@ class Hist_PyQtGraph(QWidget):
     def add_dataset(self, dataset):
         try:
             self.dataset_queue.put(dataset, block=False)
-        except queue.Full:
+        except QueueFull:
             remove_ds = self.dataset_queue.get()
             self.remove_dataset(remove_ds)
             self.dataset_queue.put(dataset, block=False)

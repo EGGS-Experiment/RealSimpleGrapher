@@ -1,6 +1,6 @@
-'''
+"""
 Configuration settings for the RSG.
-'''
+"""
 import pyqtgraph as pg
 from importlib.util import find_spec
 
@@ -19,7 +19,6 @@ if find_spec('OpenGL'):
 """
 Configuration classes for the different graph widget types.
 """
-
 
 class traceListConfig():
     """

@@ -3,7 +3,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QMenu, QFileDialog
 
-from . import *
+from .FitWindowWidget import FitWindow
+from .ParameterListWidget import ParameterList
+from .PredictSpectrumWidget import PredictSpectrum
+
 from RealSimpleGrapher.GUIConfig import traceListConfig
 
 from os import getenv

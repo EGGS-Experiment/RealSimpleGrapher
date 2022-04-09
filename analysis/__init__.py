@@ -1,3 +1,3 @@
 __all__ = ["FitWrapper"]
 
-from fitting import FitWrapper
+from .fitting import FitWrapper

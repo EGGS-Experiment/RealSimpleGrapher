@@ -1,7 +1,5 @@
-import sys
 import pyqtgraph as pg
-from TraceListWidget import TraceList
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QApplication
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 
 
 class ImageWidget(QWidget):

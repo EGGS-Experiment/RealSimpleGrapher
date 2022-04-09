@@ -1,9 +1,9 @@
 # test plotting window in pyqtgraph
 from pyqtgraph import PlotWidget
 
-from np import linspace
+from numpy import linspace
 from random import random
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QApplication
+from PyQt5.QtWidgets import QWidget, QVBoxLayout
 
 
 class Graph(QWidget):
@@ -31,8 +31,5 @@ class Graph(QWidget):
 
 
 if __name__ == '__main__':
-    import sys
-    app = QApplication(sys.argv)
-    main = Graph()
-    main.show()
-    sys.exit(app.exec_())
+    from EGGS_labrad.clients import runGUI
+    runGUI(Graph)

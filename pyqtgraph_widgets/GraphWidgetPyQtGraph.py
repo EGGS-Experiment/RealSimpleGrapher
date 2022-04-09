@@ -1,9 +1,10 @@
 """
 A normal graph widget. The "base unit" of the RSG.
 """
-# imports
 import pyqtgraph as pg
-from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
 
 from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
@@ -11,11 +12,11 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 from TraceListWidget import TraceList
 from DataVaultListWidget.DataVaultListWidget import DataVaultList
 
-import sys
-import queue
-import itertools
+from sys import settrace
+from itertools import cycle
+from queue import Queue, Full as QueueFull
 
-sys.settrace(None)
+settrace(None)
 
 
 class artistParameters():
@@ -58,18 +59,18 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.grid_on = config.grid_on
         self.scatter_plot = config.scatter_plot
 
-        self.dataset_queue = queue.Queue(config.max_datasets)
+        self.dataset_queue = Queue(config.max_datasets)
 
         self.live_update_loop = LoopingCall(self.update_figure)
         self.live_update_loop.start(0)
 
-        colors = [QtGui.QColor(QtCore.Qt.red).lighter(130),
-                  QtGui.QColor(QtCore.Qt.green),
-                  QtGui.QColor(QtCore.Qt.yellow),
-                  QtGui.QColor(QtCore.Qt.cyan),
-                  QtGui.QColor(QtCore.Qt.magenta).lighter(120),
-                  QtGui.QColor(QtCore.Qt.white)]
-        self.colorChooser = itertools.cycle(colors)
+        colors = [QColor(Qt.red).lighter(130),
+                  QColor(Qt.green),
+                  QColor(Qt.yellow),
+                  QColor(Qt.cyan),
+                  QColor(Qt.magenta).lighter(120),
+                  QColor(Qt.white)]
+        self.colorChooser = cycle(colors)
         self.autoRangeEnable = True
         self.initUI()
 
@@ -106,7 +107,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             self.inf.setPen(width=5.0)
         # layout widgets
         lsplitter = QtWidgets.QSplitter()
-        lsplitter.setOrientation(QtCore.Qt.Vertical)
+        lsplitter.setOrientation(Qt.Vertical)
         lsplitter.addWidget(tracelistLabel)
         lsplitter.addWidget(self.tracelist)
         lsplitter.addWidget(self.dv)
@@ -225,7 +226,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
     def add_dataset(self, dataset):
         try:
             self.dataset_queue.put(dataset, block=False)
-        except queue.Full:
+        except QueueFull:
             remove_ds = self.dataset_queue.get()
             self.remove_dataset(remove_ds)
             self.dataset_queue.put(dataset, block=False)

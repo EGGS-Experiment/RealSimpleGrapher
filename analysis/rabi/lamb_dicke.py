@@ -1,4 +1,4 @@
-from numpy import pi, abos, cos
+from numpy import pi, abs, cos
 from labrad import units as U, types as T
 
 
