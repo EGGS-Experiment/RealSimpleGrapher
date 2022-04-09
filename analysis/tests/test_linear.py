@@ -1,5 +1,6 @@
-# test for linear fits
-
+"""
+Test for Linear fits.
+"""
 from .model_test import ModelTest
 from analysis.fit_models.fit_linear import Linear
 

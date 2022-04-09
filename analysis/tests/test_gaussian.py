@@ -1,5 +1,6 @@
-# test for Gaussian fits
-
+"""
+Test for Gaussian fits.
+"""
 from .model_test import ModelTest
 from analysis.fit_models.fit_gaussian import Gaussian
 

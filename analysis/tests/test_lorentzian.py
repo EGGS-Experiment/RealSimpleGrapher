@@ -1,4 +1,6 @@
-# test script for Lorentzian fits
+"""
+Test for Lorentzian fits.
+"""
 from .model_test import ModelTest
 from analysis.fit_models.fit_lorentzian import Lorentzian
 

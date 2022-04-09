@@ -85,5 +85,5 @@ class Model(object):
             if self.parameters[param].index == index:
                 return self.parameters[param]
 
-        # parmeter not found
+        # parameter not found
         raise Exception('Parameter not found')

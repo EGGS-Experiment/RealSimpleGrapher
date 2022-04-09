@@ -1,8 +1,10 @@
-# Fitter class for Lorentzians
-
+"""
+Fitter class for Bessel functions.
+"""
+from scipy.special import jv
+from numpy import argmax, min
 from analysis.model import Model, ParameterInfo
-import numpy as np
-import scipy.special as sp
+
 
 class Bessel(Model):
 
@@ -14,7 +16,7 @@ class Bessel(Model):
             'offset': ParameterInfo('offset', 3, self.guess_offset),
             'modDepth': ParameterInfo('modDepth', 4, self.guess_modDepth),
             'driveRF': ParameterInfo('driveRF', 5, self.guess_driveRF)
-            }
+        }
 
     def model(self, x, p):
         '''
@@ -22,36 +24,36 @@ class Bessel(Model):
         Using definition from Pruttivarasin thesis. 
         p = [center, scale, gamma, offset, modulation depth]
         '''
-        p[2] = abs(p[2]) # fwhm is positive
-        return p[3] +  p[1]*p[2]*0.5*((sp.jv(-6,p[4])**2/((x - p[0] - 6*p[5])**2 + (0.5*p[2])**2)) + 
-               (sp.jv(-5,p[4])**2/((x - p[0] - 5*p[5])**2 + (0.5*p[2])**2)) +
-               (sp.jv(-4,p[4])**2/((x - p[0] - 4*p[5])**2 + (0.5*p[2])**2)) +
-               (sp.jv(-3,p[4])**2/((x - p[0] -3*p[5])**2 + (0.5*p[2])**2)) +
-               (sp.jv(-2,p[4])**2/((x - p[0] -2*p[5])**2 + (0.5*p[2])**2)) +
-               (sp.jv(-1,p[4])**2/((x - p[0] - p[5])**2 + (0.5*p[2])**2)) +
-               (sp.jv(0,p[4])**2/((x - p[0])**2 + (0.5*p[2])**2)) +
-               (sp.jv(1,p[4])**2/((x - p[0] + p[5])**2 + (0.5*p[2])**2)) +
-               (sp.jv(2,p[4])**2/((x - p[0] + 2*p[5])**2 + (0.5*p[2])**2)) +
-               (sp.jv(3,p[4])**2/((x - p[0] + 3*p[5])**2 + (0.5*p[2])**2)) +
-               (sp.jv(4,p[4])**2/((x - p[0] + 4*p[5])**2 + (0.5*p[2])**2)) + 
-               (sp.jv(5,p[4])**2/((x - p[0] + 5*p[5])**2 + (0.5*p[2])**2)) + 
-               (sp.jv(6,p[4])**2/((x - p[0] + 6*p[5])**2 + (0.5*p[2])**2)))
+        p[2] = abs(p[2])  # fwhm is positive
+        return p[3] + p[1] * p[2] * 0.5 * ((jv(-6, p[4]) ** 2 / ((x - p[0] - 6 * p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(-5, p[4]) ** 2 / ((x - p[0] - 5 * p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(-4, p[4]) ** 2 / ((x - p[0] - 4 * p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(-3, p[4]) ** 2 / ((x - p[0] - 3 * p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(-2, p[4]) ** 2 / ((x - p[0] - 2 * p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(-1, p[4]) ** 2 / ((x - p[0] - p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(0, p[4]) ** 2 / ((x - p[0]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(1, p[4]) ** 2 / ((x - p[0] + p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(2, p[4]) ** 2 / ((x - p[0] + 2 * p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(3, p[4]) ** 2 / ((x - p[0] + 3 * p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(4, p[4]) ** 2 / ((x - p[0] + 4 * p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(5, p[4]) ** 2 / ((x - p[0] + 5 * p[5]) ** 2 + (0.5 * p[2]) ** 2)) +
+                                           (jv(6, p[4]) ** 2 / ((x - p[0] + 6 * p[5]) ** 2 + (0.5 * p[2]) ** 2)))
 
     def guess_center(self, x, y):
-        max_index = np.argmax(y)
+        max_index = argmax(y)
         return x[max_index]
 
     def guess_scale(self, x, y):
         return 1500.0
-    
+
     def guess_fwhm(self, x, y):
-        return (max(x) - min(x))/6.0
-    
+        return (max(x) - min(x)) / 6.0
+
     def guess_offset(self, x, y):
-        return np.min(y)
+        return min(y)
 
     def guess_modDepth(self, x, y):
         return 0.2
 
-    def guess_driveRF(self, x ,y):
+    def guess_driveRF(self, x, y):
         return 48.537

@@ -1,5 +1,6 @@
-# Fitter class for Rabi flops
-
+"""
+Fitter class for Rabi flops
+"""
 from analysis.model import Model, ParameterInfo
 from analysis.rabi import motional_distribution as md
 from analysis.rabi import rabi_coupling as rc
@@ -7,6 +8,7 @@ import scipy.constants as scc
 
 import math
 import numpy as np
+
 
 class RotRamsey(Model):
 

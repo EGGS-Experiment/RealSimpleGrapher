@@ -1,7 +1,6 @@
 """
 Fitter class for Rabi flops.
 """
-
 import numpy as np
 from analysis.model import Model, ParameterInfo
 from analysis.rabi import rabi_coupling as rc
