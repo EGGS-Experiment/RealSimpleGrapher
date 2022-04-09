@@ -5,6 +5,8 @@ app = QApplication(sys.argv)
 import qt5reactor
 qt5reactor.install()
 
+# other imports
+from os import _exit
 from random import randrange
 from PyQt5.QtGui import QIcon
 from GraphWindow import GraphWindow
@@ -115,9 +117,12 @@ class RSG_client(object):
         self.gui.graphDict[graph].set_xlimits([minim[minim.units], maxim[maxim.units]])
         self.do_plot(dataset_location, graph, send_to_current)
 
+    def close(self):
+        _exit(0)
+
 
 if __name__ == '__main__':
     rsg_client = RSG_client(reactor)
     reactor.callWhenRunning(app.exec)
-    #reactor.addSystemEventTrigger('after', 'shutdown', rsg_client.close)
+    reactor.addSystemEventTrigger('after', 'shutdown', rsg_client.close)
     reactor.runReturn()

@@ -88,9 +88,6 @@ class GraphWindow(QTabWidget):
         graph_tmp = Graph_PyQtGraph(tab, reactor, cxn=self.cxn, root=self.root)
         self.graphDict[tab] = graph_tmp
         self.addTab(graph_tmp, tab)
-        
-    def closeEvent(self, x):
-        self.reactor.stop()
 
 
 if __name__ == '__main__':
