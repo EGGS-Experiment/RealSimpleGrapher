@@ -294,6 +294,15 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         val = self.U(val, units)
         yield self.pv.set_parameter(self.hline_param[0], self.hline_param[1], val)
 
+    def getItemColor(self, color):
+        color_dict = {"r": QColor(Qt.red).lighter(130),
+                      "g": QColor(Qt.green),
+                      "y": QColor(Qt.yellow),
+                      "c": QColor(Qt.cyan),
+                      "m": QColor(Qt.magenta).lighter(120),
+                      "w": QColor(Qt.white)}
+        return color_dict[color]
+
 
 if __name__ == '__main__':
     from EGGS_labrad.clients import runGUI

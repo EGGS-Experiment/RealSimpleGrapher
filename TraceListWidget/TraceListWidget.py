@@ -63,7 +63,13 @@ class TraceList(QListWidget):
 
     def changeTraceListColor(self, ident, new_color):
         item = self.trace_dict[ident]
-        item.setForeground(self.parent.getItemColor(new_color))
+        color_dict = {"r": QColor(Qt.red).lighter(130),
+                      "g": QColor(Qt.green),
+                      "y": QColor(Qt.yellow),
+                      "c": QColor(Qt.cyan),
+                      "m": QColor(Qt.magenta).lighter(120),
+                      "w": QColor(Qt.white)}
+        item.setForeground(color_dict[new_color])
 
     def popupMenu(self, pos):
         menu = QMenu()
@@ -118,7 +124,7 @@ class TraceList(QListWidget):
             if self.parent.artists[ident].logModeY:
                 logYaction.setChecked(True)
             # color menu
-            selectColorMenu = menu.addMenu("Select color")
+            selectColorMenu = menu.addMenu("Select Color")
             colorActions = map(selectColorMenu.addAction, ["Red", "Green", "Yellow", "Cyan", "Magenta", "White"])
             colorCodes = ["r", "g", "y", "c", "m", "w"]
             colorActionDict = dict(zip(colorActions, colorCodes))

@@ -91,13 +91,12 @@ class Hist_PyQtGraph(QWidget):
         self.pw.sigRangeChanged.connect(self.rangeChanged)
 
     def getItemColor(self, color):
-
-        color_dict = {(255, 0, 0, 80): QColor(Qt.red).lighter(130),
-                      (0, 255, 0, 80): QColor(Qt.green),
-                      (255, 255, 0, 80): QColor(Qt.yellow),
-                      (0, 255, 255, 80): QColor(Qt.cyan),
-                      (255, 0, 255, 80): QColor(Qt.magenta).lighter(120),
-                      (255, 255, 255, 80): QColor(Qt.white)}
+        color_dict = {"r": QColor(Qt.red).lighter(130),
+                      "g": QColor(Qt.green),
+                      "y": QColor(Qt.yellow),
+                      "c": QColor(Qt.cyan),
+                      "m": QColor(Qt.magenta).lighter(120),
+                      "w": QColor(Qt.white)}
         return color_dict[color]
 
     def update_figure(self):
