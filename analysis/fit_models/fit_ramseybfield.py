@@ -1,4 +1,4 @@
-from .model import Model, ParameterInfo
+from analysis.model import Model, ParameterInfo
 import numpy as np
 
 class RamseyBfield(Model):

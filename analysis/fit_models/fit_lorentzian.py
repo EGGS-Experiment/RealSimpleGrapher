@@ -1,6 +1,6 @@
 # Fitter class for Lorentzians
 
-from .model import Model, ParameterInfo
+from analysis.model import Model, ParameterInfo
 import numpy as np
 
 class Lorentzian(Model):

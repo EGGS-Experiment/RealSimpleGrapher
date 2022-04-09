@@ -1,13 +1,17 @@
-# Fitting wrapper class
+"""
+Fitting wrapper class.
+"""
 
-class ParameterInfo():
+
+class ParameterInfo(object):
     def __init__(self, parameter, index, guess_func, vary=True):
         self.parameter = parameter
         self.vary = vary
         self.guess_func = guess_func
         self.index = index
 
-class Model():
+
+class Model(object):
 
     def __init__(self):
         pass
@@ -38,7 +42,7 @@ class Model():
 
         n = len(self.parameters.keys())
         full_params = [None for k in range(n)]
-        
+
         for key in self.parameters.keys():
             if not self.parameters[key].vary:
                 index = self.parameters[key].index
@@ -52,7 +56,7 @@ class Model():
 
     def varied_positions(self):
         '''
-        Indices of the parameters to vary in the fit
+        Indices of the parameters to vary in the fit.
         '''
         varied = []
         for param in self.parameters.keys():
@@ -63,7 +67,7 @@ class Model():
 
     def fixed_positions(self):
         '''
-        Indicies of the parameters to hold fixed in the fit
+        Indices of the parameters to hold fixed in the fit.
         '''
         fixed = []
         for param in self.parameters.keys():
@@ -74,7 +78,7 @@ class Model():
 
     def param_from_index(self, index):
         '''
-        Return a parameter from the index
+        Return a parameter from the index.
         '''
 
         for param in self.parameters.keys():

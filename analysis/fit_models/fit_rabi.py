@@ -1,10 +1,12 @@
-# Fitter class for Rabi flops
-
-from .model import Model, ParameterInfo
-from .rabi.motional_distribution import motional_distribution as md
-from .rabi.rabi_coupling import rabi_coupling as rc
+"""
+Fitter class for Rabi flops.
+"""
 
 import numpy as np
+from analysis.model import Model, ParameterInfo
+from analysis.rabi import rabi_coupling as rc
+from analysis.rabi import motional_distribution as md
+
 
 class Rabi(Model):
 

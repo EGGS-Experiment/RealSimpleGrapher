@@ -1,24 +1,24 @@
 # Fitter class for Rabi flops
 
-from .model import Model, ParameterInfo
-from .rabi.motional_distribution import motional_distribution as md
-from .rabi.rabi_coupling import rabi_coupling as rc
+from analysis.model import Model, ParameterInfo
+from analysis.rabi import motional_distribution as md
+from analysis.rabi import rabi_coupling as rc
 import scipy.constants as scc
 
 import math
 import numpy as np
 
-class RotRabi(Model):
+class RotRamsey(Model):
 
     def __init__(self):
         self.parameters = {
-            'omega_rabi': ParameterInfo('f_rabi', 0, self.guess_omega_rabi),
-            'stdev_l': ParameterInfo('stdev_l', 1, lambda x, y: 50.0, True),
+            'omega_rabi': ParameterInfo('f_rabi', 0, lambda x, y: 0.01, vary=True),
+            'stdev_l': ParameterInfo('stdev_l', 1, lambda x, y: 50.0, vary=True),
             'sideband_order': ParameterInfo('sideband_order', 2, lambda x, y: 4, vary = False),
-            'f_trap': ParameterInfo('f_trap', 3, lambda x,y: 0.845, vary = False),
-            'f_rot': ParameterInfo('f_rot', 4, lambda x,y: 0.1, vary = False),
-            'delta': ParameterInfo('delta', 5, lambda x,y: 0, vary=False),
-            'scale': ParameterInfo('scale,', 6, lambda x,y: 1.0, vary=False)
+            'f_trap': ParameterInfo('f_trap', 3, lambda x, y: 0.845, vary=False),
+            'f_rot': ParameterInfo('f_rot', 4, lambda x, y: 0.1, vary=False),
+            'delta': ParameterInfo('delta', 5, lambda x, y: 0, vary=False),
+            'scale': ParameterInfo('scale,', 6, lambda x, y: 1.0, vary=False)
             }
 
     def model(self, x, p):
@@ -35,11 +35,11 @@ class RotRabi(Model):
         r = (scc.e**2/(40*scc.atomic_mass*4*math.pi**2*(f_trap**2-f_rot**2)*1e12*16*math.pi*scc.epsilon_0))**(1./3)
         self.omega_r = scc.hbar/(4*40*scc.atomic_mass*r**2)
 
-        result = self.rot_rabi_flop(1e-6*x,sideband_order,stdev_l,omega_rabi,delta,scale)
+        result = self.rot_ramsey(1e-6*x,sideband_order,stdev_l,omega_rabi,delta,scale)
 
         return result
 
-    def rot_rabi_flop(self, times, order, sigma_l, Omega_MHz, delta_kHz=0.0, scale=1.0):
+    def rot_ramsey(self, times, order, sigma_l, Omega_MHz, delta_kHz=0.0, scale=1.0):
         if sigma_l > 3000:
             sigma_l = 3000.0
 
@@ -50,9 +50,14 @@ class RotRabi(Model):
         # Get distribution of l's, their respective detunings, and calculate the excitation vs. time
         (l_vals, c_ls) = self.calc_ls_cls(sigma_l)
         delta_ls = 2*self.omega_r*order*l_vals - delta  # Array of detunings, one for each l
-        exc = scale * np.sum(np.outer(c_ls**2 * Omega**2/(Omega**2+delta_ls**2), np.ones(len(times))) \
-                * np.sin(np.outer(np.sqrt(Omega**2+delta_ls**2)/2, times))**2, axis=0)
-        
+        Omega_gens = np.sqrt(Omega**2 + delta_ls**2) #generalized Rabi frequencies
+        u1s = np.pi*Omega_gens/(4*Omega)
+        u2s = 1/2.0*np.outer(delta_ls, times)
+        exc = scale * np.sum(np.outer(np.abs(c_ls)**2, np.ones(len(times)))
+                           *(np.outer(2*Omega/Omega_gens**2*np.sin(u1s), np.ones(len(times)))
+                           *(np.outer(Omega_gens*np.cos(u1s), np.ones(len(times))) * np.cos(u2s)
+                            -np.outer(delta_ls*np.sin(u1s), np.ones(len(times))) * np.sin(u2s)    ))**2, axis=0)
+
         return exc
 
     def calc_ls_cls(self, sigma_l):
