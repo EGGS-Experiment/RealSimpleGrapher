@@ -295,13 +295,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
 
 if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    import qt5reactor
-
-    qt5reactor.install()
-    from twisted.internet import reactor
-
+    from EGGS_labrad.clients import runGUI
+    runGUI(Graph_PyQtGraph, 'example')
     main = Graph_PyQtGraph('example', reactor)
-    main.show()
-    reactor.run()
-    # sys.exit(app.exec_())

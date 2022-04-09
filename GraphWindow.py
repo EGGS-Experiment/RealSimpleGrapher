@@ -99,11 +99,5 @@ class GraphWindow(QTabWidget):
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    import qt5reactor
-    qt5reactor.install()
-    from twisted.internet import reactor
-    main = GraphWindow(reactor)
-    main.show()
-    #sys.exit(app.exec_())
-    reactor.run()
+    from EGGS_labrad.clients import runGUI
+    runGUI(GraphWindow)

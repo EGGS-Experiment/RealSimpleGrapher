@@ -215,10 +215,6 @@ class Hist_PyQtGraph(QWidget):
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    import qt5reactor
-    qt5reactor.install()
-    from twisted.internet import reactor
+    from EGGS_labrad.clients import runGUI
+    runGUI(Hist_PyQtGraph, 'example')
     main = Hist_PyQtGraph('example', reactor)
-    main.show()
-    reactor.run()

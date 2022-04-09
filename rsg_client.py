@@ -119,4 +119,3 @@ if __name__ == '__main__':
     client = RSG_client(reactor)
     #sys.exit(app.exec_())
     reactor.run()
-
