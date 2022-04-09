@@ -1,13 +1,16 @@
 import sys
-import queue
-import itertools
+from itertools import cycle
+from queue import Queue, Full as QueueFull
 
 import pyqtgraph as pg
-from TraceListWidget import TraceList
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QWidget, QLabel, QFrame, QSplitter, QVBoxLayout, QHBoxLayout, QApplication
 
 from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
+
+from TraceListWidget import TraceList
 
 
 class artistParameters():
@@ -17,11 +20,11 @@ class artistParameters():
         self.index = index
         self.shown = shown
         self.last_update = 0  # update counter in the Dataset object
-                              # only redraw if the dataset has a higher
-                              # update count
+        # only redraw if the dataset has a higher
+        # update count
 
-                              
-class Hist_PyQtGraph(QtWidgets.QWidget):
+
+class Hist_PyQtGraph(QWidget):
     def __init__(self, config, reactor, cxn=None, parent=None):
         super(Hist_PyQtGraph, self).__init__(parent)
         self.cxn = cxn
@@ -44,7 +47,7 @@ class Hist_PyQtGraph(QtWidgets.QWidget):
                   (0, 255, 255, 80),
                   (255, 0, 255, 80),
                   (255, 255, 255, 80)]
-        self.colorChooser = itertools.cycle(colors)
+        self.colorChooser = cycle(colors)
         self.initUI()
 
     @inlineCallbacks
@@ -61,13 +64,13 @@ class Hist_PyQtGraph(QtWidgets.QWidget):
             init_value = yield self.get_init_vline()
             self.inf.setValue(init_value)
             self.inf.setPen(width=5.0)
-        self.coords = QtWidgets.QLabel('')
-        self.title = QtWidgets.QLabel(self.name)
-        frame = QtWidgets.QFrame()
-        splitter = QtWidgets.QSplitter()
+        self.coords = QLabel('')
+        self.title = QLabel(self.name)
+        frame = QFrame()
+        splitter = QSplitter()
         splitter.addWidget(self.tracelist)
-        hbox = QtWidgets.QHBoxLayout()
-        vbox = QtWidgets.QVBoxLayout()
+        hbox = QHBoxLayout()
+        vbox = QVBoxLayout()
         vbox.addWidget(self.title)
         vbox.addWidget(self.pw)
         vbox.addWidget(self.coords)
@@ -75,9 +78,9 @@ class Hist_PyQtGraph(QtWidgets.QWidget):
         splitter.addWidget(frame)
         hbox.addWidget(splitter)
         self.setLayout(hbox)
-        #self.legend = self.pw.addLegend()
+        # self.legend = self.pw.addLegend()
         self.tracelist.itemChanged.connect(self.checkboxChanged)
-        self.pw.plot([],[])
+        self.pw.plot([], [])
         vb = self.pw.plotItem.vb
         self.img = pg.ImageItem()
         vb.addItem(self.img)
@@ -90,14 +93,14 @@ class Hist_PyQtGraph(QtWidgets.QWidget):
 
     def getItemColor(self, color):
 
-        color_dict = {(255, 0, 0, 80): QtGui.QColor(QtCore.Qt.red).lighter(130),
-                      (0, 255, 0, 80): QtGui.QColor(QtCore.Qt.green),
-                      (255, 255, 0, 80): QtGui.QColor(QtCore.Qt.yellow),
-                      (0, 255, 255, 80): QtGui.QColor(QtCore.Qt.cyan),
-                      (255, 0, 255, 80): QtGui.QColor(QtCore.Qt.magenta).lighter(120),
-                      (255, 255, 255, 80): QtGui.QColor(QtCore.Qt.white)}
+        color_dict = {(255, 0, 0, 80): QColor(Qt.red).lighter(130),
+                      (0, 255, 0, 80): QColor(Qt.green),
+                      (255, 255, 0, 80): QColor(Qt.yellow),
+                      (0, 255, 255, 80): QColor(Qt.cyan),
+                      (255, 0, 255, 80): QColor(Qt.magenta).lighter(120),
+                      (255, 255, 255, 80): QColor(Qt.white)}
         return color_dict[color]
-        
+
     def update_figure(self):
         for ident, params in self.artists.items():
             if params.shown:
@@ -106,20 +109,21 @@ class Hist_PyQtGraph(QtWidgets.QWidget):
                     index = params.index
                     current_update = ds.updateCounter
                     if params.last_update < current_update:
-                        x = ds.data[:,0]
+                        x = ds.data[:, 0]
                         x = list(x) + [x[-1] + 1]
-                        y = ds.data[:,index+1]
+                        y = ds.data[:, index + 1]
                         params.last_update = current_update
-                        params.artist.setData(x,y)
-                except: pass
+                        params.artist.setData(x, y)
+                except:
+                    pass
 
-    def add_artist(self, ident, dataset, index, no_points = False):
+    def add_artist(self, ident, dataset, index, no_points=False):
         '''
         no_points is an override parameter to the global show_points setting.
         It is to allow data fits to be plotted without points
         '''
         new_color = self.colorChooser.next()
-        hist = pg.PlotCurveItem([0,1],[1], stepMode=True, fillLevel=0, brush=new_color, pen=None)
+        hist = pg.PlotCurveItem([0, 1], [1], stepMode=True, fillLevel=0, brush=new_color, pen=None)
         self.artists[ident] = artistParameters(hist, dataset, index, True)
         self.pw.addItem(hist)
         self.tracelist.addTrace(ident, new_color)
@@ -211,7 +215,7 @@ class Hist_PyQtGraph(QtWidgets.QWidget):
 
 
 if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     import qt5reactor
     qt5reactor.install()
     from twisted.internet import reactor

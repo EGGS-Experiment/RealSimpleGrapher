@@ -1,4 +1,4 @@
-from Dataset import Dataset
+from DataVaultListWidget.Dataset import Dataset
 from PyQt5.QtGui import QIcon
 from GraphWindow import GraphWindow
 from twisted.internet.defer import inlineCallbacks

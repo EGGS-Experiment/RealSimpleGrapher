@@ -1,13 +1,13 @@
 import sys
 import pyqtgraph as pg
-from PyQt5 import QtWidgets
 from TraceListWidget import TraceList
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QApplication
 
 
-class imageWidget(QtWidgets.QWidget):
+class ImageWidget(QWidget):
 
     def __init__(self, config, reactor, parent=None, cxn=None):
-        super(imageWidget, self).__init__(parent)
+        super(ImageWidget, self).__init__(parent)
 
         self.reactor = reactor
         self.artists = {}
@@ -20,7 +20,7 @@ class imageWidget(QtWidgets.QWidget):
 
     def initUI(self):
         self.plt = plt = pg.PlotItem()
-        self.imv = pg.ImageView(view = self.plt)
+        self.imv = pg.ImageView(view=self.plt)
         plt.showAxis('top')
         plt.hideAxis('bottom')
         plt.setAspectLocked(True)
@@ -29,16 +29,16 @@ class imageWidget(QtWidgets.QWidget):
         plt.addItem(self.vLine, ignoreBounds=True)
         plt.addItem(self.hLine, ignoreBounds=True)
         self.plt.scene().sigMouseClicked.connect(self.mouse_clicked)
-        self.title = QtWidgets.QLabel(self.name)
-        self.next_button = QtWidgets.QPushButton('>')
-        self.prev_button = QtWidgets.QPushButton('<')
+        self.title = QLabel(self.name)
+        self.next_button = QPushButton('>')
+        self.prev_button = QPushButton('<')
         self.next_button.clicked.connect(self.on_next)
         self.prev_button.clicked.connect(self.on_prev)
-        layout = QtWidgets.QGridLayout()
-        layout.addWidget(self.title, 0,0)
-        layout.addWidget(self.prev_button, 1,0)
-        layout.addWidget(self.next_button, 1,1)
-        layout.addWidget(self.imv, 2,0, 20,2)
+        layout = QGridLayout()
+        layout.addWidget(self.title, 0, 0)
+        layout.addWidget(self.prev_button, 1, 0)
+        layout.addWidget(self.next_button, 1, 1)
+        layout.addWidget(self.imv, 2, 0, 20, 2)
         self.setLayout(layout)
 
     def update_image(self, data, image_size, name):
@@ -55,9 +55,10 @@ class imageWidget(QtWidgets.QWidget):
 
     def on_next(self):
         try:
-            if self.image_index < len(self.image_list) -1:
+            if self.image_index < len(self.image_list) - 1:
                 self.image_index += 1
-                self.imv.setImage(self.image_list[self.image_index][0], autoRange=False, autoLevels=False, autoHistogramRange=False)
+                self.imv.setImage(self.image_list[self.image_index][0], autoRange=False, autoLevels=False,
+                                  autoHistogramRange=False)
                 self.title.setText(self.image_list[self.image_index][1])
             else:
                 pass
@@ -69,7 +70,8 @@ class imageWidget(QtWidgets.QWidget):
         try:
             if self.image_index > 0:
                 self.image_index -= 1
-                self.imv.setImage(self.image_list[self.image_index][0], autoRange=False, autoLevels=False, autoHistogramRange=False)
+                self.imv.setImage(self.image_list[self.image_index][0], autoRange=False, autoLevels=False,
+                                  autoHistogramRange=False)
                 self.title.setText(self.image_list[self.image_index][1])
             else:
                 pass
@@ -82,16 +84,17 @@ class imageWidget(QtWidgets.QWidget):
         '''
         pos = event.pos()
         if self.plt.sceneBoundingRect().contains(pos) and event.double():
-            #only on double clicks within bounds
+            # only on double clicks within bounds
             mousePoint = self.plt.vb.mapToView(pos)
             self.vLine.setPos(mousePoint.x())
             self.hLine.setPos(mousePoint.y())
+
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     import qt5reactor
     qt5reactor.install()
-    main = imageWidget('Example', reactor)
+    main = ImageWidget('Example', reactor)
     main.show()
-    #sys.exit(app.exec_())
+    # sys.exit(app.exec_())
     reactor.run()

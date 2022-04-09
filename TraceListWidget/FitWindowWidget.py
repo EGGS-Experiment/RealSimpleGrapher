@@ -1,11 +1,12 @@
-from PyQt5 import QtCore, QtWidgets
 from analysis.fitting import FitWrapper
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QComboBox, QTableWidget, QTableWidgetItem, QPushButton, QDoubleSpinBox
 
 
 class RowInfo(object):
     '''
-    Container for the widgets with
-    each row in the parameters table
+    Container for the widgets with each row in the parameters table.
     '''
 
     def __init__(self, vary, manual_value, fitted_value):
@@ -14,7 +15,7 @@ class RowInfo(object):
         self.fitted_value = fitted_value
 
 
-class FitWindow(QtWidgets.QWidget):
+class FitWindow(QWidget):
 
     def __init__(self, dataset, index, parent):
         super(FitWindow, self).__init__()
@@ -28,20 +29,17 @@ class FitWindow(QtWidgets.QWidget):
 
     def initUI(self):
         self.setWindowTitle(self.ident)
-        mainLayout = QtWidgets.QVBoxLayout()
-        buttons = QtWidgets.QHBoxLayout()
+        mainLayout = QVBoxLayout()
+        buttons = QHBoxLayout()
 
-        self.model_select = QtWidgets.QComboBox(self)
+        self.model_select = QComboBox(self)
         for model in self.fw.models:
             self.model_select.addItem(model)
 
-        self.parameterTable = QtWidgets.QTableWidget()
+        self.parameterTable = QTableWidget()
         self.parameterTable.setColumnCount(4)
-
-        self.fitButton = QtWidgets.QPushButton('Fit', self)
-
-        self.plotButton = QtWidgets.QPushButton('Plot manual', self)
-
+        self.fitButton = QPushButton('Fit', self)
+        self.plotButton = QPushButton('Plot manual', self)
         self.fw.setModel(str(self.model_select.currentText()))
 
         mainLayout.addWidget(self.model_select)
@@ -59,7 +57,6 @@ class FitWindow(QtWidgets.QWidget):
         self.show()
 
     def setupParameterTable(self):
-
         self.parameterTable.clear()
         headerLabels = ['Vary', 'Param', 'Manual', 'Fitted']
         self.parameterTable.setHorizontalHeaderLabels(headerLabels)
@@ -69,18 +66,18 @@ class FitWindow(QtWidgets.QWidget):
         self.parameterTable.setRowCount(len(params))
         for i, p in enumerate(params):
 
-            vary_select = QtWidgets.QTableWidgetItem()
-            label = QtWidgets.QLabel(p)
-            manual_value = QtWidgets.QDoubleSpinBox()
-            fitted_value = QtWidgets.QTableWidgetItem()
+            vary_select = QTableWidgetItem()
+            label = QLabel(p)
+            manual_value = QDoubleSpinBox()
+            fitted_value = QTableWidgetItem()
 
             self.row_info_dict[p] = RowInfo(vary_select, manual_value, fitted_value)
 
-            vary_select.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
+            vary_select.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
             if self.fw.getVary(p):
-                vary_select.setCheckState(QtCore.Qt.Checked)
+                vary_select.setCheckState(Qt.Checked)
             else:
-                vary_select.setCheckState(QtCore.Qt.Unchecked)
+                vary_select.setCheckState(Qt.Unchecked)
 
             manualValue = self.fw.getManualValue(p)
             manual_value.setDecimals(6)
@@ -110,8 +107,7 @@ class FitWindow(QtWidgets.QWidget):
 
     def updateParametersFromFitter(self):
         '''
-        Set the fitted and manual parameters
-        fields to the fit values
+        Set the fitted and manual parameters fields to the fit values.
         '''
         params = self.fw.getParameters()
         for p in params:
@@ -144,8 +140,7 @@ class FitWindow(QtWidgets.QWidget):
     def onActivated(self):
         '''
         Run when model is changed.
-        Reset row_info_dict each
-        time the model is changed.
+        Reset row_info_dict each time the model is changed.
         '''
         model = str(self.model_select.currentText())
         self.fw.setModel(model)
@@ -154,9 +149,8 @@ class FitWindow(QtWidgets.QWidget):
 
     def onClick(self):
         '''
-        Send table parameters to fitter,
-        perform fit, and then update
-        paramter table with the results
+        Send table parameters to fitter, perform fit,
+        and then update parameter table with the results.
         '''
 
         self.updateParametersToFitter()
@@ -166,8 +160,8 @@ class FitWindow(QtWidgets.QWidget):
 
     def onPlot(self):
         '''
-        Plot the manual parameters. See documentation
-        for plotFit()
+        Plot the manual parameters.
+        See documentation for plotFit().
         '''
 
         class dataset():

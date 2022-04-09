@@ -9,14 +9,15 @@ from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
 
 from TraceListWidget import TraceList
-from DataVaultListWidget import DataVaultList
+from DataVaultListWidget.DataVaultListWidget import DataVaultList
 
 import sys
 import queue
 import itertools
 
-
 sys.settrace(None)
+
+
 class artistParameters():
     def __init__(self, artist, dataset, index, shown):
         self.artist = artist
@@ -63,11 +64,11 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.live_update_loop.start(0)
 
         colors = [QtGui.QColor(QtCore.Qt.red).lighter(130),
-                      QtGui.QColor(QtCore.Qt.green),
-                      QtGui.QColor(QtCore.Qt.yellow),
-                      QtGui.QColor(QtCore.Qt.cyan),
-                      QtGui.QColor(QtCore.Qt.magenta).lighter(120),
-                      QtGui.QColor(QtCore.Qt.white)]
+                  QtGui.QColor(QtCore.Qt.green),
+                  QtGui.QColor(QtCore.Qt.yellow),
+                  QtGui.QColor(QtCore.Qt.cyan),
+                  QtGui.QColor(QtCore.Qt.magenta).lighter(120),
+                  QtGui.QColor(QtCore.Qt.white)]
         self.colorChooser = itertools.cycle(colors)
         self.autoRangeEnable = True
         self.initUI()
@@ -134,7 +135,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         vbox.addWidget(pwButtons)
         # set layout
         self.setLayout(hbox)
-        #self.legend = self.pw.addLegend()
+        # self.legend = self.pw.addLegend()
         self.tracelist.itemChanged.connect(self.checkboxChanged)
         self.pw.plot([], [])
         # setup viewbox
@@ -151,7 +152,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.pw.scene().sigMouseMoved.connect(self.mouseMoved)
         self.pw.sigRangeChanged.connect(self.rangeChanged)
         # sigrangechanged and sigmouseclicked and return graphics scene
-        #self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
+        # self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
 
     def update_figure(self):
         for ident, params in self.artists.items():
@@ -244,8 +245,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.current_limits = limits
 
     def set_ylimits(self, limits):
-        self.pw.setYRange(limits[0],limits[1])
-
+        self.pw.setYRange(limits[0], limits[1])
 
     # SLOTS
     def rangeChanged(self):
@@ -254,7 +254,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.current_limits = [lims[0][0], lims[0][1]]
 
     def mouseMoved(self, pos):
-        #print("Image position:", self.img.mapFromScene(pos))
+        # print("Image position:", self.img.mapFromScene(pos))
         pnt = self.img.mapFromScene(pos)
         string = '(' + str(pnt.x()) + ' , ' + str(pnt.y()) + ')'
         self.coords.setText(string)
@@ -297,9 +297,11 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     import qt5reactor
+
     qt5reactor.install()
     from twisted.internet import reactor
+
     main = Graph_PyQtGraph('example', reactor)
     main.show()
     reactor.run()
-    #sys.exit(app.exec_())
+    # sys.exit(app.exec_())

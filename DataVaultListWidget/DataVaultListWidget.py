@@ -1,9 +1,9 @@
-from PyQt5 import QtWidgets
 from socket import gethostname
 from twisted.internet.defer import inlineCallbacks
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QListWidget, QScrollArea
 
 
-class DataVaultList(QtWidgets.QWidget):
+class DataVaultList(QWidget):
     """
     Data vault pop-up window used to select datasets for plotting.
     Creates a client connection to LabRAD to access the datavault and grapher servers.
@@ -35,13 +35,13 @@ class DataVaultList(QtWidgets.QWidget):
         self.initializeGUI()
 
     def initializeGUI(self):
-        mainLayout = QtWidgets.QGridLayout()
+        mainLayout = QGridLayout()
         self.directoryString = ['Home']
-        self.directoryTitle = QtWidgets.QLabel('Directory:')
-        self.directoryLabel = QtWidgets.QLabel('\\'.join(self.directoryString))
-        self.dataListWidget = QtWidgets.QListWidget()
+        self.directoryTitle = QLabel('Directory:')
+        self.directoryLabel = QLabel('\\'.join(self.directoryString))
+        self.dataListWidget = QListWidget()
         self.dataListWidget.doubleClicked.connect(self.onDoubleclick)
-        self.dataListWidgetScroll = QtWidgets.QScrollArea()
+        self.dataListWidgetScroll = QScrollArea()
         self.dataListWidgetScroll.setWidget(self.directoryLabel)
         self.dataListWidgetScroll.setWidgetResizable(True)
         self.dataListWidgetScroll.setFixedHeight(40)

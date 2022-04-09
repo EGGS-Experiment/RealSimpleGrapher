@@ -1,23 +1,40 @@
 '''
 The main GUI which holds everything and puts everything together.
 '''
-
 import sys
 import GUIConfig
 from PyQt5.QtWidgets import QTabWidget, QApplication
 
-from GridGraphWindow import GridGraphWindow
-from ImageWidget import imageWidget as ImageGraph
-from HistWidgetPyQtGraph import Hist_PyQtGraph as Hist
-from GraphWidgetPyQtGraph import Graph_PyQtGraph as Graph
-from ScrollingGraphWidgetPyQtGraph import ScrollingGraph_PyQtGraph as ScrollingGraph
+from pyqtgraph_widgets import ImageWidget as ImageGraph
+from pyqtgraph_widgets import Hist_PyQtGraph as Hist
+from pyqtgraph_widgets import Graph_PyQtGraph as Graph
+from pyqtgraph_widgets import ScrollingGraph_PyQtGraph as ScrollingGraph
 
+
+class GridGraphWindow(QWidget):
+    '''
+    Window containing a grid of graphs.
+    Holds an individual RSG tab page.
+    '''
+
+    def __init__(self, g_list, row_list, column_list, reactor, parent=None):
+        super(GridGraphWindow, self).__init__(parent)
+        self.reactor = reactor        
+        self.initUI(g_list, row_list, column_list)
+        self.show()
+
+    def initUI(self, g_list, row_list, column_list):
+        layout = QGridLayout()
+        for k in range(len(g_list)):
+            layout.addWidget(g_list[k], row_list[k], column_list[k])
+        self.setLayout(layout)
+        
 
 class GraphWindow(QTabWidget):
     """
     The main RSG GUI which does nearly everything.
     Creates the RSG GUI from GUIConfig.py.
-    Each tab is a _PyQtGraph object.
+    Each tab is a GridGraphWindow object, which consists of _PyQtGraph objects.
     """
 
     def __init__(self, reactor, cxn=None, parent=None, root=None):
@@ -49,7 +66,7 @@ class GraphWindow(QTabWidget):
             gli = []
             for config in gcli:
                 name = config.name
-                max_ds = config.max_datasets
+                # max_ds = config.max_datasets
                 if config.isScrolling:
                     graph_tmp = ScrollingGraph(config, reactor, cxn=self.cxn, root=self.root)
                 elif config.isImages:

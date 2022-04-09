@@ -1,6 +1,6 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QListWidget
 from twisted.internet.defer import inlineCallbacks
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QListWidget
 
 
 class ParameterList(QWidget):

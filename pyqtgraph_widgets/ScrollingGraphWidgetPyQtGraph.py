@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
-from GraphWidgetPyQtGraph import Graph_PyQtGraph as Graph
+from .GraphWidgetPyQtGraph import Graph_PyQtGraph as Graph
 
 
 class ScrollingGraph_PyQtGraph(Graph):
