@@ -177,17 +177,20 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         no_points is an override parameter to the global show_points setting.
         It is to allow data fits to be plotted without points
         '''
-        new_color = next(self.colorChooser)
-        if self.show_points and not no_points:
-            line = self.pw.plot([], [], symbol=None, symbolBrush=new_color,
-                                name=ident, pen=new_color, connect=self.scatter_plot,
-                                setSkipFiniteCheck=True)
+        if ident not in self.artists.keys():
+            new_color = next(self.colorChooser)
+            if self.show_points and not no_points:
+                line = self.pw.plot([], [], symbol=None, symbolBrush=new_color,
+                                    name=ident, pen=new_color, connect=self.scatter_plot,
+                                    setSkipFiniteCheck=True)
+            else:
+                line = self.pw.plot([], [], symbol=None, pen=new_color, name=ident)
+            if self.grid_on:
+                self.pw.showGrid(x=True, y=True)
+            self.artists[ident] = artistParameters(line, dataset, index, True)
+            self.tracelist.addTrace(ident, new_color)
         else:
-            line = self.pw.plot([], [], symbol=None, pen=new_color, name=ident)
-        if self.grid_on:
-            self.pw.showGrid(x=True, y=True)
-        self.artists[ident] = artistParameters(line, dataset, index, True)
-        self.tracelist.addTrace(ident, new_color)
+            print('Trace already added.')
 
     def remove_artist(self, ident):
         try:
