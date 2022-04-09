@@ -1,6 +1,6 @@
 from Dataset import Dataset
-from GraphWindow import GraphWindow
 from PyQt5.QtGui import QIcon
+from GraphWindow import GraphWindow
 from twisted.internet.defer import inlineCallbacks
 
 from random import randrange

@@ -41,7 +41,6 @@ class TraceList(QListWidget):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.popupMenu)
 
-
     def addTrace(self, ident, color):
         item = QListWidgetItem(ident)
 
@@ -94,15 +93,17 @@ class TraceList(QListWidget):
                 # export all datasets
                 for dataset in datasets_all:
                     try:
-                        filename = QFileDialog.getSaveFileName(self, 'Save Dataset: ' + dataset.dataset_name, os.getenv('HOME'), "CSV (*.csv)")
+                        filename = QFileDialog.getSaveFileName(self, 'Save Dataset: ' + dataset.dataset_name,
+                                                               os.getenv('HOME'), "CSV (*.csv)")
                         savetxt(filename[0], dataset.data, delimiter=',')
                     except Exception as e:
                         pass
         else:
             ident = str(item.text())
+            # create list of user actions in menu
             removeallAction = menu.addAction('Remove All Traces')
             parametersAction = menu.addAction('Parameters')
-            togglecolorsAction = menu.addAction('Toggle colors')
+            togglecolorsAction = menu.addAction('Toggle Colors')
             fitAction = menu.addAction('Fit')
             removeAction = menu.addAction('Remove')
             exportAction = menu.addAction('Export')
@@ -118,20 +119,19 @@ class TraceList(QListWidget):
                 logYaction.setChecked(True)
             # color menu
             selectColorMenu = menu.addMenu("Select color")
-            redAction = selectColorMenu.addAction("Red")
-            greenAction = selectColorMenu.addAction("Green")
-            yellowAction = selectColorMenu.addAction("Yellow")
-            cyanAction = selectColorMenu.addAction("Cyan")
-            magentaAction = selectColorMenu.addAction("Magenta")
-            whiteAction = selectColorMenu.addAction("White")
-            colorActionDict = {redAction: "r", greenAction: "g", yellowAction:"y", cyanAction: "c", magentaAction: "m", whiteAction: "w"}
+            colorActions = map(selectColorMenu.addAction, ["Red", "Green", "Yellow", "Cyan", "Magenta", "White"])
+            colorCodes = ["r", "g", "y", "c", "m", "w"]
+            colorActionDict = dict(zip(colorActions, colorCodes))
 
             # process actions
             action = menu.exec_(self.mapToGlobal(pos))
             if action == removeallAction:
-                for index in reversed(range(self.count())):
-                    ident = str(self.item(index).text())
-                    self.parent.remove_artist(ident)
+                try:
+                    for index in reversed(range(self.count())):
+                        ident = str(self.item(index).text())
+                        self.parent.remove_artist(ident)
+                except Exception as e:
+                    print('Remove All Error:', e)
             elif action == logXaction:
                 if self.parent.artists[ident].logModeX:
                     self.parent.artists[ident].artist.setLogMode(False, None)
@@ -155,7 +155,7 @@ class TraceList(QListWidget):
             elif action == togglecolorsAction:
                 # option to change color of line
                 new_color = next(self.parent.colorChooser)
-                #self.parent.artists[ident].artist.setData(color=new_color, symbolBrush=new_color)
+                # self.parent.artists[ident].artist.setData(color=new_color, symbolBrush=new_color)
                 self.parent.artists[ident].artist.setPen(new_color)
                 if self.parent.show_points:
                     self.parent.artists[ident].artist.setData(pen=new_color, symbolBrush=new_color, symbol=None)
@@ -179,16 +179,20 @@ class TraceList(QListWidget):
                     self.parent.artists[ident].artist.setData(pen=new_color, symbol=None)
                     self.changeTraceListColor(ident, new_color)
             elif action == removeAction:
-                self.parent.remove_artist(ident)
+                try:
+                    self.parent.remove_artist(ident)
+                except Exception as e:
+                    print('Remove Error:', e)
             elif action == exportAction:
                 # get datasets and index
                 dataset = self.parent.artists[ident].dataset.data
                 index = self.parent.artists[ident].index
                 # get trace from dataset
-                trace = dataset[:, (0, index)]
+                trace = dataset[:, (0, index + 1)]
                 # export trace
                 try:
-                    filename = QFileDialog.getSaveFileName(self, 'Save Dataset: ' + ident, os.getenv('HOME'), "CSV (*.csv)")
+                    filename = QFileDialog.getSaveFileName(self, 'Save Dataset: ' + ident, os.getenv('HOME'),
+                                                           "CSV (*.csv)")
                     savetxt(filename[0], trace, delimiter=',')
                 except Exception as e:
                     pass
