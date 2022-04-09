@@ -31,5 +31,5 @@ class Graph(QWidget):
 
 
 if __name__ == '__main__':
-    from EGGS_labrad.clients import runGUI
+    #from EGGS_labrad.clients import runGUI
     runGUI(Graph)

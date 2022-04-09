@@ -1,4 +1,3 @@
-import sys
 from twisted.internet.defer import inlineCallbacks
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QListWidget
 

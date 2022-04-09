@@ -214,6 +214,6 @@ class Hist_PyQtGraph(QWidget):
 
 
 if __name__ == '__main__':
-    from EGGS_labrad.clients import runGUI
+    #from EGGS_labrad.clients import runGUI
     runGUI(Hist_PyQtGraph, 'example')
     main = Hist_PyQtGraph('example', reactor)

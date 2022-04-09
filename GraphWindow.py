@@ -98,5 +98,5 @@ class GraphWindow(QTabWidget):
 
 
 if __name__ == '__main__':
-    from EGGS_labrad.clients import runGUI
+    #from EGGS_labrad.clients import runGUI
     runGUI(GraphWindow)

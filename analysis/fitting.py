@@ -1,7 +1,8 @@
-# Generic fitter class
-
-import numpy as np
+"""
+Generic fitter class.
+"""
 from scipy import optimize
+from numpy import linspace, zeros
 from analysis.fit_models import *
 
 _MODEL_DICT = {
@@ -103,14 +104,14 @@ class FitWrapper(object):
         N = 10 * n
         xmin = x[0];
         xmax = x[-1]
-        fine_grid = np.linspace(xmin, xmax, N)
+        fine_grid = linspace(xmin, xmax, N)
 
         p0 = []
         for p in self.getParameters():
             p0.append(self.getFittedValue(p))
         y = self.model.model(fine_grid, p0)
 
-        data = np.zeros((N, 2))
+        data = zeros((N, 2))
         data[:, 0] = fine_grid
         data[:, 1] = y
         return data
@@ -127,14 +128,14 @@ class FitWrapper(object):
         N = 10 * n
         xmin = x[0];
         xmax = x[-1]
-        fine_grid = np.linspace(xmin, xmax, N)
+        fine_grid = linspace(xmin, xmax, N)
 
         p0 = []
         for p in self.getParameters():
             p0.append(self.getManualValue(p))
         y = self.model.model(fine_grid, p0)
 
-        data = np.zeros((N, 2))
+        data = zeros((N, 2))
         data[:, 0] = fine_grid
         data[:, 1] = y
         return data

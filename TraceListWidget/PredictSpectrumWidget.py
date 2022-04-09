@@ -1,12 +1,13 @@
 import numpy as np
 from fractions import Fraction
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QPushButton, QLabel, QCheckBox, QDoubleSpinBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QPushButton, QLabel, QCheckBox, \
+    QDoubleSpinBox
 
 
 class ParamInfo(object):
-    '''
+    """
     Container for the widgets with each row in the parameters table.
-    '''
+    """
 
     def __init__(self, value):
         self.value = value
@@ -252,7 +253,10 @@ class Transitions_SD(object):
         return transitions
 
     def get_transition_energies(self, B, zero_offset=0.):
-        '''returns the transition enenrgies in MHz where zero_offset is the 0-field transition energy between S and D'''
+        '''
+        Returns the transition enenrgies in MHz where zero_offset
+        is the 0-field transition energy between S and D.
+        '''
         ans = []
         for m_s, E_s, repr_s in self.S.magnetic_to_energy(B):
             for m_d, E_d, repr_d in self.D.magnetic_to_energy(B):
