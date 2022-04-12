@@ -128,7 +128,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         pwButtons_layout = QtWidgets.QHBoxLayout()
         pwButtons.setLayout(pwButtons_layout)
         self.coords = QtWidgets.QLabel('')
-        self.autorangebutton = QtWidgets.QPushButton('Autorange')
+        self.autorangebutton = QtWidgets.QPushButton('Autorange Off')
         self.autorangebutton.setCheckable(True)
         self.autorangebutton.toggled.connect(lambda: self.toggleAutoRange(self.autorangebutton.isChecked()))
         pwButtons_layout.addWidget(self.coords)
@@ -266,8 +266,10 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
     def toggleAutoRange(self, autorangeEnable):
         if autorangeEnable:
             self.pw.enableAutoRange()
+            self.autorangebutton.setText('Autorange On')
         else:
             self.pw.disableAutoRange()
+            self.autorangebutton.setText('Autorange Off')
 
     @inlineCallbacks
     def get_init_vline(self):
