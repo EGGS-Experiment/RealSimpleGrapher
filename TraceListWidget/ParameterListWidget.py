@@ -9,6 +9,7 @@ class ParameterList(QWidget):
 
     def __init__(self, dataset):
         super(ParameterList, self).__init__()
+        #self.setStyleSheet("background-color:%s;" % self.config.background_color)
         self.dataset = dataset
         mainLayout = QVBoxLayout(self)
         self.parameterListWidget = QListWidget()

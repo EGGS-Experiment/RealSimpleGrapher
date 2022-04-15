@@ -9,7 +9,7 @@ from importlib.util import find_spec
 Set global configuration options.
 """
 pg.setConfigOption('background', 'k')
-pg.setConfigOption('foreground', 'y')
+pg.setConfigOption('foreground', 'k')
 pg.setConfigOption('antialias', False)
 if find_spec('OpenGL'):
     pg.setConfigOption('useOpenGL', True)
@@ -72,17 +72,30 @@ class gridGraphConfig():
 
 """
 The actual config of the RSG is set here.
+
+tabs holds the tabs on the RSG window.
+Each tab must be a gridGraphConfig object, which can contain one or more graphConfig objects.
+graphConfig objects correspond to a complete graphing unit (i.e. traceList and grapher).
+If a gridGraphConfig object holds multiple graphConfig objects, their positions must be 
+specified in the format x_pos, y_pos.
 """
 
 tabs = [
-    gridGraphConfig('Temperature', [graphConfig('Lakeshore 336 Temperature', max_datasets=5), 0, 0]),
-    gridGraphConfig('Pressure', [graphConfig('Pressure', max_datasets=5), 0, 0]),
-    gridGraphConfig('SLS', [graphConfig('SLS Locking Output', max_datasets=5), 0, 0]),
+    # system monitor tab displays system essentials
+    gridGraphConfig('System Monitor', [
+        graphConfig('Lakeshore 336 Temperature', max_datasets=4),       0, 0,
+        graphConfig('TwisTorr74 Pressure', max_datasets=1),             1, 0,
+        graphConfig('NIOPS03 Pressure', max_datasets=1),                0, 1,
+        graphConfig('RF Pickoff'), 1, 1
+    ]),
+    # laser monitor tab monitors laser frequencies via wavemeter
+    gridGraphConfig('Laser Monitor', [
+        graphConfig('397nm', max_datasets=1),                           0, 0,
+        graphConfig('423nm', max_datasets=1),                           1, 0,
+        graphConfig('854nm', max_datasets=1),                           0, 1,
+        graphConfig('866nm', max_datasets=1),                           1, 1,
+    ]),
     gridGraphConfig('RGA', [graphConfig('RGA Sweeps', max_datasets=5), 0, 0]),
-    gridGraphConfig('PMT', [graphConfig('pmt', ylim=[0, 30], isScrolling=True, max_datasets=1, show_points=False), 0, 0]),
-    gridGraphConfig('tmp', [
-        graphConfig('ms_local_stark'), 0, 0,
-        graphConfig('ms_local_stark_detuning'), 1, 0,
-        graphConfig('vaet_local_stark'), 0, 1,
-        graphConfig('vaet_local_stark_detuning'), 1, 1])
+    gridGraphConfig('SLS', [graphConfig('SLS Locking Output', max_datasets=5), 0, 0]),
+    gridGraphConfig('PMT', [graphConfig('pmt', ylim=[0, 30], isScrolling=True, max_datasets=1, show_points=False), 0, 0])
 ]
