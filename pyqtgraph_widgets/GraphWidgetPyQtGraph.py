@@ -58,12 +58,14 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.show_points = config.show_points
         self.grid_on = config.grid_on
         self.scatter_plot = config.scatter_plot
-
+        # set background color
+        self.setStyleSheet("background-color:black; color:white; border: 1px solid white")
+        # todo: document
         self.dataset_queue = Queue(config.max_datasets)
-
+        # todo: document
         self.live_update_loop = LoopingCall(self.update_figure)
         self.live_update_loop.start(0)
-
+        # todo: document
         colors = [QColor(Qt.red).lighter(130),
                   QColor(Qt.green),
                   QColor(Qt.yellow),
