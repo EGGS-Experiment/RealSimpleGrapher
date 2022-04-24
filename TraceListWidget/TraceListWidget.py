@@ -29,8 +29,7 @@ class TraceList(QListWidget):
             self.use_trace_color = self.config.use_trace_color
         except AttributeError:
             self.use_trace_color = False
-
-        self.name = 'pmt'
+        #self.name = 'pmt'
         self.initUI()
 
     def initUI(self):
@@ -42,14 +41,12 @@ class TraceList(QListWidget):
 
     def addTrace(self, ident, color):
         item = QListWidgetItem(ident)
-
+        # set color of artist entry in tracelist
         if self.use_trace_color:
-            foreground_color = self.parent.getItemColor(color)
-            item.setForeground(foreground_color)
+            item.setForeground(color)
         else:
             item.setForeground(QColor(255, 255, 255))
         item.setBackground(QColor(0, 0, 0))
-
         item.setCheckState(Qt.Checked)
         self.addItem(item)
         self.trace_dict[ident] = item
@@ -62,13 +59,7 @@ class TraceList(QListWidget):
 
     def changeTraceListColor(self, ident, new_color):
         item = self.trace_dict[ident]
-        color_dict = {"r": QColor(Qt.red).lighter(130),
-                      "g": QColor(Qt.green),
-                      "y": QColor(Qt.yellow),
-                      "c": QColor(Qt.cyan),
-                      "m": QColor(Qt.magenta).lighter(120),
-                      "w": QColor(Qt.white)}
-        item.setForeground(color_dict[new_color])
+        item.setForeground(new_color)
 
     def popupMenu(self, pos):
         menu = QMenu()
@@ -124,9 +115,8 @@ class TraceList(QListWidget):
                 logYaction.setChecked(True)
             # color menu
             selectColorMenu = menu.addMenu("Select Color")
-            colorActions = map(selectColorMenu.addAction, ["Red", "Green", "Yellow", "Cyan", "Magenta", "White"])
-            colorCodes = ["r", "g", "y", "c", "m", "w"]
-            colorActionDict = dict(zip(colorActions, colorCodes))
+            colorActions = list(map(selectColorMenu.addAction,
+                                    ["Red", "Green", "Yellow", "Cyan", "Magenta", "White"]))
 
             # process actions
             action = menu.exec_(self.mapToGlobal(pos))
@@ -136,7 +126,7 @@ class TraceList(QListWidget):
                         ident = str(self.item(index).text())
                         self.parent.remove_artist(ident)
                 except Exception as e:
-                    print('Remove All Error:', e)
+                    print('Error when doing Remove All:', e)
             elif action == logXaction:
                 if self.parent.artists[ident].logModeX:
                     self.parent.artists[ident].artist.setLogMode(False, None)
@@ -160,29 +150,28 @@ class TraceList(QListWidget):
             elif action == togglecolorsAction:
                 # option to change color of line
                 new_color = next(self.parent.colorChooser)
-                # self.parent.artists[ident].artist.setData(color=new_color, symbolBrush=new_color)
-                self.parent.artists[ident].artist.setPen(new_color)
+                if self.use_trace_color:
+                    self.changeTraceListColor(ident, new_color)
                 if self.parent.show_points:
                     self.parent.artists[ident].artist.setData(pen=new_color, symbolBrush=new_color, symbol=None)
-                    self.changeTraceListColor(ident, new_color)
                 else:
                     self.parent.artists[ident].artist.setData(pen=new_color, symbol=None)
-                    self.changeTraceListColor(ident, new_color)
             elif action == fitAction:
                 dataset = self.parent.artists[ident].dataset
                 index = self.parent.artists[ident].index
                 fw = FitWindow(dataset, index, self)
                 self.windows.append(fw)
                 fw.show()
-            elif action in colorActionDict.keys():
-                new_color = colorActionDict[action]
-                self.parent.artists[ident].artist.setPen(new_color)
+            elif action in colorActions:
+                # get color index
+                color_ind = colorActions.index(action)
+                new_color = self.parent.colors[color_ind]
+                if self.use_trace_color:
+                    self.changeTraceListColor(ident, new_color)
                 if self.parent.show_points:
                     self.parent.artists[ident].artist.setData(pen=new_color, symbolBrush=new_color, symbol=None)
-                    self.changeTraceListColor(ident, new_color)
                 else:
                     self.parent.artists[ident].artist.setData(pen=new_color, symbol=None)
-                    self.changeTraceListColor(ident, new_color)
             elif action == removeAction:
                 try:
                     self.parent.remove_artist(ident)

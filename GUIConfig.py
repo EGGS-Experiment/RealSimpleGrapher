@@ -28,7 +28,7 @@ class traceListConfig():
     Config for the traceList widget. Mostly concerns its color.
     """
 
-    def __init__(self, background_color='black', use_trace_color=False):
+    def __init__(self, background_color='black', use_trace_color=True):
         self.background_color = background_color
         self.use_trace_color = use_trace_color
 

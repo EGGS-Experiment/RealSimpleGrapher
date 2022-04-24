@@ -61,19 +61,22 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.scatter_plot = config.scatter_plot
         # set background color
         self.setStyleSheet("background-color:black; color:white; border: 1px solid white")
-        # todo: document
+        # dataset queue is used to store datasets
         self.dataset_queue = Queue(config.max_datasets)
-        # todo: document
+        # live_update_loop continuously calls update_figure,
+        # which is where points are received from the dataset objects
+        # and pushed onto the plotwidget
         self.live_update_loop = LoopingCall(self.update_figure)
         self.live_update_loop.start(0)
-        # todo: document
-        colors = [QColor(Qt.red).lighter(130),
+        # colors
+        # todo: move this to GUIConfig
+        self.colors = [QColor(Qt.red).lighter(130),
                   QColor(Qt.green),
                   QColor(Qt.yellow),
                   QColor(Qt.cyan),
                   QColor(Qt.magenta).lighter(120),
                   QColor(Qt.white)]
-        self.colorChooser = cycle(colors)
+        self.colorChooser = cycle(self.colors)
         self.autoRangeEnable = True
         self.initUI()
 
@@ -197,7 +200,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     def remove_artist(self, ident):
         try:
-            # todo: localize error messages
             artist = self.artists[ident].artist
             self.pw.removeItem(artist)
             self.tracelist.removeTrace(ident)
@@ -205,7 +207,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             del self.artists[ident]
         except Exception as e:
             print("Remove failed")
-            print(e)
 
     def display(self, ident, shown):
         try:
@@ -232,10 +233,10 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     @inlineCallbacks
     def add_dataset(self, dataset):
-        # todo: check if same or different file location
         try:
             self.dataset_queue.put(dataset, block=False)
         except QueueFull:
+            #print('Dataset queue full. Removing previous dataset.')
             remove_ds = self.dataset_queue.get()
             self.remove_dataset(remove_ds)
             self.dataset_queue.put(dataset, block=False)
@@ -304,15 +305,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         units = param.units
         val = self.U(val, units)
         yield self.pv.set_parameter(self.hline_param[0], self.hline_param[1], val)
-
-    def getItemColor(self, color):
-        color_dict = {"r": QColor(Qt.red).lighter(130),
-                      "g": QColor(Qt.green),
-                      "y": QColor(Qt.yellow),
-                      "c": QColor(Qt.cyan),
-                      "m": QColor(Qt.magenta).lighter(120),
-                      "w": QColor(Qt.white)}
-        return color_dict[color]
 
 
 if __name__ == '__main__':
