@@ -8,8 +8,11 @@ from importlib.util import find_spec
 """
 Set global configuration options.
 """
+
+#todo: set background color
+#todo: set text color
 pg.setConfigOption('background', 'k')
-pg.setConfigOption('foreground', 'k')
+pg.setConfigOption('foreground', 'y')
 pg.setConfigOption('antialias', False)
 if find_spec('OpenGL'):
     pg.setConfigOption('useOpenGL', True)

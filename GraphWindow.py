@@ -14,7 +14,10 @@ class GridGraphWindow(QWidget):
 
     def __init__(self, g_list, row_list, column_list, reactor, parent=None):
         super(GridGraphWindow, self).__init__(parent)
-        self.reactor = reactor        
+        self.reactor = reactor
+        # set background
+        self.setStyleSheet("background-color:black; color:white")
+        # initialize the UI
         self.initUI(g_list, row_list, column_list)
         self.show()
 
@@ -45,6 +48,8 @@ class GraphWindow(QTabWidget):
         self.root = root
         # initialize the UI
         self.initUI()
+        # set background
+        self.setStyleSheet("background-color:black")
         # show the UI
         self.show()
         
@@ -91,6 +96,5 @@ class GraphWindow(QTabWidget):
 
 
 if __name__ == '__main__':
-    pass
     from EGGS_labrad.clients import runGUI
-    #runGUI(GraphWindow)
+    runGUI(GraphWindow)
