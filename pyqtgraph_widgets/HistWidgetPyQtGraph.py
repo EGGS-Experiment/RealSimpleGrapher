@@ -137,7 +137,7 @@ class Hist_PyQtGraph(QWidget):
             except KeyError:
                 pass
         except Exception as e:
-            print("remove failed")
+            print("Remove failed")
 
     def display(self, ident, shown):
         try:

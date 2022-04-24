@@ -71,6 +71,7 @@ class Dataset(QObject):
         yield self.accessingData.acquire()
         labels = []
         _, all_dep = yield self.data_vault.variables(context=self.context)
+        # todo: document
         for i in range(len(all_dep)):
             label_tmp = all_dep[i][0] + ' - ' + self.dataset_name
             if label_tmp in labels:

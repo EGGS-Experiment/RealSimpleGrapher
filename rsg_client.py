@@ -95,6 +95,7 @@ class RSG_client(object):
     def make_dataset(self, dataset_location):
         cxt = self.cxn.context()
         ds = Dataset(self.dv, cxt, dataset_location, reactor)
+        print(dataset_location)
         return ds
 
     def do_plot(self, dataset_location, graph, send_to_current):
@@ -102,6 +103,9 @@ class RSG_client(object):
             # add the plot to the Current tab as well as an additional
             # specified tab for later examination
             ds = self.make_dataset(dataset_location)
+            # todo: check dataset location for duplicate
+            # look in dict for existing
+            # if same name but different loc, then add new
             self.gui.graphDict['current'].add_dataset(ds)
         ds = self.make_dataset(dataset_location)
         self.gui.graphDict[graph].add_dataset(ds)

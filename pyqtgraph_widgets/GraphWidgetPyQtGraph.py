@@ -25,8 +25,8 @@ class artistParameters():
         self.dataset = dataset
         self.index = index
         self.shown = shown
-        # update counter in the Dataset object
-        # only redraw if the dataset has a higher update count
+        # update counter in the Dataset object, only
+        # redraw if the dataset has a higher update count
         self.last_update = 0
         # keep track of log mode
         self.logModeX = False
@@ -51,6 +51,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.artists = {}
         self.should_stop = False
         self.name = config.name
+        # set lines from config
         self.vline_name = config.vline
         self.vline_param = config.vline_param
         self.hline_name = config.hline
@@ -196,6 +197,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     def remove_artist(self, ident):
         try:
+            # todo: localize error messages
             artist = self.artists[ident].artist
             self.pw.removeItem(artist)
             self.tracelist.removeTrace(ident)
@@ -203,6 +205,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             del self.artists[ident]
         except Exception as e:
             print("Remove failed")
+            print(e)
 
     def display(self, ident, shown):
         try:
@@ -229,13 +232,13 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     @inlineCallbacks
     def add_dataset(self, dataset):
+        # todo: check if same or different file location
         try:
             self.dataset_queue.put(dataset, block=False)
         except QueueFull:
             remove_ds = self.dataset_queue.get()
             self.remove_dataset(remove_ds)
             self.dataset_queue.put(dataset, block=False)
-
         labels = yield dataset.getLabels()
         for i, label in enumerate(labels):
             self.add_artist(label, dataset, i)
