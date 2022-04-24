@@ -85,7 +85,7 @@ class GraphWindow(QTabWidget):
             self.setMovable(True)
 
     def insert_tab(self, tab):
-        graph_tmp = Graph_PyQtGraph(tab, reactor, cxn=self.cxn, root=self.root)
+        graph_tmp = Graph_PyQtGraph(tab, self.reactor, cxn=self.cxn, root=self.root)
         self.graphDict[tab] = graph_tmp
         self.addTab(graph_tmp, tab)
 

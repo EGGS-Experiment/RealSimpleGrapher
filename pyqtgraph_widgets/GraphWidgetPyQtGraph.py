@@ -200,7 +200,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             self.artists[ident].shown = False
             del self.artists[ident]
         except Exception as e:
-            print("remove failed")
+            print("Remove failed")
 
     def display(self, ident, shown):
         try:
@@ -250,6 +250,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     def set_ylimits(self, limits):
         self.pw.setYRange(limits[0], limits[1])
+
 
     # SLOTS
     def rangeChanged(self):

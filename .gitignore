@@ -6,7 +6,6 @@
 **/__pycache__
 **/*.pyon
 **/*.h5
-**/*.pyc
 
 # all of .idea (pycharm's config files)
 #.idea/*
