@@ -89,7 +89,7 @@ tabs = [
         graphConfig('Lakeshore 336 Temperature', max_datasets=4),       0, 0,
         graphConfig('TwisTorr74 Pressure', max_datasets=1),             1, 0,
         graphConfig('NIOPS03 Pressure', max_datasets=1),                0, 1,
-        graphConfig('RF Pickoff'), 1, 1
+        graphConfig('RF Pickoff'),                                      1, 1
     ]),
     # laser monitor tab monitors laser frequencies via wavemeter
     gridGraphConfig('Laser Monitor', [
@@ -98,7 +98,7 @@ tabs = [
         graphConfig('854nm', max_datasets=1),                           0, 1,
         graphConfig('866nm', max_datasets=1),                           1, 1,
     ]),
-    gridGraphConfig('RGA', [graphConfig('RGA Sweeps', max_datasets=5), 0, 0]),
-    gridGraphConfig('SLS', [graphConfig('SLS Locking Output', max_datasets=5), 0, 0]),
-    gridGraphConfig('PMT', [graphConfig('pmt', ylim=[0, 30], isScrolling=True, max_datasets=1, show_points=False), 0, 0])
+    gridGraphConfig('RGA', [graphConfig('RGA Sweeps', max_datasets=5), 0, 0])
+    # gridGraphConfig('SLS', [graphConfig('SLS Locking Output', max_datasets=5), 0, 0]),
+    # gridGraphConfig('PMT', [graphConfig('pmt', ylim=[0, 30], isScrolling=True, max_datasets=1, show_points=False), 0, 0])
 ]
