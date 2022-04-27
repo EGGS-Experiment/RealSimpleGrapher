@@ -68,19 +68,19 @@ class GraphWindow(QTabWidget):
                 name = config.name
                 # max_ds = config.max_datasets
                 if config.isScrolling:
-                    graph_tmp = ScrollingGraph_PyQtGraph(config, reactor, cxn=self.cxn, root=self.root)
+                    graph_tmp = ScrollingGraph_PyQtGraph(reactor, config, cxn=self.cxn, root=self.root)
                 elif config.isImages:
-                    graph_tmp = ImageWidget(config, reactor)
+                    graph_tmp = ImageWidget(reactor, config)
                     self.graphDict[name] = graph_tmp
                     gli.append(graph_tmp)
                     continue
                 elif config.isHist:
-                    graph_tmp = Hist_PyQtGraph(config, reactor, cxn=self.cxn, root=self.root)
+                    graph_tmp = Hist_PyQtGraph(reactor, config, cxn=self.cxn, root=self.root)
                     self.graphDict[name] = graph_tmp
                     gli.append(graph_tmp)
                     continue
                 else:
-                    graph_tmp = Graph_PyQtGraph(config, reactor, cxn=self.cxn, root=self.root)
+                    graph_tmp = Graph_PyQtGraph(reactor, config, cxn=self.cxn, root=self.root)
                 graph_tmp.set_ylimits(config.ylim)
                 self.graphDict[name] = graph_tmp
                 gli.append(graph_tmp)
@@ -93,8 +93,3 @@ class GraphWindow(QTabWidget):
         graph_tmp = Graph_PyQtGraph(tab, self.reactor, cxn=self.cxn, root=self.root)
         self.graphDict[tab] = graph_tmp
         self.addTab(graph_tmp, tab)
-
-
-if __name__ == '__main__':
-    from EGGS_labrad.clients import runGUI
-    runGUI(GraphWindow)

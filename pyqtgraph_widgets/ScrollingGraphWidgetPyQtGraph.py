@@ -1,12 +1,11 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication
-from .GraphWidgetPyQtGraph import Graph_PyQtGraph as Graph
+from RealSimpleGrapher.pyqtgraph_widgets import Graph_PyQtGraph
 
 
-class ScrollingGraph_PyQtGraph(Graph):
-
-    def __init__(self, name, reactor, parent=None, ylim=[0, 1], cxn=None, root=None):
-        super(ScrollingGraph_PyQtGraph, self).__init__(name, reactor, parent=parent, cxn=cxn, root=root)
+class ScrollingGraph_PyQtGraph(Graph_PyQtGraph):
+    def __init__(self, reactor, name, parent=None, ylim=[0, 1], cxn=None, root=None):
+        super().__init__(reactor, name, parent=parent, cxn=cxn, root=root)
         self.set_xlimits([0, 100])
         self.pointsToKeep = 100
 
@@ -38,3 +37,11 @@ class ScrollingGraph_PyQtGraph(Graph):
                 self.set_xlimits([xmin, xmax])
         except Exception as e:
             pass
+
+
+if __name__ == '__main__':
+    from EGGS_labrad.clients import runClient
+    import labrad
+    cxn = labrad.connect()
+    from RealSimpleGrapher.GUIConfig import graphConfig
+    runClient(ScrollingGraph_PyQtGraph, graphConfig('example', isScrolling=True), cxn=cxn)

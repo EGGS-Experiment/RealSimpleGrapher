@@ -40,8 +40,8 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
     displayed datasets, and a DataVaultListWidget for selecting datasets.
     """
 
-    def __init__(self, config, reactor, cxn=None, parent=None, root=None):
-        super(Graph_PyQtGraph, self).__init__(parent)
+    def __init__(self, reactor, config, cxn=None, parent=None, root=None):
+        super().__init__(parent)
         self.root = root
         from labrad.units import WithUnit as U
         self.U = U
@@ -310,6 +310,8 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
 
 if __name__ == '__main__':
-    from EGGS_labrad.clients import runGUI
-    runGUI(Graph_PyQtGraph, 'example')
-    main = Graph_PyQtGraph('example', reactor)
+    from EGGS_labrad.clients import runClient
+    import labrad
+    cxn = labrad.connect()
+    from RealSimpleGrapher.GUIConfig import graphConfig
+    runClient(Graph_PyQtGraph, graphConfig('example'), cxn=cxn)

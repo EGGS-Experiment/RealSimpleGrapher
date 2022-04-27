@@ -4,16 +4,15 @@ from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 
 class ImageWidget(QWidget):
 
-    def __init__(self, config, reactor, parent=None, cxn=None):
+    def __init__(self, reactor, config, parent=None, cxn=None):
         super(ImageWidget, self).__init__(parent)
-
         self.reactor = reactor
         self.artists = {}
         self.should_stop = False
         self.name = config.name
         self.image_list = []
         self.image_index = 0
-
+        # start UI
         self.initUI()
 
     def initUI(self):
@@ -89,6 +88,8 @@ class ImageWidget(QWidget):
 
 
 if __name__ == '__main__':
-    from EGGS_labrad.clients import runGUI
-    runGUI(ImageWidget, 'Example')
-    #main = ImageWidget('Example', reactor)
+    from EGGS_labrad.clients import runClient
+    import labrad
+    cxn = labrad.connect()
+    from RealSimpleGrapher.GUIConfig import graphConfig
+    runClient(ImageWidget, graphConfig('example', isImages=True), cxn=cxn)

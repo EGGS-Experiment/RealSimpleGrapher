@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QFrame, QSplitter, QVBoxLayout, QHB
 from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
 
-from TraceListWidget import TraceList
+from RealSimpleGrapher.TraceListWidget import TraceList
 
 
 class artistParameters():
@@ -24,10 +24,10 @@ class artistParameters():
 
 
 class Hist_PyQtGraph(QWidget):
-    def __init__(self, config, reactor, cxn=None, parent=None):
+    def __init__(self, reactor, config, cxn=None, parent=None):
         super(Hist_PyQtGraph, self).__init__(parent)
         self.cxn = cxn
-        self.pv = self.cxn.parametervault
+        self.pv = self.cxn.parameter_vault
         self.reactor = reactor
         self.artists = {}
         self.should_stop = False
@@ -213,6 +213,8 @@ class Hist_PyQtGraph(QWidget):
 
 
 if __name__ == '__main__':
-    from EGGS_labrad.clients import runGUI
-    runGUI(Hist_PyQtGraph, 'example')
-    main = Hist_PyQtGraph('example', reactor)
+    from EGGS_labrad.clients import runClient
+    import labrad
+    cxn = labrad.connect()
+    from RealSimpleGrapher.GUIConfig import graphConfig
+    runClient(Hist_PyQtGraph, graphConfig('example', isHist=True), cxn=cxn)
