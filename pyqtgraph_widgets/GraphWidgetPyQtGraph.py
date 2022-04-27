@@ -274,9 +274,11 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         if autorangeEnable:
             self.pw.enableAutoRange()
             self.autorangebutton.setText('Autorange On')
+            self.autorangebutton.setStyleSheet("background-color:grey")
         else:
             self.pw.disableAutoRange()
             self.autorangebutton.setText('Autorange Off')
+            self.autorangebutton.setStyleSheet("background-color:black")
 
     @inlineCallbacks
     def get_init_vline(self):
