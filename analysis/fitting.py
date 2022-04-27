@@ -1,9 +1,13 @@
 """
 Generic fitter class.
 """
+__all__ = ["FitWrapper"]
+
 from scipy import optimize
 from numpy import linspace, zeros
+
 from .fit_models import *
+
 
 _MODEL_DICT = {
     'Lorentzian': Lorentzian,
