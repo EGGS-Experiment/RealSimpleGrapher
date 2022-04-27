@@ -2,7 +2,7 @@
 Fitter class for exponential decays.
 """
 from numpy import exp
-from analysis.model import Model, ParameterInfo
+from RealSimpleGrapher.analysis.model import Model, ParameterInfo
 
 
 class ExponentialDecay(Model):

@@ -3,7 +3,7 @@ Fitter class for Bessel functions.
 """
 from scipy.special import jv
 from numpy import argmax, min
-from analysis.model import Model, ParameterInfo
+from RealSimpleGrapher.analysis.model import Model, ParameterInfo
 
 
 class Bessel(Model):

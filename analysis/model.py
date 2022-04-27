@@ -1,7 +1,7 @@
 """
 Fitting wrapper class.
 """
-
+#__all__ = ["Model", "ParameterInfo"]
 
 class ParameterInfo(object):
     def __init__(self, parameter, index, guess_func, vary=True):

@@ -2,7 +2,7 @@
 Fitter class for Sinusoids.
 """
 from numpy import pi, sin
-from analysis.model import Model, ParameterInfo
+from RealSimpleGrapher.analysis.model import Model, ParameterInfo
 
 
 class Sinusoid2(Model):

@@ -5,16 +5,16 @@ Contains all fitting models.
 __all__ = ['Lorentzian', 'Gaussian', 'Rabi', 'RotRabi', 'RotRamsey', 'Linear', 'Bessel', 'Sinusoid', 'Sinusoid2',
            'ExponentialDecay', 'GaussianDecay', 'RamseyDecay', 'RamseyBfield']
 
-from analysis.fit_models.fit_lorentzian import Lorentzian
-from analysis.fit_models.fit_gaussian import Gaussian
-from analysis.fit_models.fit_linear import Linear
-from analysis.fit_models.fit_rabi import Rabi
-from analysis.fit_models.fit_bessel import Bessel
-from analysis.fit_models.fit_rotrabi import RotRabi
-from analysis.fit_models.fit_rotramsey import RotRamsey
-from analysis.fit_models.fit_sinusoid import Sinusoid
-from analysis.fit_models.fit_sinusoid2 import Sinusoid2
-from analysis.fit_models.fit_expdecay import ExponentialDecay
-from analysis.fit_models.fit_gaussdecay import GaussianDecay
-from analysis.fit_models.fit_ramsey import RamseyDecay
-from analysis.fit_models.fit_ramseybfield import RamseyBfield
+from .fit_lorentzian import Lorentzian
+from .fit_gaussian import Gaussian
+from .fit_linear import Linear
+from .fit_rabi import Rabi
+from .fit_bessel import Bessel
+from .fit_rotrabi import RotRabi
+from .fit_rotramsey import RotRamsey
+from .fit_sinusoid import Sinusoid
+from .fit_sinusoid2 import Sinusoid2
+from .fit_expdecay import ExponentialDecay
+from .fit_gaussdecay import GaussianDecay
+from .fit_ramsey import RamseyDecay
+from .fit_ramseybfield import RamseyBfield

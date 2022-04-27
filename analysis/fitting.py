@@ -3,7 +3,7 @@ Generic fitter class.
 """
 from scipy import optimize
 from numpy import linspace, zeros
-from analysis.fit_models import *
+from .fit_models import *
 
 _MODEL_DICT = {
     'Lorentzian': Lorentzian,

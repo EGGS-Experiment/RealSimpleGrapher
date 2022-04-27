@@ -2,7 +2,7 @@
 Fitter class for Linear fits
 """
 from numpy import mean
-from analysis.model import Model, ParameterInfo
+from RealSimpleGrapher.analysis.model import Model, ParameterInfo
 
 
 class Linear(Model):

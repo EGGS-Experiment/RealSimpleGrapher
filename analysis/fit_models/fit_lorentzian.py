@@ -2,7 +2,7 @@
 Fitter class for Lorentzians.
 """
 from numpy import argmax, min
-from analysis.model import Model, ParameterInfo
+from RealSimpleGrapher.analysis.model import Model, ParameterInfo
 
 
 class Lorentzian(Model):
