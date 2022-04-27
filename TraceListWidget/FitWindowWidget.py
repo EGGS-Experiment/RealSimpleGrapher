@@ -1,4 +1,4 @@
-from analysis import FitWrapper
+from RealSimpleGrapher.analysis import FitWrapper
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QComboBox, QTableWidget, QTableWidgetItem, QPushButton, QDoubleSpinBox, QLabel

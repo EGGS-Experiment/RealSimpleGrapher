@@ -9,8 +9,8 @@ from PyQt5.QtGui import QColor
 from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
 
-from TraceListWidget import TraceList
-from DataVaultListWidget.DataVaultListWidget import DataVaultList
+from RealSimpleGrapher.TraceListWidget import TraceList
+from RealSimpleGrapher.DataVaultListWidget import DataVaultList
 
 from sys import settrace
 from itertools import cycle

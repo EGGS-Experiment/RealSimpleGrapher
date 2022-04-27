@@ -9,10 +9,11 @@ qt5reactor.install()
 from os import _exit
 from random import randrange
 from PyQt5.QtGui import QIcon
-from GraphWindow import GraphWindow
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks
-from DataVaultListWidget import Dataset
+
+from GraphWindow import GraphWindow
+from RealSimpleGrapher.DataVaultListWidget import Dataset
 
 
 class RSG_client(object):
