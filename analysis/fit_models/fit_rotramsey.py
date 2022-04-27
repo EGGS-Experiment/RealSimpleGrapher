@@ -2,12 +2,12 @@
 Fitter class for Rabi flops
 """
 from RealSimpleGrapher.analysis.model import Model, ParameterInfo
-from analysis.rabi import motional_distribution as md
-from analysis.rabi import rabi_coupling as rc
-import scipy.constants as scc
+from RealSimpleGrapher.analysis.rabi import rabi_coupling as rc
+from RealSimpleGrapher.analysis.rabi import motional_distribution as md
 
 import math
 import numpy as np
+import scipy.constants as scc
 
 
 class RotRamsey(Model):

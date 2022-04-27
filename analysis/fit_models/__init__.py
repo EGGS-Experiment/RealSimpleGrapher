@@ -2,8 +2,10 @@
 Contains all fitting models.
 """
 
-__all__ = ['Lorentzian', 'Gaussian', 'Rabi', 'RotRabi', 'RotRamsey', 'Linear', 'Bessel', 'Sinusoid', 'Sinusoid2',
-           'ExponentialDecay', 'GaussianDecay', 'RamseyDecay', 'RamseyBfield']
+__all__ = ['Lorentzian', 'Gaussian', 'Rabi', 'RotRabi',
+           'RotRamsey', 'Linear', 'Bessel', 'Sinusoid',
+           'Sinusoid2', 'ExponentialDecay', 'GaussianDecay',
+           'RamseyDecay', 'RamseyBfield']
 
 from .fit_lorentzian import Lorentzian
 from .fit_gaussian import Gaussian
