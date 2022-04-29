@@ -2,7 +2,7 @@
 Fitter class for Ramsey experiments.
 """
 from numpy import pi, exp, cos
-from RealSimpleGrapher.analysis.model import Model, ParameterInfo
+from .model import Model, ParameterInfo
 
 
 class RamseyDecay(Model):

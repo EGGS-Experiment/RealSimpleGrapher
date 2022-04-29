@@ -3,7 +3,7 @@ Generic class for testing models and fitting.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from analysis import FitWrapper
+from RealSimpleGrapher.analysis import FitWrapper
 
 
 class ModelTest(object):

@@ -2,7 +2,7 @@
 Fitter class for Ramsey B-field.
 """
 from numpy import pi, cos, exp
-from RealSimpleGrapher.analysis.model import Model, ParameterInfo
+from .model import Model, ParameterInfo
 
 
 class RamseyBfield(Model):

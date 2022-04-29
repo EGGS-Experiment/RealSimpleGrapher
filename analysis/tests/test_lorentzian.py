@@ -2,7 +2,7 @@
 Test for Lorentzian fits.
 """
 from .model_test import ModelTest
-from analysis.fit_models.fit_lorentzian import Lorentzian
+from RealSimpleGrapher.analysis.fit_models import Lorentzian
 
 test = ModelTest(Lorentzian, 'Lorentzian')
 true_params = [130., 1., 5., 0.1]

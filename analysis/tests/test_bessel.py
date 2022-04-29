@@ -2,7 +2,7 @@
 Test for Bessel fits.
 """
 from .model_test import ModelTest
-from analysis.fit_models.fit_bessel import Bessel
+from RealSimpleGrapher.analysis.fit_models import Bessel
 
 test = ModelTest(Bessel, 'Bessel')
 true_params = [130., 1., 5., 0.1, 1]

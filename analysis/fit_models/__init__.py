@@ -1,5 +1,6 @@
 """
-Contains all fitting models.
+Contains all models for fitting.
+Used by analysis.fitting.FitWrapper.
 """
 
 __all__ = ['Lorentzian', 'Gaussian', 'Rabi', 'RotRabi',

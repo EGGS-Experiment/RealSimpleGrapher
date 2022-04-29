@@ -1,22 +1,16 @@
 __all__ = []
 
 # fitting
-from RealSimpleGrapher.analysis import fitting
-from RealSimpleGrapher.analysis.fitting import *
+from . import fitting
+from .fitting import *
 __all__.extend(fitting.__all__)
 
-# model
-from RealSimpleGrapher.analysis import model
-from RealSimpleGrapher.analysis.model import *
-__all__.extend(model.__all__)
+# fit_models
+from . import fit_models
+from .fit_models import *
+__all__.extend(fit_models.__all__)
 
 # rabi
-from RealSimpleGrapher.analysis import rabi
-from RealSimpleGrapher.analysis.rabi import *
+from . import rabi
+from .rabi import *
 __all__.extend(rabi.__all__)
-
-
-# fit_models
-from RealSimpleGrapher.analysis import fit_models
-from RealSimpleGrapher.analysis.fit_models import *
-__all__.extend(fit_models.__all__)

@@ -2,7 +2,7 @@
 Fitter class for Gaussian Decays.
 """
 from numpy import exp
-from RealSimpleGrapher.analysis.model import Model, ParameterInfo
+from .model import Model, ParameterInfo
 
 
 class GaussianDecay(Model):

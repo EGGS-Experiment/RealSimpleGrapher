@@ -2,7 +2,7 @@
 Fitter class for Rabi flops.
 """
 import numpy as np
-from RealSimpleGrapher.analysis.model import Model, ParameterInfo
+from .model import Model, ParameterInfo
 
 from RealSimpleGrapher.analysis.rabi import rabi_coupling as rc
 from RealSimpleGrapher.analysis.rabi import motional_distribution as md

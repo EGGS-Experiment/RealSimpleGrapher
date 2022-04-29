@@ -2,7 +2,7 @@
 Test for Linear fits.
 """
 from .model_test import ModelTest
-from analysis.fit_models.fit_linear import Linear
+from RealSimpleGrapher.analysis.fit_models import Linear
 
 test = ModelTest(Linear, 'Linear')
 true_params = [0.3, 4]

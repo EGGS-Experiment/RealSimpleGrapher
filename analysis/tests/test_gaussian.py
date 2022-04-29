@@ -2,7 +2,7 @@
 Test for Gaussian fits.
 """
 from .model_test import ModelTest
-from analysis.fit_models.fit_gaussian import Gaussian
+from RealSimpleGrapher.analysis.fit_models import Gaussian
 
 test = ModelTest(Gaussian, 'Gaussian')
 true_params = [130., 4., 5., 0.1]

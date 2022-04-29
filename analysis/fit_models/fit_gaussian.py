@@ -2,7 +2,7 @@
 Fitter class for Linear fits.
 """
 from numpy import exp, argmax
-from RealSimpleGrapher.analysis.model import Model, ParameterInfo
+from .model import Model, ParameterInfo
 
 
 class Gaussian(Model):

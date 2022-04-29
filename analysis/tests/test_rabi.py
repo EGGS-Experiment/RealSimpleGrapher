@@ -2,7 +2,7 @@
 Test for Rabi flop fits.
 """
 from .model_test import ModelTest
-from analysis.fit_models.fit_rabi import Rabi
+from RealSimpleGrapher.analysis.fit_models import Rabi
 from numpy import pi
 
 test = ModelTest(Rabi, 'Rabi')
