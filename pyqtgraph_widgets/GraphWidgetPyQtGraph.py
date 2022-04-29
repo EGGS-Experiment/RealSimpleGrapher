@@ -188,7 +188,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             if self.show_points and not no_points:
                 line = self.pw.plot([], [], symbol=None, symbolBrush=new_color,
                                     name=ident, pen=new_color, connect=self.scatter_plot,
-                                    setSkipFiniteCheck=True)
+                                    SkipFiniteCheck=True)
             else:
                 line = self.pw.plot([], [], symbol=None, pen=new_color, name=ident)
             if self.grid_on:
@@ -311,7 +311,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
 if __name__ == '__main__':
     from EGGS_labrad.clients import runClient
+    from RealSimpleGrapher.GUIConfig import graphConfig
     import labrad
     cxn = labrad.connect()
-    from RealSimpleGrapher.GUIConfig import graphConfig
     runClient(Graph_PyQtGraph, graphConfig('example'), cxn=cxn)

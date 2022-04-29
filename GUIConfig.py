@@ -8,9 +8,6 @@ from importlib.util import find_spec
 """
 Set global configuration options.
 """
-
-#todo: set background color
-#todo: set text color
 pg.setConfigOption('background', 'k')
 pg.setConfigOption('foreground', 'y')
 pg.setConfigOption('antialias', False)
@@ -35,13 +32,14 @@ class traceListConfig():
 
 class graphConfig():
     """
-    Config for an individual graph within a GridGraphWindow.
+    Config for an individual graph within a GridGraphWindow (i.e. a grapher unit).
     Sets graphing-related settings such as axes limits and horizontal/vertical lines.
     """
 
-    def __init__(self, name, ylim=[0, 1], isScrolling=False, max_datasets=20,
-                 show_points=True, grid_on=False, scatter_plot='all', isImages=False,
-                 isHist=False, line_param=None, vline=None, vline_param=None, hline=None, hline_param=None):
+    def __init__(self, name, ylim=[0, 1], max_datasets=20,
+                 isScrolling=False, isImages=False, isHist=False,
+                 show_points=True, grid_on=False, scatter_plot='all',
+                 line_param=None, vline=None, vline_param=None, hline=None, hline_param=None):
         self.name = name
         self.ylim = ylim
         self.isScrolling = isScrolling
@@ -80,7 +78,7 @@ tabs holds the tabs on the RSG window.
 Each tab must be a gridGraphConfig object, which can contain one or more graphConfig objects.
 graphConfig objects correspond to a complete graphing unit (i.e. traceList and grapher).
 If a gridGraphConfig object holds multiple graphConfig objects, their positions must be 
-specified in the format x_pos, y_pos.
+    specified in the format x_pos, y_pos.
 """
 
 tabs = [

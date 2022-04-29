@@ -40,6 +40,9 @@ class TraceList(QListWidget):
         self.customContextMenuRequested.connect(self.popupMenu)
 
     def addTrace(self, ident, color):
+        """
+        Adds a trace to the TraceListWidget.
+        """
         item = QListWidgetItem(ident)
         # set color of artist entry in tracelist
         if self.use_trace_color:
@@ -52,16 +55,25 @@ class TraceList(QListWidget):
         self.trace_dict[ident] = item
 
     def removeTrace(self, ident):
+        """
+        Removes a trace from the TraceListWidget.
+        """
         item = self.trace_dict[ident]
         row = self.row(item)
         self.takeItem(row)
         item = None
 
     def changeTraceListColor(self, ident, new_color):
+        """
+        Changes the color of a trace.
+        """
         item = self.trace_dict[ident]
         item.setForeground(new_color)
 
     def popupMenu(self, pos):
+        """
+        Manages the pop-up menu that happens upon a right-click.
+        """
         menu = QMenu()
         item = self.itemAt(pos)
         if item is None:
