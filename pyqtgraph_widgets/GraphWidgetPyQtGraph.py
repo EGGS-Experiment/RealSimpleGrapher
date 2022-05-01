@@ -88,6 +88,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         """
         Draws the UI.
         """
+        # todo: clean up
         # import constituent widgets
         self.tracelist = TraceList(self, root=self.root)
         self.dv = DataVaultList(self.name, cxn=self.cxn, root=self.root)
@@ -178,17 +179,65 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                 except Exception as e:
                     pass
 
+    def display(self, ident, shown):
+        try:
+            artist = self.artists[ident].artist
+            if shown:
+                self.pw.addItem(artist)
+                self.artists[ident].shown = True
+            else:
+                self.pw.removeItem(artist)
+                self.artists[ident].shown = False
+        except KeyError:
+            raise Exception('404 Artist not found')
+
+    @inlineCallbacks
+    def add_dataset(self, dataset):
+        """
+        Adds a dataset.
+        Triggered by TraceListWidget when we click on a dataset.
+        """
+        try:
+            self.dataset_queue.put(dataset, block=False)
+        except QueueFull:
+            #print('Dataset queue full. Removing previous dataset.')
+            remove_ds = self.dataset_queue.get()
+            self.remove_dataset(remove_ds)
+            self.dataset_queue.put(dataset, block=False)
+            # todo: dataset gets put into dataset_queue even though all artists may not be put in
+            # todo: even if the new dataset is the same as the old one, or if nothing gets put in,
+            # we remove the current one anyways - maybe check for that first
+            # todo/tothink (?): even if dataset is the same, if we have ***, then queue has multiple datasets
+        labels = yield dataset.getLabels()
+        for i, label in enumerate(labels):
+            self.add_artist(label, dataset, i)
+
+    @inlineCallbacks
+    def remove_dataset(self, dataset):
+        """
+        Removes all the artists/traces of a dataset from the
+        holding dictionary self.artists.
+        Triggered when dataset_queue is full.
+        Arguments:
+            dataset: the dataset to remove.
+        """
+        labels = yield dataset.getLabels()
+        for label in labels:
+            self.remove_artist(label)
+
     def add_artist(self, ident, dataset, index, no_points=False):
         """
-        no_points is an override parameter to the global show_points setting.
-        It is to allow data fits to be plotted without points
-        todo: document
+        Adds an artist/trace from a dataset.
+        Arguments:
+            no_points   (bool)  : an override parameter to the global show_points setting,
+                                    allowing data fits to be plotted without points
         """
         if ident not in self.artists.keys():
             new_color = next(self.colorChooser)
-            if self.show_points and not no_points:
-                line = self.pw.plot([], [], symbol=None, symbolBrush=new_color,
-                                    name=ident, pen=new_color, connect=self.scatter_plot,
+            if (self.show_points) and (not no_points):
+                line = self.pw.plot([], [],
+                                    symbol=None, symbolBrush=new_color, pen=new_color,
+                                    name=ident, connect=self.scatter_plot,
                                     SkipFiniteCheck=True)
             else:
                 line = self.pw.plot([], [], symbol=None, pen=new_color, name=ident)
@@ -204,7 +253,10 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     def remove_artist(self, ident):
         """
-        todo: document
+        Removes an artist (i.e. trace) from the PlotWidget and
+        the holding dictionary self.artist.
+        Arguments:
+            ident   (str)   : the artist/trace name.
         """
         try:
             artist = self.artists[ident].artist
@@ -212,23 +264,34 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             self.tracelist.removeTrace(ident)
             self.artists[ident].shown = False
             del self.artists[ident]
-            # todo: dataset doesn't get removed even if we have no traces left, i.e.e
+            # todo: dataset doesn't get removed even if we have no traces left, i.e.
             # if dataset is empty, then remove dataset from queue
         except Exception as e:
             print("Remove failed")
 
-    def display(self, ident, shown):
-        try:
-            artist = self.artists[ident].artist
-            if shown:
-                self.pw.addItem(artist)
-                self.artists[ident].shown = True
-            else:
-                self.pw.removeItem(artist)
-                self.artists[ident].shown = False
-        except KeyError:
-            raise Exception('404 Artist not found')
 
+    # CONFIGURE PLOTWIDGET
+    def set_xlimits(self, limits):
+        self.pw.setXRange(limits[0], limits[1])
+        self.current_limits = limits
+
+    def set_ylimits(self, limits):
+        self.pw.setYRange(limits[0], limits[1])
+
+    @inlineCallbacks
+    def get_init_vline(self):
+        init_vline = yield self.pv.get_parameter(self.vline_param[0],
+                                                 self.vline_param[1])
+        returnValue(init_vline)
+
+    @inlineCallbacks
+    def get_init_hline(self):
+        init_hline = yield self.pv.get_parameter(self.hline_param[0],
+                                                 self.hline_param[1])
+        returnValue(init_hline)
+
+
+    # SLOTS
     def checkboxChanged(self):
         for ident, item in self.tracelist.trace_dict.items():
             try:
@@ -240,43 +303,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             except KeyError:
                 pass
 
-    @inlineCallbacks
-    def add_dataset(self, dataset):
-        """
-        todo: document
-        """
-        try:
-            self.dataset_queue.put(dataset, block=False)
-        except QueueFull:
-            #print('Dataset queue full. Removing previous dataset.')
-            remove_ds = self.dataset_queue.get()
-            self.remove_dataset(remove_ds)
-            self.dataset_queue.put(dataset, block=False)
-            # todo: dataset gets put into dataset_queue even though all artists may not be put in
-            # todo: even if the new dataset is the same as the old one, or if nothing gets put in,
-            # we remove the current one anyways - maybe check for that first
-        labels = yield dataset.getLabels()
-        for i, label in enumerate(labels):
-            self.add_artist(label, dataset, i)
-
-    @inlineCallbacks
-    def remove_dataset(self, dataset):
-        """
-        todo: document
-        """
-        labels = yield dataset.getLabels()
-        for label in labels:
-            self.remove_artist(label)
-
-    def set_xlimits(self, limits):
-        self.pw.setXRange(limits[0], limits[1])
-        self.current_limits = limits
-
-    def set_ylimits(self, limits):
-        self.pw.setYRange(limits[0], limits[1])
-
-
-    # SLOTS
     def rangeChanged(self):
         lims = self.pw.viewRange()
         self.pointsToKeep = lims[0][1] - lims[0][0]
@@ -297,18 +323,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             self.pw.disableAutoRange()
             self.autorangebutton.setText('Autorange Off')
             self.autorangebutton.setStyleSheet("background-color:black")
-
-    @inlineCallbacks
-    def get_init_vline(self):
-        init_vline = yield self.pv.get_parameter(self.vline_param[0],
-                                                 self.vline_param[1])
-        returnValue(init_vline)
-
-    @inlineCallbacks
-    def get_init_hline(self):
-        init_hline = yield self.pv.get_parameter(self.hline_param[0],
-                                                 self.hline_param[1])
-        returnValue(init_hline)
 
     @inlineCallbacks
     def vline_changed(self, sig):
@@ -333,4 +347,3 @@ if __name__ == '__main__':
     import labrad
     cxn = labrad.connect()
     runClient(Graph_PyQtGraph, graphConfig('example'), cxn=cxn)
-# todo: profile rsg to see where exactly overhead is coming from
