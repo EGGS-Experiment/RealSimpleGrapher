@@ -4,10 +4,10 @@ from twisted.internet.defer import inlineCallbacks, returnValue, DeferredLock
 
 
 class Dataset(QObject):
-    '''
+    """
     Parent class for datasets.
     Serves as a wrapper for LabRAD datasets.
-    '''
+    """
 
     def __init__(self, data_vault, context, dataset_location, reactor):
         super(Dataset, self).__init__()

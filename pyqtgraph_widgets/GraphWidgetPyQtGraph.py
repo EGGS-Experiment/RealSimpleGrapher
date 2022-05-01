@@ -2,8 +2,8 @@
 A normal graph widget. The "base unit" of the RSG.
 """
 import pyqtgraph as pg
-from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
+from PyQt5 import QtWidgets
 from PyQt5.QtGui import QColor
 
 from twisted.internet.task import LoopingCall
@@ -18,11 +18,12 @@ from queue import Queue, Full as QueueFull
 
 settrace(None)
 
-
+# todo: move this to a separate page
 class artistParameters():
     def __init__(self, artist, dataset, index, shown):
         self.artist = artist
         self.dataset = dataset
+        # index holds which artist (i.e. trace) of the dataset it is
         self.index = index
         self.shown = shown
         # update counter in the Dataset object, only
@@ -35,8 +36,8 @@ class artistParameters():
 
 class Graph_PyQtGraph(QtWidgets.QWidget):
     """
-    A normal graph widget. The "base unit" of the RSG. Contains a
-    PlotWidget for plotting data, a TraceListWidget for managing
+    A normal graph widget. The "base unit" of the RSG.
+    Contains a PlotWidget for plotting data, a TraceListWidget for managing
     displayed datasets, and a DataVaultListWidget for selecting datasets.
     """
 
@@ -69,13 +70,15 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.live_update_loop = LoopingCall(self.update_figure)
         self.live_update_loop.start(0)
         # colors
-        # todo: move this to GUIConfig
-        self.colors = [QColor(Qt.red).lighter(130),
-                  QColor(Qt.green),
-                  QColor(Qt.yellow),
-                  QColor(Qt.cyan),
-                  QColor(Qt.magenta).lighter(120),
-                  QColor(Qt.white)]
+        # todo: move this to GUIConfig, and make a separate object
+        self.colors = [
+            QColor(Qt.red).lighter(130),
+            QColor(Qt.green),
+            QColor(Qt.yellow),
+            QColor(Qt.cyan),
+            QColor(Qt.magenta).lighter(120),
+            QColor(Qt.white)
+        ]
         self.colorChooser = cycle(self.colors)
         self.autoRangeEnable = True
         self.initUI()
@@ -111,7 +114,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             init_value = yield self.get_init_hline()
             self.inf.setValue(init_value)
             self.inf.setPen(width=5.0)
-        # layout widgets
+        # lay out widgets
         lsplitter = QtWidgets.QSplitter()
         lsplitter.setOrientation(Qt.Vertical)
         lsplitter.addWidget(tracelistLabel)
@@ -119,20 +122,18 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         lsplitter.addWidget(self.dv)
         splitter = QtWidgets.QSplitter()
         splitter.addWidget(lsplitter)
-        hbox = QtWidgets.QHBoxLayout()
+        hbox = QtWidgets.QHBoxLayout(self)
         hbox.addWidget(splitter)
         # frame/vbox is everything on RHS
         frame = QtWidgets.QFrame()
-        vbox = QtWidgets.QVBoxLayout()
+        vbox = QtWidgets.QVBoxLayout(frame)
         self.title = QtWidgets.QLabel(self.name)
         vbox.addWidget(self.title)
         vbox.addWidget(self.pw)
-        frame.setLayout(vbox)
         splitter.addWidget(frame)
         # create bottom buttons
         pwButtons = QtWidgets.QWidget()
-        pwButtons_layout = QtWidgets.QHBoxLayout()
-        pwButtons.setLayout(pwButtons_layout)
+        pwButtons_layout = QtWidgets.QHBoxLayout(pwButtons)
         self.coords = QtWidgets.QLabel('')
         self.autorangebutton = QtWidgets.QPushButton('Autorange Off')
         self.autorangebutton.setCheckable(True)
@@ -140,8 +141,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         pwButtons_layout.addWidget(self.coords)
         pwButtons_layout.addWidget(self.autorangebutton)
         vbox.addWidget(pwButtons)
-        # set layout
-        self.setLayout(hbox)
         # self.legend = self.pw.addLegend()
         self.tracelist.itemChanged.connect(self.checkboxChanged)
         self.pw.plot([], [])
@@ -172,6 +171,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                         x = ds.data[:, 0]
                         y = ds.data[:, index + 1]
                         params.last_update = current_update
+                        # todo: maybe a lower overhead way to do setData? append?
                         params.artist.setData(x, y)
                         if x < 500:
                             params.artist.setData(symbol='o')
@@ -179,10 +179,11 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                     pass
 
     def add_artist(self, ident, dataset, index, no_points=False):
-        '''
+        """
         no_points is an override parameter to the global show_points setting.
         It is to allow data fits to be plotted without points
-        '''
+        todo: document
+        """
         if ident not in self.artists.keys():
             new_color = next(self.colorChooser)
             if self.show_points and not no_points:
@@ -195,16 +196,24 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                 self.pw.showGrid(x=True, y=True)
             self.artists[ident] = artistParameters(line, dataset, index, True)
             self.tracelist.addTrace(ident, new_color)
+            # todo: we get trace already added even when traces are different b/c
+            # we only test whether the name of the given trace exists, and many traces
+            # from different datasets have the same name
         else:
             print('Trace already added.')
 
     def remove_artist(self, ident):
+        """
+        todo: document
+        """
         try:
             artist = self.artists[ident].artist
             self.pw.removeItem(artist)
             self.tracelist.removeTrace(ident)
             self.artists[ident].shown = False
             del self.artists[ident]
+            # todo: dataset doesn't get removed even if we have no traces left, i.e.e
+            # if dataset is empty, then remove dataset from queue
         except Exception as e:
             print("Remove failed")
 
@@ -233,6 +242,9 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     @inlineCallbacks
     def add_dataset(self, dataset):
+        """
+        todo: document
+        """
         try:
             self.dataset_queue.put(dataset, block=False)
         except QueueFull:
@@ -240,12 +252,18 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             remove_ds = self.dataset_queue.get()
             self.remove_dataset(remove_ds)
             self.dataset_queue.put(dataset, block=False)
+            # todo: dataset gets put into dataset_queue even though all artists may not be put in
+            # todo: even if the new dataset is the same as the old one, or if nothing gets put in,
+            # we remove the current one anyways - maybe check for that first
         labels = yield dataset.getLabels()
         for i, label in enumerate(labels):
             self.add_artist(label, dataset, i)
 
     @inlineCallbacks
     def remove_dataset(self, dataset):
+        """
+        todo: document
+        """
         labels = yield dataset.getLabels()
         for label in labels:
             self.remove_artist(label)
@@ -315,3 +333,4 @@ if __name__ == '__main__':
     import labrad
     cxn = labrad.connect()
     runClient(Graph_PyQtGraph, graphConfig('example'), cxn=cxn)
+# todo: profile rsg to see where exactly overhead is coming from

@@ -13,6 +13,7 @@ from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks
 
 from GraphWindow import GraphWindow
+# todo: change to datavaultlistwidget import dataset?
 from RealSimpleGrapher.DataVaultListWidget import Dataset
 
 
@@ -72,6 +73,7 @@ class RSG_client(object):
         return self.cxn
 
     def initializeGUI(self, cxn):
+        # todo: make GUIClient?
         # GUI creation needs to be here since the connection needs to be established
         self.gui = GraphWindow(self.reactor, cxn=self.cxn, root=self)
         self.gui.setWindowTitle('Real Simple Grapher - Client')
