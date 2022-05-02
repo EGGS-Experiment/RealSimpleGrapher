@@ -51,7 +51,7 @@ class Graph_PyQtGraph(QWidget):
         # which is where points are received from the dataset objects
         # and pushed onto the plotwidget
         self.live_update_loop = LoopingCall(self._update_figure)
-        self.live_update_loop.start(1) #todo: check that maybe this is source of overhead???
+        self.live_update_loop.start(0.25)
         # colors
         self.colorChooser = cycle(colorList)
         # autoranging
@@ -232,7 +232,6 @@ class Graph_PyQtGraph(QWidget):
             # remove references to the artist
             self.pw.removeItem(artist)
             self.tracelist.removeTrace(ident)
-            self.artists[ident].shown = False #todo: is this necessary
             # remove the artist from dataset holder
             dataset_ident, trace_name = ident
             trace_names = self.datasets[dataset_ident]['trace_names']
@@ -251,24 +250,20 @@ class Graph_PyQtGraph(QWidget):
 
     # CONFIGURE PLOTWIDGET
     def set_xlimits(self, limits):
-        # todo: see if we can use * to unzip
-        self.pw.setXRange(limits[0], limits[1])
+        self.pw.setXRange(*limits)
         self.current_limits = limits
 
     def set_ylimits(self, limits):
-        self.pw.setYRange(limits[0], limits[1])
+        self.pw.setYRange(*limits)
 
     @inlineCallbacks
     def get_init_vline(self):
-        # todo: see if we can use * to unzip
-        init_vline = yield self.pv.get_parameter(self.vline_param[0],
-                                                 self.vline_param[1])
+        init_vline = yield self.pv.get_parameter(*self.vline_param)
         returnValue(init_vline)
 
     @inlineCallbacks
     def get_init_hline(self):
-        init_hline = yield self.pv.get_parameter(self.hline_param[0],
-                                                 self.hline_param[1])
+        init_hline = yield self.pv.get_parameter(*self.hline_param)
         returnValue(init_hline)
 
 
@@ -357,7 +352,6 @@ class Graph_PyQtGraph(QWidget):
                         x = ds.data[:, 0]
                         y = ds.data[:, index + 1]
                         params.last_update = current_update
-                        # todo: maybe a lower overhead way to do setData? append?
                         params.artist.setData(x, y)
                         # we can use symbols if we don't have too many points
                         if len(x) < 500:

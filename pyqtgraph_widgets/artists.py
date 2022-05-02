@@ -9,7 +9,7 @@ from PyQt5.QtGui import QColor
 
 class artistParameters:
     """
-    todo: document
+    Holds parameters for each artist to interact with the plotwidget.
     Arguments:
         artist: the PlotLine object used to create traces on the pyqtgraph.
         dataset: the Dataset object which provides data for the artist.

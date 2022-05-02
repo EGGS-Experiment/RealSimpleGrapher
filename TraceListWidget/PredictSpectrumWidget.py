@@ -15,7 +15,8 @@ class ParamInfo(object):
 
 class PredictSpectrum(QWidget):
     """
-    todo: document
+    Allows users to select parameters for a predicted spectrum
+    and add it to the RSG.
     """
 
     def __init__(self, parent):
@@ -28,7 +29,6 @@ class PredictSpectrum(QWidget):
         self.initUI()
 
     def initUI(self):
-        # todo: document and clean up
         trace_name = self.ident[1]
         self.setWindowTitle(trace_name)
         mainLayout = QVBoxLayout()
@@ -68,7 +68,6 @@ class PredictSpectrum(QWidget):
         headerLabels = ['Parameter', 'Value']
         self.parameterTable.setHorizontalHeaderLabels(headerLabels)
         self.parameterTable.horizontalHeader().setStretchLastSection(True)
-
         params = [
             'B Field', 'Line Center', 'Mode 1 Freq', 'Orders1', 'Mode 2 Freq',
             'Orders2', 'Mode 3 Freq', 'Orders3', 'Micromotion', 'Drive Frequency'
@@ -245,7 +244,8 @@ class EnergyLevel_CA_ion(EnergyLevel):
 
 class Transitions_SD(object):
     """
-    todo: document
+    Used by the PredictSpectrum object to store
+    the transitions of Ca-40+.
     """
     S = EnergyLevel_CA_ion('S', '1/2')
     D = EnergyLevel_CA_ion('D', '5/2')
@@ -276,7 +276,10 @@ class Transitions_SD(object):
         return ans
 
     def energies_to_magnetic_field(self, transitions):
-        # given two points in the form [(S-1/2D5+1/2, 1.0 MHz), (-1/2, 5+/2, 2.0 MHz)], calculates the magnetic field
+        """
+        Given two points in the form [(S-1/2D5+1/2, 1.0 MHz), (-1/2, 5+/2, 2.0 MHz)],
+        calculates the magnetic field.
+        """
         try:
             transition1, transition2 = transitions
         except ValueError:
@@ -294,5 +297,7 @@ class Transitions_SD(object):
         return B, offset
 
     def str_to_fractions(self, inp):
-        # takes S-1/2D5+1/2 and converts to Fraction(-1/2), Fraction(1/2)
+        """
+        Takes S-1/2D5+1/2 and converts to Fraction(-1/2), Fraction(1/2).
+        """
         return Fraction(inp[1:5]), Fraction(inp[6:10])

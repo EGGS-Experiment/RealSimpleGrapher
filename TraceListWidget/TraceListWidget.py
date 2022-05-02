@@ -33,8 +33,6 @@ class TraceList(QListWidget):
 
     def initUI(self):
         self.trace_dict = {}
-        item = QListWidgetItem('Traces') # todo: check if these are necessary
-        item.setCheckState(Qt.Checked)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.popupMenu)
 

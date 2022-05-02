@@ -117,8 +117,7 @@ class RSG_client(object):
         self.gui.graphDict[graph].update_image(data, image_size, name)
 
     def plot_with_axis(self, c, dataset_location, graph, axis, send_to_current=True):
-        minim = min(axis)
-        maxim = max(axis)
+        minim, maxim = min(axis), max(axis)
         if (graph != 'current') and send_to_current:
             self.gui.graphDict['current'].set_xlimits([minim[minim.units], maxim[maxim.units]])
         self.gui.graphDict[graph].set_xlimits([minim[minim.units], maxim[maxim.units]])
