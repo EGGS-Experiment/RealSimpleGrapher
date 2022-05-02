@@ -1,7 +1,7 @@
-from itertools import cycle
 from queue import Queue, Full as QueueFull
 
 import pyqtgraph as pg
+from itertools import cycle
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QWidget, QLabel, QFrame, QSplitter, QVBoxLayout, QHBoxLayout
@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QFrame, QSplitter, QVBoxLayout, QHB
 from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
 
+from .artists import artistParameters, colorList
 from RealSimpleGrapher.TraceListWidget import TraceList
 
 
@@ -23,13 +24,10 @@ class Hist_PyQtGraph(QWidget):
         self.name = config.name
         self.vline_name = config.vline
         self.vline_param = config.vline_param
-
         self.dataset_queue = Queue(config.max_datasets)
-
         self.live_update_loop = LoopingCall(self.update_figure)
         self.live_update_loop.start(0)
-
-        self.colorChooser = cycle(colors)
+        self.colorChooser = cycle(colorList)
         self.initUI()
 
     @inlineCallbacks
