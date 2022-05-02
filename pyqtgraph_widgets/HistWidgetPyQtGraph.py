@@ -12,17 +12,6 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 from RealSimpleGrapher.TraceListWidget import TraceList
 
 
-class artistParameters():
-    def __init__(self, artist, dataset, index, shown):
-        self.artist = artist
-        self.dataset = dataset
-        self.index = index
-        self.shown = shown
-        self.last_update = 0  # update counter in the Dataset object
-        # only redraw if the dataset has a higher
-        # update count
-
-
 class Hist_PyQtGraph(QWidget):
     def __init__(self, reactor, config, cxn=None, parent=None):
         super(Hist_PyQtGraph, self).__init__(parent)
@@ -40,12 +29,6 @@ class Hist_PyQtGraph(QWidget):
         self.live_update_loop = LoopingCall(self.update_figure)
         self.live_update_loop.start(0)
 
-        colors = [(255, 0, 0, 80),
-                  (0, 255, 0, 80),
-                  (255, 255, 0, 80),
-                  (0, 255, 255, 80),
-                  (255, 0, 255, 80),
-                  (255, 255, 255, 80)]
         self.colorChooser = cycle(colors)
         self.initUI()
 
