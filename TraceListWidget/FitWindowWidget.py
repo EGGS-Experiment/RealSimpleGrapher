@@ -1,13 +1,14 @@
 from RealSimpleGrapher.analysis import FitWrapper
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QComboBox, QTableWidget, QTableWidgetItem, QPushButton, QDoubleSpinBox, QLabel
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QComboBox,\
+    QTableWidget, QTableWidgetItem, QPushButton, QDoubleSpinBox, QLabel
 
 
 class RowInfo(object):
-    '''
+    """
     Container for the widgets with each row in the parameters table.
-    '''
+    """
 
     def __init__(self, vary, manual_value, fitted_value):
         self.vary_select = vary
@@ -16,6 +17,9 @@ class RowInfo(object):
 
 
 class FitWindow(QWidget):
+    """
+    todo: document
+    """
 
     def __init__(self, dataset, index, parent):
         super(FitWindow, self).__init__()
@@ -24,11 +28,12 @@ class FitWindow(QWidget):
         self.parent = parent
         self.fw = FitWrapper(dataset, index)
         self.row_info_dict = {}
-        self.ident = 'Fit: ' + str(self.dataset.dataset_name)
+        self.ident = (None, 'Fit: ' + str(self.dataset.dataset_name))
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle(self.ident)
+        trace_name = self.ident[1]
+        self.setWindowTitle(trace_name)
         mainLayout = QVBoxLayout()
         buttons = QHBoxLayout()
 
@@ -106,9 +111,9 @@ class FitWindow(QWidget):
             self.fw.setManualValue(p, manual_value)
 
     def updateParametersFromFitter(self):
-        '''
+        """
         Set the fitted and manual parameters fields to the fit values.
-        '''
+        """
         params = self.fw.getParameters()
         for p in params:
             row = self.row_info_dict[p]
@@ -117,11 +122,11 @@ class FitWindow(QWidget):
             row.manual_value.setValue(fitted_value)
 
     def plotFit(self):
-        '''
+        """
         Plot the fitted parameters.
         We need to wrap the data in a dataset
         object to use add_artist in GraphWidget
-        '''
+        """
 
         class dataset():
             def __init__(self, data):
@@ -138,20 +143,20 @@ class FitWindow(QWidget):
             self.parent.parent.add_artist(self.ident, ds, 0, no_points=True)
 
     def onActivated(self):
-        '''
+        """
         Run when model is changed.
         Reset row_info_dict each time the model is changed.
-        '''
+        """
         model = str(self.model_select.currentText())
         self.fw.setModel(model)
         self.row_info_dict = {}
         self.setupParameterTable()
 
     def onClick(self):
-        '''
+        """
         Send table parameters to fitter, perform fit,
         and then update parameter table with the results.
-        '''
+        """
 
         self.updateParametersToFitter()
         self.fw.doFit()
@@ -159,12 +164,11 @@ class FitWindow(QWidget):
         self.plotFit()
 
     def onPlot(self):
-        '''
+        """
         Plot the manual parameters.
         See documentation for plotFit().
-        '''
-
-        class dataset():
+        """
+        class dataset:
             def __init__(self, data):
                 self.data = data
                 self.updateCounter = 1
@@ -176,7 +180,7 @@ class FitWindow(QWidget):
             # remove the previous plot
             self.parent.parent.remove_artist(self.ident)
             self.parent.parent.add_artist(self.ident, ds, 0, no_points=True)
-        except:
+        except Exception as e:
             self.parent.parent.add_artist(self.ident, ds, 0, no_points=True)
 
     def closeEvent(self, event):

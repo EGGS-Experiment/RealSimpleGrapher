@@ -50,7 +50,6 @@ class RSG_client(object):
             # set self name to rsg client + node name + number (if multiple)
             localname = gethostname() + ' ' + self.name
             self.cxn = yield connectAsync(LABRADHOST, name=localname)
-
         # try to get servers
         try:
             self.reg = self.cxn.registry
@@ -60,7 +59,6 @@ class RSG_client(object):
         except Exception as e:
             print(e)
             raise
-
         # connect to signals
             # rsg signal
         # yield self.rsg.signal__plot_update(self.ID)
@@ -96,6 +94,11 @@ class RSG_client(object):
 
     # PLOTTING
     def make_dataset(self, dataset_location):
+        """
+        Create and initialize a dataset object.
+        Arguments:
+            dataset_location    ([str]): the dataset directory location in the data vault.
+        """
         cxt = self.cxn.context()
         ds = Dataset(self.dv, cxt, dataset_location, reactor)
         return ds

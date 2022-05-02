@@ -20,16 +20,22 @@ settrace(None)
 
 # todo: move this to a separate page
 class artistParameters():
+    """
+    todo: document
+    """
+
     def __init__(self, artist, dataset, index, shown):
+        # artist: the PlotLine object
         self.artist = artist
+        # dataset: the *** todo
         self.dataset = dataset
-        # index holds which artist (i.e. trace) of the dataset it is
+        # index: holds which artist (i.e. trace) of the dataset it is
         self.index = index
         self.shown = shown
-        # update counter in the Dataset object, only
-        # redraw if the dataset has a higher update count
+        # last_update: update counter in the Dataset object, only
+        # redraws if the dataset has a higher update count
         self.last_update = 0
-        # keep track of log mode
+        # lodModeX/Y: keeps track of log mode
         self.logModeX = False
         self.logModeY = False
 
@@ -41,7 +47,9 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
     displayed datasets, and a DataVaultListWidget for selecting datasets.
     """
 
+    # SETUP
     def __init__(self, reactor, config, cxn=None, parent=None, root=None):
+        # todo: clean up
         super().__init__(parent)
         self.root = root
         from labrad.units import WithUnit as U
@@ -51,26 +59,25 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.reactor = reactor
         self.artists = {}
         self.should_stop = False
+        # get properties from config
         self.name = config.name
-        # set lines from config
-        self.vline_name = config.vline
-        self.vline_param = config.vline_param
-        self.hline_name = config.hline
-        self.hline_param = config.hline_param
         self.show_points = config.show_points
         self.grid_on = config.grid_on
         self.scatter_plot = config.scatter_plot
+        # set lines from config
+        self.vline_name, self.vline_param = (config.vline, config.vline_param)
+        self.hline_name, self.hline_param = (config.hline, config.hline_param)
         # set background color
         self.setStyleSheet("background-color:black; color:white; border: 1px solid white")
         # dataset queue is used to store datasets
         self.dataset_queue = Queue(config.max_datasets)
-        # live_update_loop continuously calls update_figure,
+        # live_update_loop continuously calls _update_figure,
         # which is where points are received from the dataset objects
         # and pushed onto the plotwidget
-        self.live_update_loop = LoopingCall(self.update_figure)
-        self.live_update_loop.start(0)
+        self.live_update_loop = LoopingCall(self._update_figure)
+        self.live_update_loop.start(0) #todo: check that maybe this is source of overhead???
         # colors
-        # todo: move this to GUIConfig, and make a separate object
+        # todo: move this somewhere else and make an object
         self.colors = [
             QColor(Qt.red).lighter(130),
             QColor(Qt.green),
@@ -161,117 +168,132 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         # sigrangechanged and sigmouseclicked and return graphics scene
         # self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
 
-    def update_figure(self):
-        for ident, params in self.artists.items():
-            if params.shown:
-                try:
-                    ds = params.dataset
-                    index = params.index
-                    current_update = ds.updateCounter
-                    if params.last_update < current_update:
-                        x = ds.data[:, 0]
-                        y = ds.data[:, index + 1]
-                        params.last_update = current_update
-                        # todo: maybe a lower overhead way to do setData? append?
-                        params.artist.setData(x, y)
-                        if x < 500:
-                            params.artist.setData(symbol='o')
-                except Exception as e:
-                    pass
 
-    def display(self, ident, shown):
-        try:
-            artist = self.artists[ident].artist
-            if shown:
-                self.pw.addItem(artist)
-                self.artists[ident].shown = True
-            else:
-                self.pw.removeItem(artist)
-                self.artists[ident].shown = False
-        except KeyError:
-            raise Exception('404 Artist not found')
-
+    # DATASETS/TRACE MANAGEMENT
     @inlineCallbacks
     def add_dataset(self, dataset):
         """
         Adds a dataset.
         Triggered by TraceListWidget when we click on a dataset.
+        Arguments:
+            dataset (Dataset): the dataset to add.
         """
-        try:
-            self.dataset_queue.put(dataset, block=False)
-        except QueueFull:
-            #print('Dataset queue full. Removing previous dataset.')
-            remove_ds = self.dataset_queue.get()
-            self.remove_dataset(remove_ds)
-            self.dataset_queue.put(dataset, block=False)
-            # todo: dataset gets put into dataset_queue even though all artists may not be put in
-            # todo: even if the new dataset is the same as the old one, or if nothing gets put in,
-            # we remove the current one anyways - maybe check for that first
-            # todo/tothink (?): even if dataset is the same, if we have ***, then queue has multiple datasets
-        labels = yield dataset.getLabels()
-        for i, label in enumerate(labels):
-            self.add_artist(label, dataset, i)
+        # referenced to same dataset object
+        dataset_location = dataset.dataset_location
+        dataset_trace_names = yield dataset.getLabels()
+        existing_trace_names = set()
+        # get index corresponding to each trace within the dataset
+        index_dict = {}
+        for i, trace_name in enumerate(dataset_trace_names):
+            index_dict[trace_name] = i
+        # use old dataset if dataset already exists
+        if dataset_location in self.datasets.keys():
+            #del dataset
+            # get existing dataset and traces
+            dataset_holder = self.datasets[dataset_location]
+            dataset = dataset_holder['dataset']
+            existing_trace_names = dataset_holder['trace_names']
+            # update existing traces
+            self.datasets[dataset_location]['trace_names'] = set(dataset_trace_names)
+        # otherwise add new dataset to self.datasets
+        else:
+            self.datasets[dataset_location] = {
+                'dataset': dataset,
+                'trace_names': set(dataset_trace_names)
+            }
+        # get different traces and add each trace to artists
+        diff_trace_names = list(set(dataset_trace_names) - existing_trace_names)
+        for trace_name in diff_trace_names:
+            ident = (dataset_location, trace_name)
+            index = index_dict[trace_name]
+            self.add_artist(ident, dataset, index)
+        # try:
+        #     self.dataset_queue.put(dataset, block=False)
+        # except QueueFull:
+        #     #print('Dataset queue full. Removing previous dataset.')
+        #     remove_ds = self.dataset_queue.get()
+        #     self.remove_dataset(remove_ds)
+        #     self.dataset_queue.put(dataset, block=False)
+        # # create artists for each trace within the dataset and plot them
+        # for i, trace_name in enumerate(dataset_trace_names):
+        #     self.add_artist(trace_name, dataset, i)
 
     @inlineCallbacks
     def remove_dataset(self, dataset):
         """
-        Removes all the artists/traces of a dataset from the
-        holding dictionary self.artists.
-        Triggered when dataset_queue is full.
+        Removes all the traces of a dataset from the holding
+        dictionary self.artists.
+        Called only by add_dataset when dataset_queue is full.
         Arguments:
-            dataset: the dataset to remove.
+            dataset (Dataset): the dataset to remove.
         """
-        labels = yield dataset.getLabels()
-        for label in labels:
-            self.remove_artist(label)
+        # get all traces currently in use
+        dataset_location = dataset.dataset_location
+        existing_trace_names = self.datasets[dataset_location]['trace_names']
+        # remove traces
+        for trace_name in existing_trace_names:
+            self.remove_artist((dataset_location, trace_name))
+        # delete dataset
+        del self.datasets[dataset_location]
 
     def add_artist(self, ident, dataset, index, no_points=False):
         """
         Adds an artist/trace from a dataset.
+        Called only by add_dataset to add the traces within a dataset.
         Arguments:
             no_points   (bool)  : an override parameter to the global show_points setting,
-                                    allowing data fits to be plotted without points
+                                    allowing data fits to be plotted without points.
         """
         if ident not in self.artists.keys():
             new_color = next(self.colorChooser)
-            if (self.show_points) and (not no_points):
+            if self.show_points and (not no_points):
                 line = self.pw.plot([], [],
                                     symbol=None, symbolBrush=new_color, pen=new_color,
                                     name=ident, connect=self.scatter_plot,
                                     SkipFiniteCheck=True)
             else:
-                line = self.pw.plot([], [], symbol=None, pen=new_color, name=ident)
+                line = self.pw.plot([], [],
+                                    symbol=None, pen=new_color, name=ident)
             if self.grid_on:
                 self.pw.showGrid(x=True, y=True)
+            # add artist to holding dictionary and tracelist
             self.artists[ident] = artistParameters(line, dataset, index, True)
             self.tracelist.addTrace(ident, new_color)
-            # todo: we get trace already added even when traces are different b/c
-            # we only test whether the name of the given trace exists, and many traces
-            # from different datasets have the same name
         else:
             print('Trace already added.')
 
     def remove_artist(self, ident):
         """
-        Removes an artist (i.e. trace) from the PlotWidget and
-        the holding dictionary self.artist.
+        Removes an artist (i.e. trace) from the PlotWidget.
+        Called by remove_dataset when dataset_queue is full and
+        when we manually remove it via the TraceListWidget.
         Arguments:
-            ident   (str)   : the artist/trace name.
+            ident   ((dataset_location, trace_name)): a unique identifier for the artist
         """
         try:
             artist = self.artists[ident].artist
+            # remove references to the artist
             self.pw.removeItem(artist)
             self.tracelist.removeTrace(ident)
-            self.artists[ident].shown = False
+            self.artists[ident].shown = False #todo: is this necessary
+            # remove the artist from dataset holder
+            dataset_location, trace_name = ident
+            trace_names = self.datasets[dataset_location]['trace_names']
+            trace_names.remove(trace_name)
+            # delete the artist
             del self.artists[ident]
-            # todo: dataset doesn't get removed even if we have no traces left, i.e.
-            # if dataset is empty, then remove dataset from queue
+            # todo: if dataset is empty, then remove dataset from queue
+            # todo: what if artist doesn't exist in self.datasets?
+        except KeyError:
+            print("Error: artist already deleted. ident =", ident)
         except Exception as e:
-            print("Remove failed")
+            print("Error: remove failed.")
+            print(e)
 
 
     # CONFIGURE PLOTWIDGET
     def set_xlimits(self, limits):
+        # todo: see if we can use * to unzip
         self.pw.setXRange(limits[0], limits[1])
         self.current_limits = limits
 
@@ -280,6 +302,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     @inlineCallbacks
     def get_init_vline(self):
+        # todo: see if we can use * to unzip
         init_vline = yield self.pv.get_parameter(self.vline_param[0],
                                                  self.vline_param[1])
         returnValue(init_vline)
@@ -296,9 +319,9 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         for ident, item in self.tracelist.trace_dict.items():
             try:
                 if item.checkState() and not self.artists[ident].shown:
-                    self.display(ident, True)
+                    self._display(ident, True)
                 if not item.checkState() and self.artists[ident].shown:
-                    self.display(ident, False)
+                    self._display(ident, False)
             # this means the artist has been deleted.
             except KeyError:
                 pass
@@ -339,6 +362,49 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         units = param.units
         val = self.U(val, units)
         yield self.pv.set_parameter(self.hline_param[0], self.hline_param[1], val)
+    
+    
+    # HELPER
+    def _display(self, ident, shown):
+        """
+        Displays/removes a trace from the PlotWidget.
+        Called only by checkboxChanged.
+        Arguments:
+            ident   ([str], str): the unique identifier for the trace.
+            shown   (bool)      : whether the trace corresponding to ident is shown.
+        """
+        try:
+            artist = self.artists[ident].artist
+            if shown:
+                self.pw.addItem(artist)
+                self.artists[ident].shown = True
+            else:
+                self.pw.removeItem(artist)
+                self.artists[ident].shown = False
+        except KeyError:
+            raise Exception('404 Artist not found')
+
+    def _update_figure(self):
+        """
+        The main update loop which updates the artists
+        with data from the Datasets.
+        """
+        # todo: reduce overhead as much as possible since this is where everything happens
+        for ident, params in self.artists.items():
+            if params.shown:
+                try:
+                    ds, index, current_update = (params.dataset, params.index, ds.updateCounter)
+                    if params.last_update < current_update:
+                        x = ds.data[:, 0]
+                        y = ds.data[:, index + 1]
+                        params.last_update = current_update
+                        # todo: maybe a lower overhead way to do setData? append?
+                        params.artist.setData(x, y)
+                        # we can use symbols if we don't have too many points
+                        if x < 500:
+                            params.artist.setData(symbol='o')
+                except Exception as e:
+                    pass
 
 
 if __name__ == '__main__':

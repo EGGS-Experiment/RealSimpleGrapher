@@ -1,7 +1,7 @@
 import numpy as np
 from fractions import Fraction
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QPushButton, QLabel, QCheckBox, \
-    QDoubleSpinBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout,\
+    QTableWidget, QPushButton, QLabel, QCheckBox, QDoubleSpinBox
 
 
 class ParamInfo(object):
@@ -14,24 +14,28 @@ class ParamInfo(object):
 
 
 class PredictSpectrum(QWidget):
+    """
+    todo: document
+    """
 
     def __init__(self, parent):
         super(PredictSpectrum, self).__init__()
         # self.reactor=reactor
         self.parent = parent
         self.value_dict = {}
-        self.ident = 'Predicted Spectrum'
+        self.ident = (None, 'Predicted Spectrum')
         self.Ca_data = Transitions_SD()
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle(self.ident)
+        # todo: document and clean up
+        trace_name = self.ident[1]
+        self.setWindowTitle(trace_name)
         mainLayout = QVBoxLayout()
         buttons = QHBoxLayout()
 
         self.parameterTable = QTableWidget()
         self.parameterTable.setColumnCount(2)
-
         self.plotButton = QPushButton('Plot', self)
 
         mainLayout.addWidget(self.parameterTable)
@@ -55,36 +59,33 @@ class PredictSpectrum(QWidget):
         mainLayout.addWidget(self.deltam2)
 
         self.plotButton.clicked.connect(self.onPlot)
-
         self.setupParameterTable()
         self.setLayout(mainLayout)
         self.show()
 
     def setupParameterTable(self):
-
         self.parameterTable.clear()
         headerLabels = ['Parameter', 'Value']
         self.parameterTable.setHorizontalHeaderLabels(headerLabels)
         self.parameterTable.horizontalHeader().setStretchLastSection(True)
 
-        params = ['B Field', 'Line Center', 'Mode 1 Freq', 'Orders1', 'Mode 2 Freq', 'Orders2', 'Mode 3 Freq',
-                  'Orders3', 'Micromotion', 'Drive Frequency']
+        params = [
+            'B Field', 'Line Center', 'Mode 1 Freq', 'Orders1', 'Mode 2 Freq',
+            'Orders2', 'Mode 3 Freq', 'Orders3', 'Micromotion', 'Drive Frequency'
+        ]
         self.parameterTable.setRowCount(len(params))
         for i, p in enumerate(params):
             label = QLabel(p)
             value = QDoubleSpinBox()
-
             self.value_dict[p] = ParamInfo(value)
-
             value.setDecimals(3)
             value.setRange(-100, 100)
             value.setValue(0)
-
             self.parameterTable.setCellWidget(i, 0, label)
             self.parameterTable.setCellWidget(i, 1, value)
 
     def generate_spectrum(self):
-        ##must be in gauss and MHz!!
+        # must be in gauss and MHz!!
         b_field = self.value_dict['B Field'].value.value()
         line_center = self.value_dict['Line Center'].value.value()
         mode_1 = self.value_dict['Mode 1 Freq'].value.value()
@@ -97,7 +98,6 @@ class PredictSpectrum(QWidget):
         micromotion = int(self.value_dict['Micromotion'].value.value())
 
         all_carriers = self.Ca_data.get_transition_energies(b_field * 1e-4, line_center)  # to Tesla and MHz
-
         print(all_carriers)
 
         # choose which carriers to include
@@ -151,12 +151,12 @@ class PredictSpectrum(QWidget):
         return gauss
 
     def onPlot(self):
-        '''
+        """
         Plot the manual parameters. See documentation
         for plotFit()
-        '''
+        """
 
-        class dataset():
+        class dataset:
             def __init__(self, data):
                 self.data = data
                 self.updateCounter = 1
@@ -203,12 +203,16 @@ class EnergyLevel(object):
         self.energy_scale = (lande_factor * 9.274e-24 / 6.626e-34)  # 1.4 MHz / gauss
 
     def lande_factor(self, S, L, J):
-        '''computes the lande g factor'''
+        """
+        Computes the lande g factor.
+        """
         g = Fraction(3, 2) + Fraction(S * (S + 1) - L * (L + 1), 2 * J * (J + 1))
         return g
 
     def magnetic_to_energy(self, B):
-        '''given the magnitude of the magnetic field, returns all energies of all zeeman sublevels'''
+        """
+        Given the magnitude of the magnetic field, returns all energies of all zeeman sublevels.
+        """
         energies = [(self.energy_scale * m * B) * 1e-6 for m in self.sublevels_m]  # put in MHz
         representations = [self.frac_to_string(m) for m in self.sublevels_m]
         return zip(self.sublevels_m, energies, representations)
@@ -223,10 +227,11 @@ class EnergyLevel(object):
 
 
 class EnergyLevel_CA_ion(EnergyLevel):
-    '''
-    Class for describing the energy levels of Calcium Ions. This is specific to Ca+ because it uses
-    precisely measured g factors of the S and D states in the calculations.
-    '''
+    """
+    Class for describing the energy levels of Calcium Ions.
+    This is specific to Ca+ because it uses precisely measured
+    g-factors of the S and D states in the calculations.
+    """
 
     def lande_factor(self, S, L, J):
         g_factor_S = 2.00225664  # Eur Phys JD 25 113-125
@@ -239,6 +244,9 @@ class EnergyLevel_CA_ion(EnergyLevel):
 
 
 class Transitions_SD(object):
+    """
+    todo: document
+    """
     S = EnergyLevel_CA_ion('S', '1/2')
     D = EnergyLevel_CA_ion('D', '5/2')
     allowed_transitions = [0, 1, 2]
@@ -253,10 +261,10 @@ class Transitions_SD(object):
         return transitions
 
     def get_transition_energies(self, B, zero_offset=0.):
-        '''
+        """
         Returns the transition enenrgies in MHz where zero_offset
         is the 0-field transition energy between S and D.
-        '''
+        """
         ans = []
         for m_s, E_s, repr_s in self.S.magnetic_to_energy(B):
             for m_d, E_d, repr_d in self.D.magnetic_to_energy(B):

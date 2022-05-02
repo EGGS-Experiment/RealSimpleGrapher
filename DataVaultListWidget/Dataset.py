@@ -14,7 +14,6 @@ class Dataset(QObject):
         self.accessingData = DeferredLock()
         self.reactor = reactor
         self.context = context
-
         # dataset storage variables
         self.dataset_location = dataset_location
         self.data_vault = data_vault
@@ -22,14 +21,13 @@ class Dataset(QObject):
         self.points_per_grab = 1000
         self.last_index = 0
         self.updateCounter = 0
-        
         # startup sequence
         self.connectDataVault()
         self.openDataset()
         self.setupListeners()
 
 
-    # SETUP CONNECTION
+    # SET UP CONNECTION
     @inlineCallbacks
     def connectDataVault(self):
         yield self.accessingData.acquire()
@@ -68,6 +66,11 @@ class Dataset(QObject):
 
     @inlineCallbacks
     def getLabels(self):
+        """
+        # todo: document
+        Returns:
+            [str]:  a string array containing the trace names.
+        """
         yield self.accessingData.acquire()
         labels = []
         _, all_dep = yield self.data_vault.variables(context=self.context)
