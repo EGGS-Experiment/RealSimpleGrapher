@@ -67,16 +67,18 @@ class Dataset(QObject):
     @inlineCallbacks
     def getLabels(self):
         """
-        # todo: document
+        Returns all trace names in the dataset.
         Returns:
-            [str]:  a string array containing the trace names.
+            [str]:  a list containing the trace names.
         """
         yield self.accessingData.acquire()
         labels = []
         _, all_dep = yield self.data_vault.variables(context=self.context)
-        # todo: document
+        # check for duplicate trace names
         for i in range(len(all_dep)):
             label_tmp = all_dep[i][0] + ' - ' + self.dataset_name
+            # add the index in parentheses to the end
+            # of the name to break the degeneracy
             if label_tmp in labels:
                 label_tmp += ' (' + str(i) + ')'
             labels.append(label_tmp)

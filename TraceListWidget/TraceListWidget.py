@@ -46,7 +46,7 @@ class TraceList(QListWidget):
         dataset_location, trace_name = ident
         item = QListWidgetItem(trace_name)
         # store ident within the QListWidgetItem
-        item.setData(ident, Qt.UserRole)
+        item.setData(Qt.UserRole, ident)
         # set color of artist entry in tracelist
         if self.use_trace_color:
             item.setForeground(color)
@@ -54,7 +54,7 @@ class TraceList(QListWidget):
             item.setForeground(QColor(255, 255, 255))
         item.setBackground(QColor(0, 0, 0))
         item.setCheckState(Qt.Checked)
-        self.addItem(trace_name)
+        self.addItem(item)
         self.trace_dict[ident] = item
 
     def removeTrace(self, ident):
@@ -83,7 +83,6 @@ class TraceList(QListWidget):
             spectrumaddAction = menu.addAction('Add Predicted Spectrum')
             removeallAction = menu.addAction('Remove All Traces')
             exportallAction = menu.addAction('Export All Traces')
-
             # process actions
             action = menu.exec_(self.mapToGlobal(pos))
             if action == spectrumaddAction:
@@ -212,4 +211,5 @@ class TraceList(QListWidget):
                     filename = QFileDialog.getSaveFileName(self, 'Save Dataset: ' + trace_name, getenv('HOME'), "CSV (*.csv)")
                     savetxt(filename[0], trace, delimiter=',')
                 except Exception as e:
+                    print('Error during export:', e)
                     pass

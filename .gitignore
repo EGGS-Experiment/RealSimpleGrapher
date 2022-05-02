@@ -8,8 +8,8 @@
 **/*.h5
 
 # all of .idea (pycharm's config files)
-#.idea/*
-#.idea/**
-#**/.idea
-#*.iml
-#**/*.xml
+.idea/*
+.idea/**
+**/.idea
+*.iml
+**/*.xml

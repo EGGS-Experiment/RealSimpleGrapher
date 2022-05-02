@@ -14,7 +14,6 @@ from RealSimpleGrapher.DataVaultListWidget import DataVaultList
 
 from sys import settrace
 from itertools import cycle
-from queue import Queue, Full as QueueFull
 
 settrace(None)
 
@@ -69,8 +68,8 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.hline_name, self.hline_param = (config.hline, config.hline_param)
         # set background color
         self.setStyleSheet("background-color:black; color:white; border: 1px solid white")
-        # dataset queue is used to store datasets
-        self.dataset_queue = Queue(config.max_datasets)
+        # datasets is used to store datasets and active traces
+        self.datasets = {}
         # live_update_loop continuously calls _update_figure,
         # which is where points are received from the dataset objects
         # and pushed onto the plotwidget
@@ -178,8 +177,10 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         Arguments:
             dataset (Dataset): the dataset to add.
         """
+        # todo: replace dataset_location with dataset_ident
         # referenced to same dataset object
         dataset_location = dataset.dataset_location
+        dataset_location = self.processDatasetLocation(dataset_location)
         dataset_trace_names = yield dataset.getLabels()
         existing_trace_names = set()
         # get index corresponding to each trace within the dataset
@@ -188,7 +189,8 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             index_dict[trace_name] = i
         # use old dataset if dataset already exists
         if dataset_location in self.datasets.keys():
-            #del dataset
+            print('Dataset already added. Adding any missing traces.')
+            del dataset
             # get existing dataset and traces
             dataset_holder = self.datasets[dataset_location]
             dataset = dataset_holder['dataset']
@@ -207,16 +209,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             ident = (dataset_location, trace_name)
             index = index_dict[trace_name]
             self.add_artist(ident, dataset, index)
-        # try:
-        #     self.dataset_queue.put(dataset, block=False)
-        # except QueueFull:
-        #     #print('Dataset queue full. Removing previous dataset.')
-        #     remove_ds = self.dataset_queue.get()
-        #     self.remove_dataset(remove_ds)
-        #     self.dataset_queue.put(dataset, block=False)
-        # # create artists for each trace within the dataset and plot them
-        # for i, trace_name in enumerate(dataset_trace_names):
-        #     self.add_artist(trace_name, dataset, i)
 
     @inlineCallbacks
     def remove_dataset(self, dataset):
@@ -229,6 +221,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         """
         # get all traces currently in use
         dataset_location = dataset.dataset_location
+        dataset_location = self.processDatasetLocation(dataset_location)
         existing_trace_names = self.datasets[dataset_location]['trace_names']
         # remove traces
         for trace_name in existing_trace_names:
@@ -282,7 +275,9 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             trace_names.remove(trace_name)
             # delete the artist
             del self.artists[ident]
-            # todo: if dataset is empty, then remove dataset from queue
+            # if dataset has no active traces, remove the dataset
+            if len(trace_names) == 0:
+                del self.datasets[dataset_location]
             # todo: what if artist doesn't exist in self.datasets?
         except KeyError:
             print("Error: artist already deleted. ident =", ident)
@@ -324,6 +319,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                     self._display(ident, False)
             # this means the artist has been deleted.
             except KeyError:
+                print('Error in checkboxChanged:', e)
                 pass
 
     def rangeChanged(self):
@@ -393,7 +389,8 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         for ident, params in self.artists.items():
             if params.shown:
                 try:
-                    ds, index, current_update = (params.dataset, params.index, ds.updateCounter)
+                    ds = params.dataset
+                    index, current_update = (params.index, ds.updateCounter)
                     if params.last_update < current_update:
                         x = ds.data[:, 0]
                         y = ds.data[:, index + 1]
@@ -401,10 +398,18 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                         # todo: maybe a lower overhead way to do setData? append?
                         params.artist.setData(x, y)
                         # we can use symbols if we don't have too many points
-                        if x < 500:
-                            params.artist.setData(symbol='o')
+                        if len(x) < 500:
+                            #params.artist.setData(symbol='o')
+                            pass
                 except Exception as e:
+                    print('Error in _update_figure:', e)
                     pass
+
+    def processDatasetLocation(self, dataset_location):
+        directory_list, dataset_name = dataset_location
+        dataset_location_processed = '\\'.join(directory_list)
+        dataset_location_processed += '\\' + dataset_name
+        return dataset_location_processed
 
 
 if __name__ == '__main__':
