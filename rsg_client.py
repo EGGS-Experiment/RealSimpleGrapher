@@ -14,7 +14,6 @@ from twisted.internet.defer import inlineCallbacks
 
 from GraphWindow import GraphWindow
 from DataVaultListWidget import Dataset
-# todo: profile rsg to see where exactly overhead is coming from
 
 
 class RSG_client(object):

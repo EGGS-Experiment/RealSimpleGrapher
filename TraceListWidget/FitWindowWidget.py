@@ -18,7 +18,7 @@ class RowInfo(object):
 
 class FitWindow(QWidget):
     """
-    todo: document
+    A window for selecting fitting parameters.
     """
 
     def __init__(self, dataset, index, parent):
@@ -34,31 +34,29 @@ class FitWindow(QWidget):
     def initUI(self):
         trace_name = self.ident[1]
         self.setWindowTitle(trace_name)
-        mainLayout = QVBoxLayout()
+        mainLayout = QVBoxLayout(self)
         buttons = QHBoxLayout()
-
+        # create constituent widgets
         self.model_select = QComboBox(self)
         for model in self.fw.models:
             self.model_select.addItem(model)
-
         self.parameterTable = QTableWidget()
         self.parameterTable.setColumnCount(4)
         self.fitButton = QPushButton('Fit', self)
         self.plotButton = QPushButton('Plot manual', self)
         self.fw.setModel(str(self.model_select.currentText()))
-
+        # lay out
         mainLayout.addWidget(self.model_select)
         mainLayout.addWidget(self.parameterTable)
         mainLayout.addLayout(buttons)
         buttons.addWidget(self.fitButton)
         buttons.addWidget(self.plotButton)
-
+        # connect signals to slots
         self.model_select.activated.connect(self.onActivated)
         self.fitButton.clicked.connect(self.onClick)
         self.plotButton.clicked.connect(self.onPlot)
 
         self.setupParameterTable()
-        self.setLayout(mainLayout)
         self.show()
 
     def setupParameterTable(self):
@@ -70,7 +68,6 @@ class FitWindow(QWidget):
         params = self.fw.getParameters()
         self.parameterTable.setRowCount(len(params))
         for i, p in enumerate(params):
-
             vary_select = QTableWidgetItem()
             label = QLabel(p)
             manual_value = QDoubleSpinBox()
@@ -124,11 +121,10 @@ class FitWindow(QWidget):
     def plotFit(self):
         """
         Plot the fitted parameters.
-        We need to wrap the data in a dataset
-        object to use add_artist in GraphWidget
+        We need to wrap the data in a dataset object to use
+        add_artist in GraphWidget.
         """
-
-        class dataset():
+        class dataset:
             def __init__(self, data):
                 self.data = data
                 self.updateCounter = 1
@@ -139,7 +135,7 @@ class FitWindow(QWidget):
             # remove the previous fit
             self.parent.parent.remove_artist(self.ident)
             self.parent.parent.add_artist(self.ident, ds, 0, no_points=True)
-        except:
+        except Exception as e:
             self.parent.parent.add_artist(self.ident, ds, 0, no_points=True)
 
     def onActivated(self):
@@ -157,7 +153,6 @@ class FitWindow(QWidget):
         Send table parameters to fitter, perform fit,
         and then update parameter table with the results.
         """
-
         self.updateParametersToFitter()
         self.fw.doFit()
         self.updateParametersFromFitter()

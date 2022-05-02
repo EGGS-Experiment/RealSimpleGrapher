@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QListWidget
 
 class ParameterList(QWidget):
     """
-    TODO: document
+    A window for visualizing dataset parameters.
     """
 
     def __init__(self, dataset):
@@ -14,7 +14,7 @@ class ParameterList(QWidget):
         mainLayout = QVBoxLayout(self)
         self.parameterListWidget = QListWidget()
         mainLayout.addWidget(self.parameterListWidget)
-        self.setWindowTitle(str(dataset.dataset_name))  # + " " + str(dataset.directory))
+        self.setWindowTitle(str(dataset.dataset_name))
         self.populate()
         self.show()
 

@@ -242,7 +242,6 @@ class Graph_PyQtGraph(QWidget):
             # if dataset has no active traces, remove the dataset
             if len(trace_names) == 0:
                 del self.datasets[dataset_ident]
-\            # todo: what if artist doesn't exist in self.datasets?
         except KeyError:
             print("Error: artist already deleted. ident =", ident)
         except Exception as e:

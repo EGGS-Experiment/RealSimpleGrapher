@@ -29,7 +29,6 @@ class TraceList(QListWidget):
             self.use_trace_color = self.config.use_trace_color
         except AttributeError:
             self.use_trace_color = False
-        #self.name = 'pmt'
         self.initUI()
 
     def initUI(self):
@@ -129,7 +128,6 @@ class TraceList(QListWidget):
             if self.parent.artists[ident].logModeY:
                 logYaction.setChecked(True)
             # color menu
-            # todo: fix and clean up
             selectColorMenu = menu.addMenu("Select Color")
             colorActions = list(map(selectColorMenu.addAction,
                                     ["Red", "Green", "Yellow", "Cyan", "Magenta", "White"]))
