@@ -12,4 +12,6 @@
 .idea/**
 **/.idea
 *.iml
+**/*.iml
+*.xml
 **/*.xml
