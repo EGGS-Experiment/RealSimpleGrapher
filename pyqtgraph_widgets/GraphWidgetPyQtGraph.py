@@ -2,44 +2,22 @@
 A normal graph widget. The "base unit" of the RSG.
 """
 import pyqtgraph as pg
+from itertools import cycle
 from PyQt5.QtCore import Qt
-from PyQt5 import QtWidgets
-from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QWidget, QLabel, QSplitter, QHBoxLayout, QVBoxLayout, QFrame, QPushButton
 
 from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
 
+from .artists import artistParameters, colorList
 from RealSimpleGrapher.TraceListWidget import TraceList
 from RealSimpleGrapher.DataVaultListWidget import DataVaultList
 
 from sys import settrace
-from itertools import cycle
-
 settrace(None)
 
-# todo: move this to a separate page
-class artistParameters():
-    """
-    todo: document
-    """
 
-    def __init__(self, artist, dataset, index, shown):
-        # artist: the PlotLine object
-        self.artist = artist
-        # dataset: the *** todo
-        self.dataset = dataset
-        # index: holds which artist (i.e. trace) of the dataset it is
-        self.index = index
-        self.shown = shown
-        # last_update: update counter in the Dataset object, only
-        # redraws if the dataset has a higher update count
-        self.last_update = 0
-        # lodModeX/Y: keeps track of log mode
-        self.logModeX = False
-        self.logModeY = False
-
-
-class Graph_PyQtGraph(QtWidgets.QWidget):
+class Graph_PyQtGraph(QWidget):
     """
     A normal graph widget. The "base unit" of the RSG.
     Contains a PlotWidget for plotting data, a TraceListWidget for managing
@@ -48,7 +26,6 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
 
     # SETUP
     def __init__(self, reactor, config, cxn=None, parent=None, root=None):
-        # todo: clean up
         super().__init__(parent)
         self.root = root
         from labrad.units import WithUnit as U
@@ -76,16 +53,8 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.live_update_loop = LoopingCall(self._update_figure)
         self.live_update_loop.start(0) #todo: check that maybe this is source of overhead???
         # colors
-        # todo: move this somewhere else and make an object
-        self.colors = [
-            QColor(Qt.red).lighter(130),
-            QColor(Qt.green),
-            QColor(Qt.yellow),
-            QColor(Qt.cyan),
-            QColor(Qt.magenta).lighter(120),
-            QColor(Qt.white)
-        ]
-        self.colorChooser = cycle(self.colors)
+        self.colorChooser = cycle(colorList)
+        # autoranging
         self.autoRangeEnable = True
         self.initUI()
 
@@ -99,7 +68,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         self.tracelist = TraceList(self, root=self.root)
         self.dv = DataVaultList(self.name, cxn=self.cxn, root=self.root)
         self.pw = pg.PlotWidget()
-        tracelistLabel = QtWidgets.QLabel('Dataset Traces:')
+        tracelistLabel = QLabel('Dataset Traces:')
         # configure lines
         if self.vline_name:
             self.inf = pg.InfiniteLine(movable=True, angle=90,
@@ -122,36 +91,35 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             self.inf.setValue(init_value)
             self.inf.setPen(width=5.0)
         # lay out widgets
-        lsplitter = QtWidgets.QSplitter()
+        lsplitter = QSplitter()
         lsplitter.setOrientation(Qt.Vertical)
         lsplitter.addWidget(tracelistLabel)
         lsplitter.addWidget(self.tracelist)
         lsplitter.addWidget(self.dv)
-        splitter = QtWidgets.QSplitter()
+        splitter = QSplitter()
         splitter.addWidget(lsplitter)
-        hbox = QtWidgets.QHBoxLayout(self)
+        hbox = QHBoxLayout(self)
         hbox.addWidget(splitter)
         # frame/vbox is everything on RHS
-        frame = QtWidgets.QFrame()
-        vbox = QtWidgets.QVBoxLayout(frame)
-        self.title = QtWidgets.QLabel(self.name)
+        frame = QFrame()
+        vbox = QVBoxLayout(frame)
+        self.title = QLabel(self.name)
         vbox.addWidget(self.title)
         vbox.addWidget(self.pw)
         splitter.addWidget(frame)
         # create bottom buttons
-        pwButtons = QtWidgets.QWidget()
-        pwButtons_layout = QtWidgets.QHBoxLayout(pwButtons)
-        self.coords = QtWidgets.QLabel('')
-        self.autorangebutton = QtWidgets.QPushButton('Autorange Off')
+        pwButtons = QWidget()
+        pwButtons_layout = QHBoxLayout(pwButtons)
+        self.coords = QLabel('')
+        self.autorangebutton = QPushButton('Autorange Off')
         self.autorangebutton.setCheckable(True)
         self.autorangebutton.toggled.connect(lambda: self.toggleAutoRange(self.autorangebutton.isChecked()))
         pwButtons_layout.addWidget(self.coords)
         pwButtons_layout.addWidget(self.autorangebutton)
         vbox.addWidget(pwButtons)
-        # self.legend = self.pw.addLegend()
         self.tracelist.itemChanged.connect(self.checkboxChanged)
         self.pw.plot([], [])
-        # setup viewbox
+        # set up viewbox
         vb = self.pw.plotItem.vb
         self.img = pg.ImageItem()
         vb.addItem(self.img)
@@ -177,10 +145,7 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         Arguments:
             dataset (Dataset): the dataset to add.
         """
-        # todo: replace dataset_location with dataset_ident
-        # referenced to same dataset object
-        dataset_location = dataset.dataset_location
-        dataset_location = self.processDatasetLocation(dataset_location)
+        dataset_ident = self._makeDatasetIdent(dataset.dataset_location)
         dataset_trace_names = yield dataset.getLabels()
         existing_trace_names = set()
         # get index corresponding to each trace within the dataset
@@ -188,25 +153,25 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
         for i, trace_name in enumerate(dataset_trace_names):
             index_dict[trace_name] = i
         # use old dataset if dataset already exists
-        if dataset_location in self.datasets.keys():
+        if dataset_ident in self.datasets.keys():
             print('Dataset already added. Adding any missing traces.')
             del dataset
             # get existing dataset and traces
-            dataset_holder = self.datasets[dataset_location]
+            dataset_holder = self.datasets[dataset_ident]
             dataset = dataset_holder['dataset']
             existing_trace_names = dataset_holder['trace_names']
             # update existing traces
-            self.datasets[dataset_location]['trace_names'] = set(dataset_trace_names)
+            self.datasets[dataset_ident]['trace_names'] = set(dataset_trace_names)
         # otherwise add new dataset to self.datasets
         else:
-            self.datasets[dataset_location] = {
+            self.datasets[dataset_ident] = {
                 'dataset': dataset,
                 'trace_names': set(dataset_trace_names)
             }
         # get different traces and add each trace to artists
         diff_trace_names = list(set(dataset_trace_names) - existing_trace_names)
         for trace_name in diff_trace_names:
-            ident = (dataset_location, trace_name)
+            ident = (dataset_ident, trace_name)
             index = index_dict[trace_name]
             self.add_artist(ident, dataset, index)
 
@@ -220,14 +185,13 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             dataset (Dataset): the dataset to remove.
         """
         # get all traces currently in use
-        dataset_location = dataset.dataset_location
-        dataset_location = self.processDatasetLocation(dataset_location)
-        existing_trace_names = self.datasets[dataset_location]['trace_names']
+        dataset_ident = self._makeDatasetIdent(dataset.dataset_location)
+        existing_trace_names = self.datasets[dataset_ident]['trace_names']
         # remove traces
         for trace_name in existing_trace_names:
-            self.remove_artist((dataset_location, trace_name))
+            self.remove_artist((dataset_ident, trace_name))
         # delete dataset
-        del self.datasets[dataset_location]
+        del self.datasets[dataset_ident]
 
     def add_artist(self, ident, dataset, index, no_points=False):
         """
@@ -270,14 +234,14 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
             self.tracelist.removeTrace(ident)
             self.artists[ident].shown = False #todo: is this necessary
             # remove the artist from dataset holder
-            dataset_location, trace_name = ident
-            trace_names = self.datasets[dataset_location]['trace_names']
+            dataset_ident, trace_name = ident
+            trace_names = self.datasets[dataset_ident]['trace_names']
             trace_names.remove(trace_name)
             # delete the artist
             del self.artists[ident]
             # if dataset has no active traces, remove the dataset
             if len(trace_names) == 0:
-                del self.datasets[dataset_location]
+                del self.datasets[dataset_ident]
             # todo: what if artist doesn't exist in self.datasets?
         except KeyError:
             print("Error: artist already deleted. ident =", ident)
@@ -405,11 +369,14 @@ class Graph_PyQtGraph(QtWidgets.QWidget):
                     print('Error in _update_figure:', e)
                     pass
 
-    def processDatasetLocation(self, dataset_location):
+    def _makeDatasetIdent(self, dataset_location):
+        """
+        Creates an identifier unique to each dataset.
+        """
         directory_list, dataset_name = dataset_location
-        dataset_location_processed = '\\'.join(directory_list)
-        dataset_location_processed += '\\' + dataset_name
-        return dataset_location_processed
+        dataset_ident = '\\'.join(directory_list)
+        dataset_ident += '\\' + dataset_name
+        return dataset_ident
 
 
 if __name__ == '__main__':
