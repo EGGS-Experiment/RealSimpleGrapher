@@ -51,7 +51,7 @@ class Graph_PyQtGraph(QWidget):
         # which is where points are received from the dataset objects
         # and pushed onto the plotwidget
         self.live_update_loop = LoopingCall(self._update_figure)
-        self.live_update_loop.start(0) #todo: check that maybe this is source of overhead???
+        self.live_update_loop.start(1) #todo: check that maybe this is source of overhead???
         # colors
         self.colorChooser = cycle(colorList)
         # autoranging
@@ -242,7 +242,7 @@ class Graph_PyQtGraph(QWidget):
             # if dataset has no active traces, remove the dataset
             if len(trace_names) == 0:
                 del self.datasets[dataset_ident]
-            # todo: what if artist doesn't exist in self.datasets?
+\            # todo: what if artist doesn't exist in self.datasets?
         except KeyError:
             print("Error: artist already deleted. ident =", ident)
         except Exception as e:
@@ -283,7 +283,6 @@ class Graph_PyQtGraph(QWidget):
                     self._display(ident, False)
             # this means the artist has been deleted.
             except KeyError:
-                print('Error in checkboxChanged:', e)
                 pass
 
     def rangeChanged(self):
