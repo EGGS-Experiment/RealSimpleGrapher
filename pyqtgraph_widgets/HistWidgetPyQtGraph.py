@@ -9,11 +9,15 @@ from PyQt5.QtWidgets import QWidget, QLabel, QFrame, QSplitter, QVBoxLayout, QHB
 from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
 
-from .artists import artistParameters, colorList
 from RealSimpleGrapher.TraceListWidget import TraceList
+from RealSimpleGrapher.pyqtgraph_widgets.artists import artistParameters, colorList
 
 
 class Hist_PyQtGraph(QWidget):
+    """
+    todo: document
+    """
+
     def __init__(self, reactor, config, cxn=None, parent=None):
         super(Hist_PyQtGraph, self).__init__(parent)
         self.cxn = cxn
@@ -97,10 +101,10 @@ class Hist_PyQtGraph(QWidget):
                     pass
 
     def add_artist(self, ident, dataset, index, no_points=False):
-        '''
+        """
         no_points is an override parameter to the global show_points setting.
         It is to allow data fits to be plotted without points
-        '''
+        """
         new_color = self.colorChooser.next()
         hist = pg.PlotCurveItem([0, 1], [1], stepMode=True, fillLevel=0, brush=new_color, pen=None)
         self.artists[ident] = artistParameters(hist, dataset, index, True)
@@ -143,7 +147,6 @@ class Hist_PyQtGraph(QWidget):
                 pass
 
     def rangeChanged(self):
-
         lims = self.pw.viewRange()
         self.pointsToKeep = lims[0][1] - lims[0][0]
         self.current_limits = [lims[0][0], lims[0][1]]

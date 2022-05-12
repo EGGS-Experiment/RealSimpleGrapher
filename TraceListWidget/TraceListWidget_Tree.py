@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QMenu, QFileDialog, QTreeWidget
+from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QMenu, QFileDialog, QTreeWidget, QTreeWidgetItem
 
 from .FitWindowWidget import FitWindow
 from .ParameterListWidget import ParameterList
@@ -13,7 +13,9 @@ from numpy import savetxt
 
 
 # todo: qtreewidget: create header for each dataset, ensure header consistent w/presence of datasets, make headers collapsible
-class TraceList(QListWidget):
+# todo: sort artists within a dataset
+# what is point of windows?
+class TraceList(QTreeWidget):
     """
     Manages the datasets that are being plotted.
     Basically the left-hand column of each GraphWidget.
@@ -30,6 +32,7 @@ class TraceList(QListWidget):
             self.use_trace_color = self.config.use_trace_color
         except AttributeError:
             self.use_trace_color = False
+        # todo: set columns (name, date, time) and header labels
         self.initUI()
 
     def initUI(self):

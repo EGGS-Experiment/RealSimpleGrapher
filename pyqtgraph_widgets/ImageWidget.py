@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 
 
 class ImageWidget(QWidget):
+    """
+    todo: document
+    """
 
     def __init__(self, reactor, config, parent=None, cxn=None):
         super(ImageWidget, self).__init__(parent)
@@ -72,13 +75,13 @@ class ImageWidget(QWidget):
                 self.title.setText(self.image_list[self.image_index][1])
             else:
                 pass
-        except:
+        except Exception as e:
             print('Could not access index: ' + str(self.image_index))
 
     def mouse_clicked(self, event):
-        '''
+        """
         draws the cross at the position of a double click
-        '''
+        """
         pos = event.pos()
         if self.plt.sceneBoundingRect().contains(pos) and event.double():
             # only on double clicks within bounds

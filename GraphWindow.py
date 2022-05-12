@@ -30,7 +30,7 @@ class GridGraphWindow(QWidget):
         self.setLayout(layout)
         
 
-class GraphWindow(QDetachableTabWidget):
+class GraphWindow(QTabWidget):
     """
     The main RSG GUI which does nearly everything.
     Creates the RSG GUI from GUIConfig.py.
@@ -39,7 +39,7 @@ class GraphWindow(QDetachableTabWidget):
 
     def __init__(self, reactor, cxn=None, parent=None, root=None):
         """
-        Initialize self variables and setup the GUI.
+        Initialize self variables and set up the GUI.
         """
         # initialize the PyQt object
         super(GraphWindow, self).__init__()
@@ -68,10 +68,7 @@ class GraphWindow(QDetachableTabWidget):
             gli = []
             for config in gcli:
                 name = config.name
-                # max_ds = config.max_datasets
-                if config.isScrolling:
-                    graph_tmp = ScrollingGraph_PyQtGraph(reactor, config, cxn=self.cxn, root=self.root)
-                elif config.isImages:
+                if config.isImages:
                     graph_tmp = ImageWidget(reactor, config)
                     self.graphDict[name] = graph_tmp
                     gli.append(graph_tmp)

@@ -36,14 +36,12 @@ class graphConfig():
     Sets graphing-related settings such as axes limits and horizontal/vertical lines.
     """
 
-    def __init__(self, name, ylim=[0, 1], max_datasets=20,
-                 isScrolling=False, isImages=False, isHist=False,
+    def __init__(self, name, ylim=[0, 1],
+                 isImages=False, isHist=False,
                  show_points=True, grid_on=False, scatter_plot='all',
                  line_param=None, vline=None, vline_param=None, hline=None, hline_param=None):
         self.name = name
         self.ylim = ylim
-        self.isScrolling = isScrolling
-        self.max_datasets = max_datasets
         self.graphs = 1
         self.show_points = show_points
         self.grid_on = grid_on
@@ -84,19 +82,20 @@ If a gridGraphConfig object holds multiple graphConfig objects, their positions 
 tabs = [
     # system monitor tab displays system essentials
     gridGraphConfig('System Monitor', [
-        graphConfig('Lakeshore 336 Temperature', max_datasets=4),       0, 0,
-        graphConfig('TwisTorr74 Pressure', max_datasets=1),             1, 0,
-        graphConfig('NIOPS03 Pressure', max_datasets=1),                0, 1,
-        graphConfig('RF Pickoff'),                                      1, 1
+        graphConfig('Lakeshore 336 Temperature'),               0, 0,
+        graphConfig('TwisTorr74 Pressure'),                     1, 0,
+        graphConfig('NIOPS03 Pressure'),                        0, 1,
+        graphConfig('RF Pickoff'),                              1, 1
     ]),
     # laser monitor tab monitors laser frequencies via wavemeter
     gridGraphConfig('Laser Monitor', [
-        graphConfig('397nm', max_datasets=1),                           0, 0,
-        graphConfig('423nm', max_datasets=1),                           1, 0,
-        graphConfig('854nm', max_datasets=1),                           0, 1,
-        graphConfig('866nm', max_datasets=1),                           1, 1,
+        graphConfig('397nm'),                                   0, 0,
+        graphConfig('423nm'),                                   1, 0,
+        graphConfig('854nm'),                                   0, 1,
+        graphConfig('866nm'),                                   1, 1,
     ]),
-    gridGraphConfig('RGA', [graphConfig('RGA Sweeps', max_datasets=5), 0, 0])
-    # gridGraphConfig('SLS', [graphConfig('SLS Locking Output', max_datasets=5), 0, 0]),
-    # gridGraphConfig('PMT', [graphConfig('pmt', ylim=[0, 30], isScrolling=True, max_datasets=1, show_points=False), 0, 0])
+    gridGraphConfig('RGA', [
+        graphConfig('RGA Sweeps'),                           0, 0
+    ])
+    # gridGraphConfig('SLS', [graphConfig('SLS Locking Output', 5), 0, 0]),
 ]

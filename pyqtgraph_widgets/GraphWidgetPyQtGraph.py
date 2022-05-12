@@ -9,9 +9,9 @@ from PyQt5.QtWidgets import QWidget, QLabel, QSplitter, QHBoxLayout, QVBoxLayout
 from twisted.internet.task import LoopingCall
 from twisted.internet.defer import inlineCallbacks, returnValue
 
-from .artists import artistParameters, colorList
 from RealSimpleGrapher.TraceListWidget import TraceList
 from RealSimpleGrapher.DataVaultListWidget import DataVaultList
+from RealSimpleGrapher.pyqtgraph_widgets.artists import artistParameters, colorList
 
 from sys import settrace
 settrace(None)
@@ -174,6 +174,8 @@ class Graph_PyQtGraph(QWidget):
             ident = (dataset_ident, trace_name)
             index = index_dict[trace_name]
             self.add_artist(ident, dataset, index)
+        # enable autorange
+        self.toggleAutoRange(True)
 
     @inlineCallbacks
     def remove_dataset(self, dataset):

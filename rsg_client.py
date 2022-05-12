@@ -4,6 +4,7 @@ import sys
 app = QApplication(sys.argv)
 import qt5reactor
 qt5reactor.install()
+# todo: requirements.txt
 
 # other imports
 from os import _exit

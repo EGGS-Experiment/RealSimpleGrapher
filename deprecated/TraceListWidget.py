@@ -2,9 +2,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QListWidget, QListWidgetItem, QMenu, QFileDialog, QTreeWidget
 
-from .FitWindowWidget import FitWindow
-from .ParameterListWidget import ParameterList
-from .PredictSpectrumWidget import PredictSpectrum
+from TraceListWidget.FitWindowWidget import FitWindow
+from TraceListWidget.ParameterListWidget import ParameterList
+from TraceListWidget.PredictSpectrumWidget import PredictSpectrum
 
 from RealSimpleGrapher.GUIConfig import traceListConfig
 
