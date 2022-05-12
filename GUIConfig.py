@@ -19,8 +19,7 @@ if find_spec('OpenGL'):
 """
 Configuration classes for the different graph widget types.
 """
-
-class traceListConfig():
+class traceListConfig(object):
     """
     Config for the traceList widget. Mostly concerns its color.
     """
@@ -30,7 +29,7 @@ class traceListConfig():
         self.use_trace_color = use_trace_color
 
 
-class graphConfig():
+class graphConfig(object):
     """
     Config for an individual graph within a GridGraphWindow (i.e. a grapher unit).
     Sets graphing-related settings such as axes limits and horizontal/vertical lines.

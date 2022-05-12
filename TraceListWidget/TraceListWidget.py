@@ -15,7 +15,7 @@ from numpy import savetxt
 # todo: qtreewidget: create header for each dataset, ensure header consistent w/presence of datasets, make headers collapsible
 # todo: sort artists within a dataset
 # what is point of windows?
-class TraceList(QTreeWidget):
+class TraceList(QListWidget):
     """
     Manages the datasets that are being plotted.
     Basically the left-hand column of each GraphWidget.
@@ -212,4 +212,3 @@ class TraceList(QTreeWidget):
                     savetxt(filename[0], trace, delimiter=',')
                 except Exception as e:
                     print('Error during export:', e)
-                    pass

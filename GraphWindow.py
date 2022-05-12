@@ -21,7 +21,6 @@ class GridGraphWindow(QWidget):
         self.setStyleSheet("background-color:black; color:white")
         # initialize the UI
         self.initUI(g_list, row_list, column_list)
-        self.show()
 
     def initUI(self, g_list, row_list, column_list):
         layout = QGridLayout()
@@ -30,7 +29,7 @@ class GridGraphWindow(QWidget):
         self.setLayout(layout)
         
 
-class GraphWindow(QTabWidget):
+class GraphWindow(QDetachableTabWidget):
     """
     The main RSG GUI which does nearly everything.
     Creates the RSG GUI from GUIConfig.py.
@@ -52,9 +51,7 @@ class GraphWindow(QTabWidget):
         self.initUI()
         # set background
         self.setStyleSheet("background-color:black")
-        # show the UI
-        self.show()
-        
+
     def initUI(self):
         reactor = self.reactor
         # create dictionaries to hold the graphs and tabs

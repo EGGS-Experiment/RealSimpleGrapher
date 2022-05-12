@@ -1,14 +1,17 @@
+# install qt5reactor
+from PyQt5.QtWidgets import QApplication
+app = QApplication([])
+import qt5reactor
+qt5reactor.install()
+
 # imports
-# todo: requirements.txt
-from os import _exit
 from random import randrange
+from os import _exit, environ
 from socket import gethostname
+from twisted.internet.defer import inlineCallbacks
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QApplication
-
-from twisted.internet import reactor
-from twisted.internet.defer import inlineCallbacks
+from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout
 
 from GraphWindow import GraphWindow
 from DataVaultListWidget import Dataset
@@ -22,17 +25,19 @@ class RSG_client(QMainWindow):
 
     name = gethostname() + " RSG Client"
 
-    def __init__(self, reactor, cxn=None, parent=None):
-        super().__init__()
+    def __init__(self, reactor, clipboard=None, parent=None):
+        super(RSG_client, self).__init__(parent)
+        self.clipboard = clipboard
+        self.reactor = reactor
+        self.cxn = None
         # create random client ID
         self.ID = randrange(3e5, 1e6)
-        self.cxn = cxn
-        self.reactor = reactor
         self.setWindowTitle(self.name)
+        self.setWindowIcon(QIcon('rsg_icon.JPG'))
         self.servers = ['Data Vault', 'Parameter Vault']
         # initialization sequence
         d = self.connect()
-        d.addCallback(self.initializeGUI)
+        d.addCallback(self.makeLayout)
 
     @inlineCallbacks
     def connect(self):
@@ -41,18 +46,14 @@ class RSG_client(QMainWindow):
         """
         # create labrad connection
         if not self.cxn:
-            import os
-            LABRADHOST = os.environ['LABRADHOST']
+            LABRADHOST = environ['LABRADHOST']
             from labrad.wrappers import connectAsync
             # set self name to rsg client + node name + number (if multiple)
-            localname = gethostname() + ' ' + self.name
-            self.cxn = yield connectAsync(LABRADHOST, name=localname)
+            self.cxn = yield connectAsync(LABRADHOST, name=self.name)
         # try to get servers
         try:
-            self.reg = self.cxn.registry
             self.pv = self.cxn.parameter_vault
             self.dv = self.cxn.data_vault
-            #self.rsg = self.cxn.real_simple_grapher
         except Exception as e:
             print(e)
             raise
@@ -61,22 +62,19 @@ class RSG_client(QMainWindow):
         # yield self.rsg.signal__plot_update(self.ID)
         # yield self.rsg.addListener(listener=self., source=None, ID=self.ID)
             # server connections
-        yield self.cxn.manager.subscribe_to_named_message('Server Connect', 9898989, True)
-        yield self.cxn.manager.addListener(listener=self.on_connect, source=None, ID=9898989)
-        yield self.cxn.manager.subscribe_to_named_message('Server Disconnect', 9898989 + 1, True)
-        yield self.cxn.manager.addListener(listener=self.on_disconnect, source=None, ID=9898989 + 1)
+        # yield self.cxn.manager.subscribe_to_named_message('Server Connect', 9898989, True)
+        # yield self.cxn.manager.addListener(listener=self.on_connect, source=None, ID=9898989)
+        # yield self.cxn.manager.subscribe_to_named_message('Server Disconnect', 9898989 + 1, True)
+        # yield self.cxn.manager.addListener(listener=self.on_disconnect, source=None, ID=9898989 + 1)
         return self.cxn
 
-    def initializeGUI(self, cxn):
+
+    def makeLayout(self, cxn):
         centralWidget = QWidget()
         layout = QHBoxLayout(centralWidget)
-
         # GUI creation needs to be here since the connection needs to be established
         self.gui = GraphWindow(self.reactor, cxn=self.cxn, root=self)
-        self.gui.setWindowTitle('Real Simple Grapher - Client')
-        self.gui.setWindowIcon(QIcon('rsg_icon.JPG'))
         layout.addWidget(self.gui)
-
         self.setCentralWidget(centralWidget)
 
 
@@ -131,13 +129,6 @@ class RSG_client(QMainWindow):
 
 
 if __name__ == '__main__':
-    # set up QApplication
-    app = QApplication([])
-    try:
-        import qt5reactor
-        qt5reactor.install()
-    except Exception as e:
-        print(e)
     # instantiate client with a reactor
     from twisted.internet import reactor
     client_tmp = RSG_client(reactor)

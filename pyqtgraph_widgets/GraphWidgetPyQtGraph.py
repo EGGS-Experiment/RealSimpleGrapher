@@ -132,7 +132,6 @@ class Graph_PyQtGraph(QWidget):
             self.inf.sigPositionChangeFinished.connect(self.hline_changed)
         self.pw.scene().sigMouseMoved.connect(self.mouseMoved)
         self.pw.sigRangeChanged.connect(self.rangeChanged)
-        # sigrangechanged and sigmouseclicked and return graphics scene
         # self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
 
 
@@ -246,8 +245,7 @@ class Graph_PyQtGraph(QWidget):
         except KeyError:
             print("Error: artist already deleted. ident =", ident)
         except Exception as e:
-            print("Error: remove failed.")
-            print(e)
+            print("Error: remove failed:", e)
 
 
     # CONFIGURE PLOTWIDGET
@@ -344,7 +342,6 @@ class Graph_PyQtGraph(QWidget):
         The main update loop which updates the artists
         with data from the Datasets.
         """
-        # todo: reduce overhead as much as possible since this is where everything happens
         for ident, params in self.artists.items():
             if params.shown:
                 try:
@@ -361,7 +358,6 @@ class Graph_PyQtGraph(QWidget):
                             pass
                 except Exception as e:
                     print('Error in _update_figure:', e)
-                    pass
 
     def _makeDatasetIdent(self, dataset_location):
         """

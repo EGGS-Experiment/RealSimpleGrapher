@@ -55,7 +55,6 @@ class FitWindow(QWidget):
         self.model_select.activated.connect(self.onActivated)
         self.fitButton.clicked.connect(self.onClick)
         self.plotButton.clicked.connect(self.onPlot)
-
         self.setupParameterTable()
         self.show()
 

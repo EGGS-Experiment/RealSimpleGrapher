@@ -51,7 +51,6 @@ class DataVaultList(QWidget):
         self.setWindowTitle('Data Vault')
         self.setLayout(mainLayout)
         self.populate()
-        self.show()
 
     @inlineCallbacks
     def populate(self):

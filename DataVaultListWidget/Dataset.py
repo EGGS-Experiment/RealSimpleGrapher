@@ -2,7 +2,7 @@ import numpy as np
 from PyQt5.QtCore import QObject
 from twisted.internet.defer import inlineCallbacks, returnValue, DeferredLock
 
-
+# todo: does it need to be a qobject
 class Dataset(QObject):
     """
     Parent class for datasets.
