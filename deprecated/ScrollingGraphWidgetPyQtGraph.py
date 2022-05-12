@@ -4,6 +4,10 @@ from RealSimpleGrapher.pyqtgraph_widgets import Graph_PyQtGraph
 
 
 class ScrollingGraph_PyQtGraph(Graph_PyQtGraph):
+    """
+    todo: document
+    """
+
     def __init__(self, reactor, name, parent=None, ylim=[0, 1], cxn=None, root=None):
         super().__init__(reactor, name, parent=parent, cxn=cxn, root=root)
         self.set_xlimits([0, 100])
