@@ -5,6 +5,8 @@ import GUIConfig
 from pyqtgraph_widgets import *
 from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout
 
+from EGGS_labrad.clients.Widgets import QDetachableTabWidget
+
 
 class GridGraphWindow(QWidget):
     """
@@ -28,7 +30,7 @@ class GridGraphWindow(QWidget):
         self.setLayout(layout)
         
 
-class GraphWindow(QTabWidget):
+class GraphWindow(QDetachableTabWidget):
     """
     The main RSG GUI which does nearly everything.
     Creates the RSG GUI from GUIConfig.py.
