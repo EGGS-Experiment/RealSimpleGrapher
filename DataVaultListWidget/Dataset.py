@@ -1,9 +1,8 @@
 import numpy as np
-from PyQt5.QtCore import QObject
 from twisted.internet.defer import inlineCallbacks, returnValue, DeferredLock
 
-# todo: does it need to be a qobject
-class Dataset(QObject):
+
+class Dataset(object):
     """
     Parent class for datasets.
     Serves as a wrapper for LabRAD datasets.
