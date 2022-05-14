@@ -170,26 +170,24 @@ class Graph_PyQtGraph(QWidget):
         diff_trace_names = list(set(dataset_trace_names) - existing_trace_names)
         for trace_name in diff_trace_names:
             index = index_dict[trace_name]
-            artist_ident = [*dataset_ident, trace_name]
+            artist_ident = (*dataset_ident, trace_name)
             self.add_artist(artist_ident, dataset, index)
         # enable autorange
         self.toggleAutoRange(True)
 
     @inlineCallbacks
-    def remove_dataset(self, dataset):
+    def remove_dataset(self, dataset_ident):
         """
-        Removes all the traces of a dataset from the holding
-        dictionary self.artists.
+        Removes all the traces of a dataset from the holding dictionary self.artists.
         Called only by add_dataset when dataset_queue is full.
         Arguments:
-            dataset (Dataset): the dataset to remove.
+            dataset_ident   (dataset_location, dataset_name):  a unique identifier for a dataset.
         """
         # get all traces currently in use
-        dataset_ident = self._makeDatasetIdent(dataset.dataset_location)
         existing_trace_names = self.datasets[dataset_ident]['trace_names']
         # remove traces
         for trace_name in existing_trace_names:
-            artist_ident = [*dataset_ident, trace_name]
+            artist_ident = (*dataset_ident, trace_name)
             self.remove_artist(artist_ident)
         # remove dataset
         self.tracelist.removeDataset(dataset_ident)
@@ -201,7 +199,7 @@ class Graph_PyQtGraph(QWidget):
         Adds an artist/trace from a dataset.
         Called only by add_dataset to add the traces within a dataset.
         Arguments:
-            artist_ident    [dataset_location, dataset_name, trace_name]: a unique identifier for an artist.
+            artist_ident    (dataset_location, dataset_name, trace_name): a unique identifier for an artist.
             no_points       (bool)  : an override parameter to the global show_points setting,
                                     allowing data fits to be plotted without points.
         """
@@ -230,7 +228,7 @@ class Graph_PyQtGraph(QWidget):
         Called by remove_dataset when dataset_queue is full and when we manually
         remove it via the TraceListWidget.
         Arguments:
-            artist_ident    [dataset_location, dataset_name, trace_name]: a unique identifier for an artist.
+            artist_ident    (dataset_location, dataset_name, trace_name): a unique identifier for an artist.
         """
         try:
             artist = self.artists[artist_ident].artist
@@ -238,7 +236,8 @@ class Graph_PyQtGraph(QWidget):
             self.pw.removeItem(artist)
             self.tracelist.removeTrace(artist_ident)
             # remove the artist from dataset holder
-            dataset_ident, trace_name = artist_ident
+            dataset_location, dataset_name, trace_name = artist_ident
+            dataset_ident = (dataset_location, dataset_name)
             trace_names = self.datasets[dataset_ident]['trace_names']
             trace_names.remove(trace_name)
             # delete the artist
@@ -246,6 +245,7 @@ class Graph_PyQtGraph(QWidget):
             # if dataset has no active traces, remove the dataset
             if len(trace_names) == 0:
                 del self.datasets[dataset_ident]
+                self.tracelist.removeDataset(dataset_ident)
                 # remove dataset header from tracelist
         except KeyError:
             print("Error: artist already deleted.")
@@ -277,9 +277,9 @@ class Graph_PyQtGraph(QWidget):
     def checkboxChanged(self):
         for ident, artist in self.tracelist.trace_dict.items():
             try:
-                if artist.checkState() and (not self.artists[ident].shown):
+                if artist.checkState(0) and (not self.artists[ident].shown):
                     self._display(ident, True)
-                if (not artist.checkState()) and self.artists[ident].shown:
+                if (not artist.checkState(0)) and self.artists[ident].shown:
                     self._display(ident, False)
             # this means the artist has been deleted.
             except KeyError:
@@ -370,7 +370,7 @@ class Graph_PyQtGraph(QWidget):
         """
         directory_list, dataset_name = dataset_ident
         dataset_location = '\\'.join(directory_list)
-        return [dataset_location, dataset_name]
+        return (dataset_location, dataset_name)
 
 
 if __name__ == '__main__':

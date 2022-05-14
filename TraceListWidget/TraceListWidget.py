@@ -13,10 +13,10 @@ from numpy import savetxt
 
 
 # todo: sort artists within a dataset
-# todo: when adding artists, make dataset expand
 # todo: clicking on top item expands it
-# todo: ensure we can still select checkbox
 # todo: try setting background of qtreewidgetitem
+# todo: ensureorder ok, otherwise traces won't get removed from graphwidget
+# todo: missing traces not added
 class TraceList(QTreeWidget):
     """
     Manages the datasets that are being plotted.
@@ -30,12 +30,21 @@ class TraceList(QTreeWidget):
         self.windows = []
         self.config = traceListConfig()
         self.setColumnCount(2)
-        self.setHeaderLabels(["Dataset Name", "Location"])
-        self.setStyleSheet("background-color:%s;" % self.config.background_color)
+        #self.setStyleSheet("background-color:black; color:white;".format(self.config.background_color))
+        #self.setStyleSheet("background-color:{:s};".format(self.config.background_color))
+        # set up header
+        header_labels = QTreeWidgetItem(None, ["Dataset Name", "Location"])
+        header_labels.setForeground(0, QColor(0, 0, 0))
+        header_labels.setForeground(1, QColor(0, 0, 0))
+        header_labels.setBackground(0, QColor(0, 0, 0))
+        header_labels.setBackground(1, QColor(0, 0, 0))
+        #header_labels.setStyleSheet("background-color:white; color:black; border: 1px solid white;")
+        self.setHeaderItem(header_labels)
         try:
             self.use_trace_color = self.config.use_trace_color
-        except AttributeError:
+        except AttributeError as e:
             self.use_trace_color = False
+            print('Error in init:', e)
         self.initUI()
 
     def initUI(self):
@@ -48,14 +57,16 @@ class TraceList(QTreeWidget):
         """
         Adds a dataset header.
         Arguments:
-            dataset_ident   [dataset_location, dataset_name]: a unique identifier for a dataset.
+            dataset_ident   (dataset_location, dataset_name): a unique identifier for a dataset.
         """
         if dataset_ident in self.dataset_dict.keys():
             print('Error in tracelist.addDataset: dataset already added.')
             print('\tdataset_ident:', dataset_ident)
         else:
-            dataset_item = QTreeWidgetItem(self)
-            dataset_item.setText(0, dataset_ident[::-1])
+            ident_tmp = list(dataset_ident).reverse()
+            dataset_item = QTreeWidgetItem(self, ident_tmp)
+            dataset_item.setBackground(0, QColor(255, 255, 255))
+            dataset_item.setForeground(0, QColor(0, 0, 0))
             dataset_item.setData(0, Qt.UserRole, dataset_ident)
             dataset_item.setExpanded(True)
             self.dataset_dict[dataset_ident] = dataset_item
@@ -64,7 +75,7 @@ class TraceList(QTreeWidget):
         """
         Removes a dataset header and all child traces.
         Arguments:
-            dataset_ident   [dataset_location, dataset_name]: a unique identifier for a dataset.
+            dataset_ident   (dataset_location, dataset_name): a unique identifier for a dataset.
         """
         if dataset_ident not in self.dataset_dict.keys():
             print("Error in tracelist.removeDataset: dataset doesn't exist.")
@@ -72,28 +83,28 @@ class TraceList(QTreeWidget):
         else:
             dataset_item = self.dataset_dict[dataset_ident]
             dataset_item.takeChildren()
-            del dataset_item
+            dataset_item = None
 
     def addTrace(self, artist_ident, color):
         """
         Adds a trace to the TraceListWidget.
         Arguments:
-            artist_ident    [dataset_location, dataset_name, artist_name]: a unique identifier for an artist.
+            artist_ident    (dataset_location, dataset_name, artist_name): a unique identifier for an artist.
             color           Qt.Color: the color to set the trace.
         """
         dataset_ident = artist_ident[:2]
         # get dataset
         try:
             dataset_item = self.dataset_dict[dataset_ident]
-            artist_item = QTreeWidgetItem(artist_ident[2])
+            artist_item = QTreeWidgetItem(dataset_item, [artist_ident[2]])
             artist_item.setData(0, Qt.UserRole, artist_ident)
+            artist_item.setBackground(0, QColor(0, 0, 0))
             # set color of artist entry in tracelist
             if self.use_trace_color:
-                artist_item.setForeground(color)
+                artist_item.setForeground(0, color)
             else:
-                artist_item.setForeground(QColor(255, 255, 255))
-            artist_item.setBackground(QColor(0, 0, 0))
-            artist_item.setCheckState(Qt.Checked)
+                artist_item.setForeground(0, QColor(255, 255, 255))
+            artist_item.setCheckState(0, Qt.Checked)
             # add artist item
             dataset_item.addChild(artist_item)
             self.trace_dict[artist_ident] = artist_item
@@ -106,7 +117,7 @@ class TraceList(QTreeWidget):
         """
         Removes a trace from the TraceListWidget.
         Arguments:
-            artist_ident   [dataset_location, dataset_name, artist_name]: a unique identifier for an artist.
+            artist_ident   (dataset_location, dataset_name, artist_name): a unique identifier for an artist.
         """
         # get objects
         dataset_ident = artist_ident[:2]
@@ -149,13 +160,13 @@ class TraceList(QTreeWidget):
             elif action == removeallAction:
                 # remove all artists/traces
                 for index in reversed(range(self.count())):
-                    ident = self.item(index).data(Qt.UserRole)
+                    ident = self.item(index).data(0, Qt.UserRole)
                     self.parent.remove_artist(ident)
             elif action == exportallAction:
                 # get all datasets
                 datasets_all = set()
                 for index in range(self.count()):
-                    ident = self.item(index).data(Qt.UserRole)
+                    ident = self.item(index).data(0, Qt.UserRole)
                     dataset_tmp = self.parent.artists[ident].dataset
                     datasets_all.add(dataset_tmp)
                 # export all datasets
@@ -170,7 +181,7 @@ class TraceList(QTreeWidget):
         else:
             # clicked on artist_item
             if item.parent() is not None:
-                artist_ident = item.data(Qt.UserRole)
+                artist_ident = item.data(0, Qt.UserRole)
                 artist_params = self.parent.artists[artist_ident]
                 # create list of user actions in menu
                 removeallAction = menu.addAction('Remove All Traces')
@@ -259,8 +270,8 @@ class TraceList(QTreeWidget):
                         print('Error during export:', e)
             # clicked on dataset_item
             else:
-                dataset_ident = item.data(Qt.UserRole)
-                dataset_item = self.dataset_dict[dataset_ident]
+                dataset_ident = item.data(0, Qt.UserRole)
+                print('remove all: dataset ident:', dataset_ident)
                 # create list of user actions in menu
                 removeDatasetAction = menu.addAction('Remove Dataset')
                 # process actions
@@ -268,10 +279,8 @@ class TraceList(QTreeWidget):
                 # remove all traces within the dataset
                 if action == removeDatasetAction:
                     try:
-                        # get all child artist_items of dataset_item
-                        dataset_children = dataset_item.takeChildren()
-                        for artist_item in dataset_children:
-                            artist_ident = artist_item.data(Qt.UserRole)
-                            self.parent.remove_artist(artist_ident)
+                        self.parent.remove_dataset(dataset_ident)
+                        # remove all child artists from the dataset
+                        item.takeChildren()
                     except Exception as e:
                         print('Error when doing Remove Dataset:', e)
