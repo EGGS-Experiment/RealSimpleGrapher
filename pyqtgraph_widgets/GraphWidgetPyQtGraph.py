@@ -153,13 +153,11 @@ class Graph_PyQtGraph(QWidget):
             index_dict[trace_name] = i
         # use old dataset if dataset already exists
         if dataset_ident in self.datasets.keys():
-            print('Dataset already added. Adding any missing traces.')
+            print('Error in add_dataset: Dataset already added.')
+            print('\tAdding any missing traces.')
             del dataset
-            # get existing dataset and traces
-            dataset_holder = self.datasets[dataset_ident]
-            dataset = dataset_holder['dataset']
-            existing_trace_names = dataset_holder['trace_names']
-            # update existing traces
+            # update existing dataset traces
+            existing_trace_names = self.datasets[dataset_ident]['trace_names']
             self.datasets[dataset_ident]['trace_names'] = set(dataset_trace_names)
         # otherwise add new dataset to self.datasets
         else:
@@ -167,12 +165,13 @@ class Graph_PyQtGraph(QWidget):
                 'dataset': dataset,
                 'trace_names': set(dataset_trace_names)
             }
+            self.tracelist.addDataset(dataset_ident)
         # get different traces and add each trace to artists
         diff_trace_names = list(set(dataset_trace_names) - existing_trace_names)
         for trace_name in diff_trace_names:
-            ident = (dataset_ident, trace_name)
             index = index_dict[trace_name]
-            self.add_artist(ident, dataset, index)
+            artist_ident = [*dataset_ident, trace_name]
+            self.add_artist(artist_ident, dataset, index)
         # enable autorange
         self.toggleAutoRange(True)
 
@@ -190,60 +189,67 @@ class Graph_PyQtGraph(QWidget):
         existing_trace_names = self.datasets[dataset_ident]['trace_names']
         # remove traces
         for trace_name in existing_trace_names:
-            self.remove_artist((dataset_ident, trace_name))
+            artist_ident = [*dataset_ident, trace_name]
+            self.remove_artist(artist_ident)
+        # remove dataset
+        self.tracelist.removeDataset(dataset_ident)
         # delete dataset
         del self.datasets[dataset_ident]
 
-    def add_artist(self, ident, dataset, index, no_points=False):
+    def add_artist(self, artist_ident, dataset, index, no_points=False):
         """
         Adds an artist/trace from a dataset.
         Called only by add_dataset to add the traces within a dataset.
         Arguments:
-            no_points   (bool)  : an override parameter to the global show_points setting,
+            artist_ident    [dataset_location, dataset_name, trace_name]: a unique identifier for an artist.
+            no_points       (bool)  : an override parameter to the global show_points setting,
                                     allowing data fits to be plotted without points.
         """
-        if ident not in self.artists.keys():
+        if artist_ident not in self.artists.keys():
             new_color = next(self.colorChooser)
+            trace_name = artist_ident[2]
             if self.show_points and (not no_points):
                 line = self.pw.plot([], [],
                                     symbol=None, symbolBrush=new_color, pen=new_color,
-                                    name=ident, connect=self.scatter_plot,
+                                    name=trace_name, connect=self.scatter_plot,
                                     SkipFiniteCheck=True)
             else:
                 line = self.pw.plot([], [],
-                                    symbol=None, pen=new_color, name=ident)
+                                    symbol=None, pen=new_color, name=trace_name)
             if self.grid_on:
                 self.pw.showGrid(x=True, y=True)
             # add artist to holding dictionary and tracelist
-            self.artists[ident] = artistParameters(line, dataset, index, True)
-            self.tracelist.addTrace(ident, new_color)
+            self.artists[artist_ident] = artistParameters(line, dataset, index, True)
+            self.tracelist.addTrace(artist_ident, new_color)
         else:
-            print('Trace already added.')
+            print('Error in add_artist: Trace already added.')
 
-    def remove_artist(self, ident):
+    def remove_artist(self, artist_ident):
         """
         Removes an artist (i.e. trace) from the PlotWidget.
-        Called by remove_dataset when dataset_queue is full and
-        when we manually remove it via the TraceListWidget.
+        Called by remove_dataset when dataset_queue is full and when we manually
+        remove it via the TraceListWidget.
         Arguments:
-            ident   ((dataset_location, trace_name)): a unique identifier for the artist
+            artist_ident    [dataset_location, dataset_name, trace_name]: a unique identifier for an artist.
         """
         try:
-            artist = self.artists[ident].artist
+            artist = self.artists[artist_ident].artist
             # remove references to the artist
             self.pw.removeItem(artist)
-            self.tracelist.removeTrace(ident)
+            self.tracelist.removeTrace(artist_ident)
             # remove the artist from dataset holder
-            dataset_ident, trace_name = ident
+            dataset_ident, trace_name = artist_ident
             trace_names = self.datasets[dataset_ident]['trace_names']
             trace_names.remove(trace_name)
             # delete the artist
-            del self.artists[ident]
+            del self.artists[artist_ident]
             # if dataset has no active traces, remove the dataset
             if len(trace_names) == 0:
                 del self.datasets[dataset_ident]
+                # remove dataset header from tracelist
         except KeyError:
-            print("Error: artist already deleted. ident =", ident)
+            print("Error: artist already deleted.")
+            print("\tident:", artist_ident)
         except Exception as e:
             print("Error: remove failed:", e)
 
@@ -269,11 +275,11 @@ class Graph_PyQtGraph(QWidget):
 
     # SLOTS
     def checkboxChanged(self):
-        for ident, item in self.tracelist.trace_dict.items():
+        for ident, artist in self.tracelist.trace_dict.items():
             try:
-                if item.checkState() and not self.artists[ident].shown:
+                if artist.checkState() and (not self.artists[ident].shown):
                     self._display(ident, True)
-                if not item.checkState() and self.artists[ident].shown:
+                if (not artist.checkState()) and self.artists[ident].shown:
                     self._display(ident, False)
             # this means the artist has been deleted.
             except KeyError:
@@ -285,20 +291,20 @@ class Graph_PyQtGraph(QWidget):
         self.current_limits = [lims[0][0], lims[0][1]]
 
     def mouseMoved(self, pos):
-        # print("Image position:", self.img.mapFromScene(pos))
         pnt = self.img.mapFromScene(pos)
-        string = '(' + str(pnt.x()) + ' , ' + str(pnt.y()) + ')'
+        string = "({:.4g},\t{:.4g})".format(pnt.x(), pnt.y())
         self.coords.setText(string)
 
     def toggleAutoRange(self, autorangeEnable):
         if autorangeEnable:
+            # todo: try to move stylesheets to once during init for both states
             self.pw.enableAutoRange()
             self.autorangebutton.setText('Autorange On')
-            self.autorangebutton.setStyleSheet("background-color:grey")
+            self.autorangebutton.setStyleSheet("background-color:#272323; border-style:inset; border-width: 3px; border-color: grey")
         else:
             self.pw.disableAutoRange()
             self.autorangebutton.setText('Autorange Off')
-            self.autorangebutton.setStyleSheet("background-color:black")
+            self.autorangebutton.setStyleSheet("background-color:black; border-style:outset; border-width: 3px; border-color: grey")
 
     @inlineCallbacks
     def vline_changed(self, sig):
@@ -328,30 +334,29 @@ class Graph_PyQtGraph(QWidget):
         """
         try:
             artist = self.artists[ident].artist
+            self.artists[ident].shown = shown
             if shown:
                 self.pw.addItem(artist)
-                self.artists[ident].shown = True
             else:
                 self.pw.removeItem(artist)
-                self.artists[ident].shown = False
         except KeyError:
-            raise Exception('404 Artist not found')
+            raise Exception('Error 404: Artist not found')
 
     def _update_figure(self):
         """
         The main update loop which updates the artists
         with data from the Datasets.
         """
-        for ident, params in self.artists.items():
-            if params.shown:
+        for artist_params in self.artists.values():
+            if artist_params.shown:
                 try:
-                    ds = params.dataset
-                    index, current_update = (params.index, ds.updateCounter)
-                    if params.last_update < current_update:
+                    ds = artist_params.dataset
+                    current_update = ds.updateCounter
+                    if artist_params.last_update < current_update:
                         x = ds.data[:, 0]
-                        y = ds.data[:, index + 1]
-                        params.last_update = current_update
-                        params.artist.setData(x, y)
+                        y = ds.data[:, artist_params.index + 1]
+                        artist_params.last_update = current_update
+                        artist_params.artist.setData(x, y)
                         # we can use symbols if we don't have too many points
                         if len(x) < 500:
                             #params.artist.setData(symbol='o')
@@ -359,14 +364,13 @@ class Graph_PyQtGraph(QWidget):
                 except Exception as e:
                     print('Error in _update_figure:', e)
 
-    def _makeDatasetIdent(self, dataset_location):
+    def _makeDatasetIdent(self, dataset_ident):
         """
         Creates an identifier unique to each dataset.
         """
-        directory_list, dataset_name = dataset_location
-        dataset_ident = '\\'.join(directory_list)
-        dataset_ident += '\\' + dataset_name
-        return dataset_ident
+        directory_list, dataset_name = dataset_ident
+        dataset_location = '\\'.join(directory_list)
+        return [dataset_location, dataset_name]
 
 
 if __name__ == '__main__':
