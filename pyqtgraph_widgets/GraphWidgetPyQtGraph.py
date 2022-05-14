@@ -156,9 +156,11 @@ class Graph_PyQtGraph(QWidget):
             print('Error in add_dataset: Dataset already added.')
             print('\tAdding any missing traces.')
             del dataset
-            # update existing dataset traces
+            # update existing values
             existing_trace_names = self.datasets[dataset_ident]['trace_names']
             self.datasets[dataset_ident]['trace_names'] = set(dataset_trace_names)
+            # get old dataset
+            dataset = self.datasets[dataset_ident]['dataset']
         # otherwise add new dataset to self.datasets
         else:
             self.datasets[dataset_ident] = {
@@ -175,24 +177,25 @@ class Graph_PyQtGraph(QWidget):
         # enable autorange
         self.toggleAutoRange(True)
 
-    @inlineCallbacks
     def remove_dataset(self, dataset_ident):
         """
         Removes all the traces of a dataset from the holding dictionary self.artists.
         Called only by add_dataset when dataset_queue is full.
+        todo: convenience
         Arguments:
             dataset_ident   (dataset_location, dataset_name):  a unique identifier for a dataset.
         """
-        # get all traces currently in use
-        existing_trace_names = self.datasets[dataset_ident]['trace_names']
-        # remove traces
-        for trace_name in existing_trace_names:
-            artist_ident = (*dataset_ident, trace_name)
-            self.remove_artist(artist_ident)
-        # remove dataset
-        self.tracelist.removeDataset(dataset_ident)
-        # delete dataset
-        del self.datasets[dataset_ident]
+        try:
+            # get all traces currently in use
+            existing_trace_names = self.datasets[dataset_ident]['trace_names']
+            # remove traces
+            for trace_name in tuple(existing_trace_names):
+                artist_ident = (*dataset_ident, trace_name)
+                self.remove_artist(artist_ident)
+            # no need to call traceList.removeDataset or otherwise interact since
+            # it is all handled in self.remove_artist
+        except Exception as e:
+            print("Error in remove_dataset:", e)
 
     def add_artist(self, artist_ident, dataset, index, no_points=False):
         """

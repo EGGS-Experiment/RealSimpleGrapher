@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeWidget, QTreeWidgetItem
+from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeWidget, QTreeWidgetItem, QLabel
 
 from .FitWindowWidget import FitWindow
 from .ParameterListWidget import ParameterList
@@ -11,12 +11,8 @@ from RealSimpleGrapher.GUIConfig import traceListConfig
 from os import getenv
 from numpy import savetxt
 
-
 # todo: sort artists within a dataset
-# todo: clicking on top item expands it
-# todo: try setting background of qtreewidgetitem
 # todo: ensureorder ok, otherwise traces won't get removed from graphwidget
-# todo: missing traces not added
 class TraceList(QTreeWidget):
     """
     Manages the datasets that are being plotted.
@@ -30,16 +26,8 @@ class TraceList(QTreeWidget):
         self.windows = []
         self.config = traceListConfig()
         self.setColumnCount(2)
-        #self.setStyleSheet("background-color:black; color:white;".format(self.config.background_color))
-        #self.setStyleSheet("background-color:{:s};".format(self.config.background_color))
-        # set up header
-        header_labels = QTreeWidgetItem(None, ["Dataset Name", "Location"])
-        header_labels.setForeground(0, QColor(0, 0, 0))
-        header_labels.setForeground(1, QColor(0, 0, 0))
-        header_labels.setBackground(0, QColor(0, 0, 0))
-        header_labels.setBackground(1, QColor(0, 0, 0))
-        #header_labels.setStyleSheet("background-color:white; color:black; border: 1px solid white;")
-        self.setHeaderItem(header_labels)
+        # todo: fix header label coloring problem
+        self.setHeaderLabels(["Dataset Name", "Location"])
         try:
             self.use_trace_color = self.config.use_trace_color
         except AttributeError as e:
@@ -63,10 +51,9 @@ class TraceList(QTreeWidget):
             print('Error in tracelist.addDataset: dataset already added.')
             print('\tdataset_ident:', dataset_ident)
         else:
-            ident_tmp = list(dataset_ident).reverse()
+            ident_tmp = list(dataset_ident)
+            ident_tmp.reverse()
             dataset_item = QTreeWidgetItem(self, ident_tmp)
-            dataset_item.setBackground(0, QColor(255, 255, 255))
-            dataset_item.setForeground(0, QColor(0, 0, 0))
             dataset_item.setData(0, Qt.UserRole, dataset_ident)
             dataset_item.setExpanded(True)
             self.dataset_dict[dataset_ident] = dataset_item
@@ -83,7 +70,6 @@ class TraceList(QTreeWidget):
         else:
             dataset_item = self.dataset_dict[dataset_ident]
             dataset_item.takeChildren()
-            dataset_item = None
 
     def addTrace(self, artist_ident, color):
         """
@@ -159,14 +145,14 @@ class TraceList(QTreeWidget):
                 ps.show()
             elif action == removeallAction:
                 # remove all artists/traces
-                for index in reversed(range(self.count())):
-                    ident = self.item(index).data(0, Qt.UserRole)
+                for index in reversed(range(self.topLevelItemCount())):
+                    ident = self.topLevelItem(index).data(0, Qt.UserRole)
                     self.parent.remove_artist(ident)
             elif action == exportallAction:
                 # get all datasets
                 datasets_all = set()
-                for index in range(self.count()):
-                    ident = self.item(index).data(0, Qt.UserRole)
+                for index in reversed(range(self.topLevelItemCount())):
+                    ident = self.topLevelItem(index).data(0, Qt.UserRole)
                     dataset_tmp = self.parent.artists[ident].dataset
                     datasets_all.add(dataset_tmp)
                 # export all datasets
@@ -271,7 +257,6 @@ class TraceList(QTreeWidget):
             # clicked on dataset_item
             else:
                 dataset_ident = item.data(0, Qt.UserRole)
-                print('remove all: dataset ident:', dataset_ident)
                 # create list of user actions in menu
                 removeDatasetAction = menu.addAction('Remove Dataset')
                 # process actions
@@ -279,8 +264,11 @@ class TraceList(QTreeWidget):
                 # remove all traces within the dataset
                 if action == removeDatasetAction:
                     try:
-                        self.parent.remove_dataset(dataset_ident)
                         # remove all child artists from the dataset
-                        item.takeChildren()
+                        self.parent.remove_dataset(dataset_ident)
+                        # remove self
+                        dataset_index = self.indexOfTopLevelItem(item)
+                        self.takeTopLevelItem(dataset_index)
+                        del item
                     except Exception as e:
                         print('Error when doing Remove Dataset:', e)
