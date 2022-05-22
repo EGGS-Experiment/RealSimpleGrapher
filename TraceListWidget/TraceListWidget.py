@@ -68,7 +68,7 @@ class TraceList(QTreeWidget):
             print("Error in tracelist.removeDataset: dataset doesn't exist.")
             print('\tdataset_ident:', dataset_ident)
         else:
-            dataset_item = self.dataset_dict[dataset_ident]
+            dataset_item = self.dataset_dict.pop(dataset_ident, None)
             dataset_item.takeChildren()
 
     def addTrace(self, artist_ident, color):
@@ -271,4 +271,5 @@ class TraceList(QTreeWidget):
                         self.takeTopLevelItem(dataset_index)
                         del item
                     except Exception as e:
-                        print('Error when doing Remove Dataset:', e)
+                        print('Error in tracelist.removeDatasetAction:', e)
+        # todo: set symbol

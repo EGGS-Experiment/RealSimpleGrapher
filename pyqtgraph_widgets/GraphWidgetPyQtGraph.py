@@ -180,7 +180,6 @@ class Graph_PyQtGraph(QWidget):
     def remove_dataset(self, dataset_ident):
         """
         Removes all the traces of a dataset from the holding dictionary self.artists.
-        Called only by add_dataset when dataset_queue is full.
         todo: convenience
         Arguments:
             dataset_ident   (dataset_location, dataset_name):  a unique identifier for a dataset.
@@ -360,10 +359,6 @@ class Graph_PyQtGraph(QWidget):
                         y = ds.data[:, artist_params.index + 1]
                         artist_params.last_update = current_update
                         artist_params.artist.setData(x, y)
-                        # we can use symbols if we don't have too many points
-                        if len(x) < 500:
-                            #params.artist.setData(symbol='o')
-                            pass
                 except Exception as e:
                     print('Error in _update_figure:', e)
 
