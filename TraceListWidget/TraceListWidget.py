@@ -10,9 +10,10 @@ from RealSimpleGrapher.GUIConfig import traceListConfig
 
 from os import getenv
 from numpy import savetxt
-
 # todo: sort artists within a dataset
 # todo: ensureorder ok, otherwise traces won't get removed from graphwidget
+
+
 class TraceList(QTreeWidget):
     """
     Manages the datasets that are being plotted.
@@ -48,7 +49,7 @@ class TraceList(QTreeWidget):
             dataset_ident   (dataset_location, dataset_name): a unique identifier for a dataset.
         """
         if dataset_ident in self.dataset_dict.keys():
-            print('Error in tracelist.addDataset: dataset already added.')
+            print('Error in tracelist.addDataset: Dataset already added.')
             print('\tdataset_ident:', dataset_ident)
         else:
             ident_tmp = list(dataset_ident)
@@ -68,7 +69,7 @@ class TraceList(QTreeWidget):
             print("Error in tracelist.removeDataset: dataset doesn't exist.")
             print('\tdataset_ident:', dataset_ident)
         else:
-            dataset_item = self.dataset_dict[dataset_ident]
+            dataset_item = self.dataset_dict.pop(dataset_ident, None)
             dataset_item.takeChildren()
 
     def addTrace(self, artist_ident, color):
@@ -132,6 +133,7 @@ class TraceList(QTreeWidget):
         # todo: remove artist before general
         # todo: make menu header
         # todo: add on later
+        # todo: if statements set menus, but process as one
         # clicked on nothing
         if item is None:
             spectrumaddAction = menu.addAction('Add Predicted Spectrum')
@@ -169,33 +171,39 @@ class TraceList(QTreeWidget):
             if item.parent() is not None:
                 artist_ident = item.data(0, Qt.UserRole)
                 artist_params = self.parent.artists[artist_ident]
-                # create list of user actions in menu
-                removeallAction = menu.addAction('Remove All Traces')
-                parametersAction = menu.addAction('Parameters')
-                togglecolorsAction = menu.addAction('Toggle Colors')
+                # trace-specific functions
                 fitAction = menu.addAction('Fit')
                 removeAction = menu.addAction('Remove')
                 exportAction = menu.addAction('Export')
+                selectColorMenu = menu.addMenu("Select Color")
                 # log mode
                 logAction = menu.addMenu('Set Log Mode')
                 logXaction = logAction.addAction('X-axis')
+                logYaction = logAction.addAction('Y-axis')
+                # remove all actions
+                removeallAction = menu.addAction('Remove All Traces')
+                parametersAction = menu.addAction('Parameters')
+                togglecolorsAction = menu.addAction('Toggle Colors')
+                # configure submenus
                 logXaction.setCheckable(True)
+                logYaction.setCheckable(True)
                 if artist_params.logModeX:
                     logXaction.setChecked(True)
-                logYaction = logAction.addAction('Y-axis')
-                logYaction.setCheckable(True)
                 if artist_params.logModeY:
                     logYaction.setChecked(True)
                 # color menu
-                selectColorMenu = menu.addMenu("Select Color")
                 colorActions = list(map(selectColorMenu.addAction,
                                         ["Red", "Green", "Yellow", "Cyan", "Magenta", "White"]))
+
                 # process actions
                 action = menu.exec_(self.mapToGlobal(pos))
                 # remove all traces
                 if action == removeallAction:
-                    # todo: implement
-                    pass
+                    # remove all artists/traces
+                    print('top level item count:', self.topLevelItemCount())
+                    for index in reversed(range(self.topLevelItemCount())):
+                        ident = self.topLevelItem(index).data(0, Qt.UserRole)
+                        self.parent.remove_artist(ident)
                 # remove an individual trace
                 elif action == removeAction:
                     try:
@@ -229,6 +237,7 @@ class TraceList(QTreeWidget):
                 elif action in colorActions:
                     # get color index
                     color_ind = colorActions.index(action)
+                    # todo: parent doesn't have attribute colors
                     new_color = self.parent.colors[color_ind]
                     if self.use_trace_color:
                         self.changeTraceListColor(artist_ident, new_color)
