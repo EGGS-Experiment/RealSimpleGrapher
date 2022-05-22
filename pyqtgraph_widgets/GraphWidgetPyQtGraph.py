@@ -53,6 +53,7 @@ class Graph_PyQtGraph(QWidget):
         self.live_update_loop = LoopingCall(self._update_figure)
         self.live_update_loop.start(0.25)
         # colors
+        self.colorList = colorList
         self.colorChooser = cycle(colorList)
         # autoranging
         self.autoRangeEnable = True
@@ -140,7 +141,6 @@ class Graph_PyQtGraph(QWidget):
     def add_dataset(self, dataset):
         """
         Adds a dataset.
-        Triggered by TraceListWidget when we click on a dataset.
         Arguments:
             dataset (Dataset): the dataset to add.
         """
@@ -153,9 +153,8 @@ class Graph_PyQtGraph(QWidget):
             index_dict[trace_name] = i
         # use old dataset if dataset already exists
         if dataset_ident in self.datasets.keys():
-            print('Error in add_dataset: Dataset already added.')
+            print('Error in graphwidget.add_dataset: Dataset already exists.')
             print('\tAdding any missing traces.')
-            del dataset
             # update existing values
             existing_trace_names = self.datasets[dataset_ident]['trace_names']
             self.datasets[dataset_ident]['trace_names'] = set(dataset_trace_names)
@@ -179,8 +178,7 @@ class Graph_PyQtGraph(QWidget):
 
     def remove_dataset(self, dataset_ident):
         """
-        Removes all the traces of a dataset from the holding dictionary self.artists.
-        todo: convenience
+        Removes all the traces of a dataset from the holding dictionary self.artists
         Arguments:
             dataset_ident   (dataset_location, dataset_name):  a unique identifier for a dataset.
         """
@@ -194,7 +192,8 @@ class Graph_PyQtGraph(QWidget):
             # no need to call traceList.removeDataset or otherwise interact since
             # it is all handled in self.remove_artist
         except Exception as e:
-            print("Error in remove_dataset:", e)
+            # todo: this is called when no datasets left
+            print("Error in graphwidget.remove_dataset:", e)
 
     def add_artist(self, artist_ident, dataset, index, no_points=False):
         """
@@ -222,7 +221,7 @@ class Graph_PyQtGraph(QWidget):
             self.artists[artist_ident] = artistParameters(line, dataset, index, True)
             self.tracelist.addTrace(artist_ident, new_color)
         else:
-            print('Error in add_artist: Trace already added.')
+            print('Error in graphwidget.add_artist: Trace already added.')
 
     def remove_artist(self, artist_ident):
         """
@@ -236,7 +235,6 @@ class Graph_PyQtGraph(QWidget):
             artist = self.artists[artist_ident].artist
             # remove references to the artist
             self.pw.removeItem(artist)
-            self.tracelist.removeTrace(artist_ident)
             # remove the artist from dataset holder
             dataset_location, dataset_name, trace_name = artist_ident
             dataset_ident = (dataset_location, dataset_name)
@@ -247,13 +245,11 @@ class Graph_PyQtGraph(QWidget):
             # if dataset has no active traces, remove the dataset
             if len(trace_names) == 0:
                 del self.datasets[dataset_ident]
-                self.tracelist.removeDataset(dataset_ident)
-                # remove dataset header from tracelist
         except KeyError:
-            print("Error: artist already deleted.")
+            print("Error in graphwidget.remove_artist: artist already deleted.")
             print("\tident:", artist_ident)
         except Exception as e:
-            print("Error: remove failed:", e)
+            print("Error in graphwidget.remove_artist: remove failed:", e)
 
 
     # CONFIGURE PLOTWIDGET
@@ -342,7 +338,7 @@ class Graph_PyQtGraph(QWidget):
             else:
                 self.pw.removeItem(artist)
         except KeyError:
-            raise Exception('Error 404: Artist not found')
+            raise Exception('Error in graphwidget._display: Artist not found')
 
     def _update_figure(self):
         """
@@ -360,7 +356,7 @@ class Graph_PyQtGraph(QWidget):
                         artist_params.last_update = current_update
                         artist_params.artist.setData(x, y)
                 except Exception as e:
-                    print('Error in _update_figure:', e)
+                    print('Error in graphwidget._update_figure:', e)
 
     def _makeDatasetIdent(self, dataset_ident):
         """
