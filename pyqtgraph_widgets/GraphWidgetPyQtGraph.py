@@ -59,29 +59,53 @@ class Graph_PyQtGraph(QWidget):
         self.autoRangeEnable = True
         # startup
         self.initUI()
-        self.connectSignals()
 
     @inlineCallbacks
     def initUI(self):
         """
-        Draws the UI.
+        Create the GUI.
         """
         layout = QHBoxLayout(self)
-        layout_splitter = QSplitter
-        layout.addWidget(layout_splitter)
-        # create widgets
-        left_widget = self._makeLeftSide()
-        right_widget = self._makeRightSide()
-        # lay out widgets
-        layout_splitter = QSplitter()
-        layout_splitter.addWidget(left_widget)
-        layout_splitter.addWidget(right_widget)
+        splitter_widget = QSplitter()
+        layout.addWidget(splitter_widget)
+
+        # LHS displays datasets and active traces
+        self.tracelist = TraceList(self, root=self.root)
+        self.dv = DataVaultList(self.name, cxn=self.cxn, root=self.root)
+        lhs_widget = QSplitter()
+        lhs_widget.setOrientation(Qt.Vertical)
+        lhs_widget.addWidget(QLabel('Dataset Traces:'))
+        lhs_widget.addWidget(self.tracelist)
+        lhs_widget.addWidget(self.dv)
+
+
+        # RHS displays plots and related data
+        self.pw = pg.PlotWidget()
+        rhs_widget = QFrame()
+        # create bottom buttons
+        pwButtons = QWidget()
+        pwButtons_layout = QHBoxLayout(pwButtons)
+        self.coords = QLabel('')
+        self.autorangebutton = QPushButton('Autorange Off')
+        self.autorangebutton.setCheckable(True)
+        pwButtons_layout.addWidget(self.coords)
+        pwButtons_layout.addWidget(self.autorangebutton)
+
+        rhs_widget_layout = QVBoxLayout(rhs_widget)
+        rhs_widget_layout.addWidget(QLabel(self.name))
+        rhs_widget_layout.addWidget(self.pw)
+        rhs_widget_layout.addWidget(pwButtons)
+
+        # add widgets to layout
+        splitter_widget.addWidget(lhs_widget)
+        splitter_widget.addWidget(rhs_widget)
 
         # set up viewbox
         self.pw.plot([], [])
         vb = self.pw.plotItem.vb
         self.img = pg.ImageItem()
         vb.addItem(self.img)
+
         # configure lines
         if self.vline_name:
             self.inf = pg.InfiniteLine(movable=True, angle=90,
@@ -108,64 +132,11 @@ class Graph_PyQtGraph(QWidget):
             vb.addItem(self.inf)
             self.inf.sigPositionChangeFinished.connect(self.hline_changed)
 
-    def _makeLeftSide(self):
-        """
-        Creates the left-hand side of the graphWidget.
-        The left-hand side contains the TraceList, which displays traces,
-        and the DataVaultListWidget, which interacts with the data vault
-        to get data.
-        """
-        # QSplitter allows vertical resizing of the TraceList and DataVaultListWidget
-        widget = QSplitter()
-
-        # create constituent widgets
-        self.tracelist = TraceList(self, root=self.root)
-        self.dv = DataVaultList(self.name, cxn=self.cxn, root=self.root)
-        tracelistLabel = QLabel('Dataset Traces:')
-
-        # lay out
-        widget.setOrientation(Qt.Vertical)
-        widget.addWidget(tracelistLabel)
-        widget.addWidget(self.tracelist)
-        widget.addWidget(self.dv)
-        return widget
-
-    def _makeRightSide(self):
-        """
-        Creates the right-hand side of the graphWidget.
-        The left-hand side contains the PlotWidget, which does all the graphing,
-        a readout of the co-ordinates of the cursor, a button to autoRange the plot,
-        and the graphWidget's title.
-        """
-        widget = QFrame()
-        widget_layout = QVBoxLayout(widget)
-
-        self.pw = pg.PlotWidget()
-        self.title = QLabel(self.name)
-
-        # create subwidget
-        pwButtons = QWidget()
-        pwButtons_layout = QHBoxLayout(pwButtons)
-        self.coords = QLabel('')
-        self.autorangebutton = QPushButton('Autorange Off')
-        self.autorangebutton.setCheckable(True)
-        pwButtons_layout.addWidget(self.coords)
-        pwButtons_layout.addWidget(self.autorangebutton)
-
-        # lay out
-        widget_layout.addWidget(self.title)
-        widget_layout.addWidget(self.pw)
-        widget_layout.addWidget(pwButtons)
-        return widget
-
-    def _connectSignals(self):
-        """
-        Connect signals to slots.
-        """
+        # connect signals to slots
+        self.autorangebutton.toggled.connect(lambda status: self.toggleAutoRange(status))
         self.tracelist.itemChanged.connect(self.checkboxChanged)
         self.pw.scene().sigMouseMoved.connect(self.mouseMoved)
         self.pw.sigRangeChanged.connect(self.rangeChanged)
-        self.autorangebutton.toggled.connect(lambda: self.toggleAutoRange(self.autorangebutton.isChecked()))
         # self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
 
 
