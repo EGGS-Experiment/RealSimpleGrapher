@@ -17,9 +17,8 @@ class Graph(QWidget):
         y = [random() for k in x]
         y2 = [random() for k in x]
         self.pw = PlotWidget()
-        layout = QVBoxLayout()
+        layout = QVBoxLayout(self)
         layout.addWidget(self.pw)
-        self.setLayout(layout)
         # self.pw = pg.plot([],[])
         self.legend = self.pw.addLegend()
         self.pw.setXRange(1, 503)

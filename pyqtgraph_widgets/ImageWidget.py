@@ -34,12 +34,11 @@ class ImageWidget(QWidget):
         self.prev_button = QPushButton('<')
         self.next_button.clicked.connect(self.on_next)
         self.prev_button.clicked.connect(self.on_prev)
-        layout = QGridLayout()
+        layout = QGridLayout(self)
         layout.addWidget(self.title, 0, 0)
         layout.addWidget(self.prev_button, 1, 0)
         layout.addWidget(self.next_button, 1, 1)
         layout.addWidget(self.imv, 2, 0, 20, 2)
-        self.setLayout(layout)
 
     def update_image(self, data, image_size, name):
         image = data.reshape(image_size[0], image_size[1])

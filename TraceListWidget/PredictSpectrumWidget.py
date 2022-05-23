@@ -31,7 +31,7 @@ class PredictSpectrum(QWidget):
     def initUI(self):
         trace_name = self.ident[1]
         self.setWindowTitle(trace_name)
-        mainLayout = QVBoxLayout()
+        mainLayout = QVBoxLayout(self)
         buttons = QHBoxLayout()
 
         self.parameterTable = QTableWidget()
@@ -60,7 +60,6 @@ class PredictSpectrum(QWidget):
 
         self.plotButton.clicked.connect(self.onPlot)
         self.setupParameterTable()
-        self.setLayout(mainLayout)
         self.show()
 
     def setupParameterTable(self):

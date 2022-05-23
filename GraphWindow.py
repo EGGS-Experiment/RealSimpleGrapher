@@ -2,9 +2,9 @@
 The main GUI which holds everything and puts everything together.
 """
 import GUIConfig
-from pyqtgraph_widgets import *
-from PyQt5.QtWidgets import QWidget, QTabWidget, QGridLayout
+from PyQt5.QtWidgets import QWidget, QGridLayout
 
+from RealSimpleGrapher.pyqtgraph_widgets import *
 from EGGS_labrad.clients.Widgets import QDetachableTabWidget
 
 
@@ -23,11 +23,10 @@ class GridGraphWindow(QWidget):
         self.initUI(g_list, row_list, column_list)
 
     def initUI(self, g_list, row_list, column_list):
-        layout = QGridLayout()
+        layout = QGridLayout(self)
         for k in range(len(g_list)):
             layout.addWidget(g_list[k], row_list[k], column_list[k])
-        self.setLayout(layout)
-        
+
 
 class GraphWindow(QDetachableTabWidget):
     """
