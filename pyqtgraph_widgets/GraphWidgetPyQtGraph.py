@@ -57,19 +57,31 @@ class Graph_PyQtGraph(QWidget):
         self.colorChooser = cycle(colorList)
         # autoranging
         self.autoRangeEnable = True
+        # startup
         self.initUI()
+        self.connectSignals()
 
     @inlineCallbacks
     def initUI(self):
         """
         Draws the UI.
         """
-        # todo: clean up
-        # import constituent widgets
-        self.tracelist = TraceList(self, root=self.root)
-        self.dv = DataVaultList(self.name, cxn=self.cxn, root=self.root)
-        self.pw = pg.PlotWidget()
-        tracelistLabel = QLabel('Dataset Traces:')
+        layout = QHBoxLayout(self)
+        layout_splitter = QSplitter
+        layout.addWidget(layout_splitter)
+        # create widgets
+        left_widget = self._makeLeftSide()
+        right_widget = self._makeRightSide()
+        # lay out widgets
+        layout_splitter = QSplitter()
+        layout_splitter.addWidget(left_widget)
+        layout_splitter.addWidget(right_widget)
+
+        # set up viewbox
+        self.pw.plot([], [])
+        vb = self.pw.plotItem.vb
+        self.img = pg.ImageItem()
+        vb.addItem(self.img)
         # configure lines
         if self.vline_name:
             self.inf = pg.InfiniteLine(movable=True, angle=90,
@@ -81,6 +93,8 @@ class Graph_PyQtGraph(QWidget):
             init_value = yield self.get_init_vline()
             self.inf.setValue(init_value)
             self.inf.setPen(width=5.0)
+            vb.addItem(self.inf)
+            self.inf.sigPositionChangeFinished.connect(self.vline_changed)
         if self.hline_name:
             self.inf = pg.InfiniteLine(movable=True, angle=0,
                                        label=self.hline_name + '{value:0.0f}',
@@ -91,48 +105,67 @@ class Graph_PyQtGraph(QWidget):
             init_value = yield self.get_init_hline()
             self.inf.setValue(init_value)
             self.inf.setPen(width=5.0)
-        # lay out widgets
-        lsplitter = QSplitter()
-        lsplitter.setOrientation(Qt.Vertical)
-        lsplitter.addWidget(tracelistLabel)
-        lsplitter.addWidget(self.tracelist)
-        lsplitter.addWidget(self.dv)
-        splitter = QSplitter()
-        splitter.addWidget(lsplitter)
-        hbox = QHBoxLayout(self)
-        hbox.addWidget(splitter)
-        # frame/vbox is everything on RHS
-        frame = QFrame()
-        vbox = QVBoxLayout(frame)
+            vb.addItem(self.inf)
+            self.inf.sigPositionChangeFinished.connect(self.hline_changed)
+
+    def _makeLeftSide(self):
+        """
+        Creates the left-hand side of the graphWidget.
+        The left-hand side contains the TraceList, which displays traces,
+        and the DataVaultListWidget, which interacts with the data vault
+        to get data.
+        """
+        # QSplitter allows vertical resizing of the TraceList and DataVaultListWidget
+        widget = QSplitter()
+
+        # create constituent widgets
+        self.tracelist = TraceList(self, root=self.root)
+        self.dv = DataVaultList(self.name, cxn=self.cxn, root=self.root)
+        tracelistLabel = QLabel('Dataset Traces:')
+
+        # lay out
+        widget.setOrientation(Qt.Vertical)
+        widget.addWidget(tracelistLabel)
+        widget.addWidget(self.tracelist)
+        widget.addWidget(self.dv)
+        return widget
+
+    def _makeRightSide(self):
+        """
+        Creates the right-hand side of the graphWidget.
+        The left-hand side contains the PlotWidget, which does all the graphing,
+        a readout of the co-ordinates of the cursor, a button to autoRange the plot,
+        and the graphWidget's title.
+        """
+        widget = QFrame()
+        widget_layout = QVBoxLayout(widget)
+
+        self.pw = pg.PlotWidget()
         self.title = QLabel(self.name)
-        vbox.addWidget(self.title)
-        vbox.addWidget(self.pw)
-        splitter.addWidget(frame)
-        # create bottom buttons
+
+        # create subwidget
         pwButtons = QWidget()
         pwButtons_layout = QHBoxLayout(pwButtons)
         self.coords = QLabel('')
         self.autorangebutton = QPushButton('Autorange Off')
         self.autorangebutton.setCheckable(True)
-        self.autorangebutton.toggled.connect(lambda: self.toggleAutoRange(self.autorangebutton.isChecked()))
         pwButtons_layout.addWidget(self.coords)
         pwButtons_layout.addWidget(self.autorangebutton)
-        vbox.addWidget(pwButtons)
+
+        # lay out
+        widget_layout.addWidget(self.title)
+        widget_layout.addWidget(self.pw)
+        widget_layout.addWidget(pwButtons)
+        return widget
+
+    def _connectSignals(self):
+        """
+        Connect signals to slots.
+        """
         self.tracelist.itemChanged.connect(self.checkboxChanged)
-        self.pw.plot([], [])
-        # set up viewbox
-        vb = self.pw.plotItem.vb
-        self.img = pg.ImageItem()
-        vb.addItem(self.img)
-        # connect signals to slots
-        if self.vline_name:
-            vb.addItem(self.inf)
-            self.inf.sigPositionChangeFinished.connect(self.vline_changed)
-        if self.hline_name:
-            vb.addItem(self.inf)
-            self.inf.sigPositionChangeFinished.connect(self.hline_changed)
         self.pw.scene().sigMouseMoved.connect(self.mouseMoved)
         self.pw.sigRangeChanged.connect(self.rangeChanged)
+        self.autorangebutton.toggled.connect(lambda: self.toggleAutoRange(self.autorangebutton.isChecked()))
         # self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
 
 
@@ -192,7 +225,6 @@ class Graph_PyQtGraph(QWidget):
             # no need to call traceList.removeDataset or otherwise interact since
             # it is all handled in self.remove_artist
         except Exception as e:
-            # todo: this is called when no datasets left
             print("Error in graphwidget.remove_dataset:", e)
 
     def add_artist(self, artist_ident, dataset, index, no_points=False):
