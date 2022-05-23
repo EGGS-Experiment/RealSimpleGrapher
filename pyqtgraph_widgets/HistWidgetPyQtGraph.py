@@ -11,6 +11,7 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 
 from RealSimpleGrapher.TraceListWidget import TraceList
 from RealSimpleGrapher.pyqtgraph_widgets.artists import artistParameters, colorList
+# todo: make an offshoot of graphwidgetpyqtgraph
 
 
 class Hist_PyQtGraph(QWidget):
