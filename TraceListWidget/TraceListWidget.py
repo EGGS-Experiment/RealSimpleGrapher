@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeWidget, QTreeWidgetItem, QLabel
+from PyQt5.QtWidgets import QMenu, QFileDialog, QTreeWidget, QTreeWidgetItem
 
 from .FitWindowWidget import FitWindow
 from .ParameterListWidget import ParameterList

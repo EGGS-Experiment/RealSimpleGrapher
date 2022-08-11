@@ -37,6 +37,7 @@ class Dataset(object):
     def openDataset(self):
         # open the dataset
         yield self.data_vault.cd(self.dataset_location[0], context=self.context)
+        print('\tds_loc: {}'.format(self.dataset_location))
         yield self.data_vault.open(self.dataset_location[1], context=self.context)
         # allocate array size based on dataset size
         dataset_shape = yield self.data_vault.shape(context=self.context)

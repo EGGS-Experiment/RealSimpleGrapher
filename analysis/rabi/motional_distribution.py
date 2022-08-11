@@ -10,11 +10,11 @@ class motional_distribution(object):
 
     @classmethod
     def thermal(cls, nbar, dimension):
-        '''
+        """
         Returns a thermal distribution of occupational numbers of the required dimensions.
         @param nbar: temperature
         @param dimension: number of required entries 
-        '''
+        """
         return np.fromfunction(lambda n: cls._thermal(nbar, n), (dimension,))
 
     @classmethod
@@ -24,20 +24,20 @@ class motional_distribution(object):
 
     @classmethod
     def displaced_thermal(cls, alpha, nbar, dimension):
-        '''
+        """
         Outputs occupational numbers for a displaced thermal distribution.
         @param alpha: coherent displacement
         @param nbar: temperature of the thermal distribution
         @param dimension: required number of modes   
-        '''
+        """
         return np.fromfunction(lambda n: cls._displaced_thermal(alpha, nbar, n), (dimension,))
 
     @classmethod
     def _displaced_thermal(cls, alpha, nbar, n):
-        '''
+        """
         Returns the motional state distribution with the displacement alpha,
         motional temperature nbar for the state n.
-        '''
+        """
         # this is needed because for some inputs (larrge n or small nbar, this term is 0 while the laguerre term is infinite. their product is zero but beyond the floating point precision
         try:
             old_settings = np.seterr(invalid='raise')
@@ -56,9 +56,9 @@ class motional_distribution(object):
 
     @classmethod
     def test_displaced_thermal(cls):
-        '''
+        """
         Compares the result of the computed distribution with the same result obtained through qutip.
-        '''
+        """
         alpha = np.sqrt(5) * np.random.ranf()
         nbar = 5 * np.random.ranf()
         test_entries = 100
@@ -72,9 +72,9 @@ class motional_distribution(object):
 
     @classmethod
     def test_thermal_distribution(cls):
-        '''
+        """
         Compares the result of the computed distribution with the same result obtained through qutip.
-        '''
+        """
         nbar = 3 * np.random.ranf()
         test_entries = 10
         computed = cls.thermal(nbar, test_entries)
