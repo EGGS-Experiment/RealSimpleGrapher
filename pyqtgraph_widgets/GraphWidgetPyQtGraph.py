@@ -31,7 +31,7 @@ class Graph_PyQtGraph(QWidget):
         from labrad.units import WithUnit as U
         self.U = U
         self.cxn = cxn
-        self.pv = self.cxn.parameter_vault
+        self.pv = self.cxn.parametervault
         self.reactor = reactor
         self.artists = {}
         self.should_stop = False

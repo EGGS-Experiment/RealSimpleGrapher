@@ -52,7 +52,7 @@ class RSG_client(QMainWindow):
             self.cxn = yield connectAsync(LABRADHOST, name=self.name)
         # try to get servers
         try:
-            self.pv = self.cxn.parameter_vault
+            self.pv = self.cxn.parametervault
             self.dv = self.cxn.data_vault
         except Exception as e:
             print(e)

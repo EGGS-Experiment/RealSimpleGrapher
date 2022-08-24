@@ -22,7 +22,7 @@ class Hist_PyQtGraph(QWidget):
     def __init__(self, reactor, config, cxn=None, parent=None):
         super(Hist_PyQtGraph, self).__init__(parent)
         self.cxn = cxn
-        self.pv = self.cxn.parameter_vault
+        self.pv = self.cxn.parametervault
         self.reactor = reactor
         self.artists = {}
         self.should_stop = False

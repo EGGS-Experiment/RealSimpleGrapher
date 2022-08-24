@@ -39,7 +39,13 @@ class Dataset(object):
         yield self.data_vault.cd(self.dataset_location[0], context=self.context)
         yield self.data_vault.open(self.dataset_location[1], context=self.context)
         # allocate array size based on dataset size
-        dataset_shape = yield self.data_vault.shape(context=self.context)
+        dataset_shape = 0
+        # support older data vault versions that don't have shape function
+        try:
+            dataset_shape = yield self.data_vault.shape(context=self.context)
+        except Exception as e:
+            _, all_dep = yield self.data_vault.variables(context=self.context)
+            dataset_shape = (0, 1 + len(all_dep))
         self.data = np.zeros(dataset_shape)
         self.accessingData.release()
 
@@ -91,21 +97,20 @@ class Dataset(object):
     @inlineCallbacks
     def getData(self):
         """
-        Gets data in bunches at a time and adds
-        them to self.data, which holds the dataset.
+        Gets data in bunches at a time and adds them to self.data, which holds the dataset.
         """
         # acquire communication
         yield self.accessingData.acquire()
         # get data from the datavault
-        Data = yield self.data_vault.get(self.points_per_grab, context=self.context)
-        Data = np.array(Data)
-        next_index = self.last_index + np.shape(Data)[0]
+        data_tmp = yield self.data_vault.get(self.points_per_grab, context=self.context)
+        data_tmp = np.array(data_tmp)
+        next_index = self.last_index + np.shape(data_tmp)[0]
         # add to array if we have the space
         if next_index <= np.shape(self.data)[0]:
-            self.data[self.last_index: next_index] = Data
+            self.data[self.last_index: next_index] = data_tmp
         # otherwise append to array
         else:
-            self.data = np.append(self.data, Data, axis=0)
+            self.data = np.append(self.data, data_tmp, axis=0)
         self.last_index = next_index
         # release communication
         self.accessingData.release()
