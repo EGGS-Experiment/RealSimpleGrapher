@@ -31,7 +31,10 @@ class Graph_PyQtGraph(QWidget):
         from labrad.units import WithUnit as U
         self.U = U
         self.cxn = cxn
-        self.pv = self.cxn.parametervault
+        # get parameter vault
+        for server_name in self.cxn.servers.keys():
+            if ("parameter" in server_name) and ("vault" in server_name):
+                setattr(self, "pv", self.cxn.servers[server_name])
         self.reactor = reactor
         self.artists = {}
         self.should_stop = False

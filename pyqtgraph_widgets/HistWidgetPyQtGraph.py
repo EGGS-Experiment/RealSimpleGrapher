@@ -22,7 +22,10 @@ class Hist_PyQtGraph(QWidget):
     def __init__(self, reactor, config, cxn=None, parent=None):
         super(Hist_PyQtGraph, self).__init__(parent)
         self.cxn = cxn
-        self.pv = self.cxn.parametervault
+        # get parameter vault
+        for server_name in self.cxn.servers.keys():
+            if ("parameter" in server_name) and ("vault" in server_name):
+                setattr(self, "pv", self.cxn.servers[server_name])
         self.reactor = reactor
         self.artists = {}
         self.should_stop = False

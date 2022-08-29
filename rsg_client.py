@@ -52,11 +52,14 @@ class RSG_client(QMainWindow):
             self.cxn = yield connectAsync(LABRADHOST, name=self.name)
         # try to get servers
         try:
-            self.pv = self.cxn.parametervault
-            self.dv = self.cxn.data_vault
+            for server_name in self.cxn.servers.keys():
+                if ("parameter" in server_name) and ("vault" in server_name):
+                    setattr(self, "pv", self.cxn.servers[server_name])
+                elif ("data" in server_name) and ("vault" in server_name):
+                    setattr(self, "dv", self.cxn.servers[server_name])
         except Exception as e:
             print(e)
-            raise
+            raise Exception
         # connect to signals
             # rsg signal
         # yield self.rsg.signal__plot_update(self.ID)
@@ -67,7 +70,6 @@ class RSG_client(QMainWindow):
         # yield self.cxn.manager.subscribe_to_named_message('Server Disconnect', 9898989 + 1, True)
         # yield self.cxn.manager.addListener(listener=self.on_disconnect, source=None, ID=9898989 + 1)
         return self.cxn
-
 
     def makeLayout(self, cxn):
         centralWidget = QWidget()
