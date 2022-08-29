@@ -24,7 +24,7 @@ class Hist_PyQtGraph(QWidget):
         self.cxn = cxn
         # get parameter vault
         for server_name in self.cxn.servers.keys():
-            if ("parameter" in server_name) and ("vault" in server_name):
+            if ("parameter" in server_name.lower()) and ("vault" in server_name.lower()):
                 setattr(self, "pv", self.cxn.servers[server_name])
         self.reactor = reactor
         self.artists = {}

@@ -51,15 +51,11 @@ class RSG_client(QMainWindow):
             # set self name to rsg client + node name + number (if multiple)
             self.cxn = yield connectAsync(LABRADHOST, name=self.name)
         # try to get servers
-        try:
-            for server_name in self.cxn.servers.keys():
-                if ("parameter" in server_name) and ("vault" in server_name):
-                    setattr(self, "pv", self.cxn.servers[server_name])
-                elif ("data" in server_name) and ("vault" in server_name):
-                    setattr(self, "dv", self.cxn.servers[server_name])
-        except Exception as e:
-            print(e)
-            raise Exception
+        for server_name in self.cxn.servers.keys():
+            if ("parameter" in server_name.lower()) and ("vault" in server_name.lower()):
+                setattr(self, "pv", self.cxn.servers[server_name])
+            elif ("data" in server_name.lower()) and ("vault" in server_name.lower()):
+                setattr(self, "dv", self.cxn.servers[server_name])
         # connect to signals
             # rsg signal
         # yield self.rsg.signal__plot_update(self.ID)

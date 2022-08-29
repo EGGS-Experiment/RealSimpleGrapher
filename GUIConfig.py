@@ -11,9 +11,9 @@ Set global configuration options.
 pg.setConfigOption('background', 'k')
 pg.setConfigOption('foreground', 'y')
 pg.setConfigOption('antialias', False)
-if find_spec('OpenGL'):
-    pg.setConfigOption('useOpenGL', True)
-    pg.setConfigOption('enableExperimental', True)
+# if find_spec('OpenGL'):
+#     pg.setConfigOption('useOpenGL', True)
+#     pg.setConfigOption('enableExperimental', True)
 
 
 """
