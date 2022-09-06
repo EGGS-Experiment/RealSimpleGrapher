@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QListWidget, QScrollAr
 
 class DataVaultList(QWidget):
     """
-    Data vault pop-up window used to select datasets for plotting.
+    Data vault window used to select datasets for plotting.
     Creates a client connection to LabRAD to access the datavault and grapher servers.
     """
 
@@ -37,7 +37,6 @@ class DataVaultList(QWidget):
     def initializeGUI(self):
         mainLayout = QGridLayout(self)
         self.directoryString = ['Home']
-        self.directoryTitle = QLabel('Directory:')
         self.directoryLabel = QLabel('\\'.join(self.directoryString))
         self.dataListWidget = QListWidget()
         self.dataListWidget.doubleClicked.connect(self.onDoubleclick)
@@ -45,7 +44,6 @@ class DataVaultList(QWidget):
         self.dataListWidgetScroll.setWidget(self.directoryLabel)
         self.dataListWidgetScroll.setWidgetResizable(True)
         self.dataListWidgetScroll.setFixedHeight(40)
-        mainLayout.addWidget(self.directoryTitle)
         mainLayout.addWidget(self.dataListWidgetScroll)
         mainLayout.addWidget(self.dataListWidget)
         self.setWindowTitle('Data Vault')

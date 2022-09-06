@@ -79,6 +79,7 @@ class Graph_PyQtGraph(QWidget):
         lhs_widget.setOrientation(Qt.Vertical)
         lhs_widget.addWidget(QLabel('Dataset Traces:'))
         lhs_widget.addWidget(self.tracelist)
+        lhs_widget.addWidget(QLabel('Directory:'))
         lhs_widget.addWidget(self.dv)
 
 
