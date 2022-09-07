@@ -200,6 +200,7 @@ class TraceList(QTreeWidget):
                 ps.show()
             elif action == actionDict.get('removeAllAction'):
                 # remove all artists/traces
+                # todo: maybe should be reverse?
                 for index in range(self.topLevelItemCount()):
                     dataset_item = self.topLevelItem(index)
                     ident = dataset_item.data(0, Qt.UserRole)

@@ -35,7 +35,7 @@ class DataVaultList(QWidget):
         self.initializeGUI()
 
     def initializeGUI(self):
-        mainLayout = QGridLayout(self)
+        # create widgets
         self.directoryString = ['Home']
         self.directoryLabel = QLabel('\\'.join(self.directoryString))
         self.dataListWidget = QListWidget()
@@ -44,6 +44,9 @@ class DataVaultList(QWidget):
         self.dataListWidgetScroll.setWidget(self.directoryLabel)
         self.dataListWidgetScroll.setWidgetResizable(True)
         self.dataListWidgetScroll.setFixedHeight(40)
+
+        # create layout
+        mainLayout = QGridLayout(self)
         mainLayout.addWidget(self.dataListWidgetScroll)
         mainLayout.addWidget(self.dataListWidget)
         self.setWindowTitle('Data Vault')
