@@ -66,7 +66,7 @@ class DataVaultList(QWidget):
     @inlineCallbacks
     def onDoubleclick(self, item):
         item = self.dataListWidget.currentItem().text()
-        # go to previous directory
+        # previous directory
         if item == '...':
             yield self.dv.cd(1, context=self._context)
             if len(self.directoryString) > 1:
@@ -75,13 +75,13 @@ class DataVaultList(QWidget):
             self.populate()
         else:
             try:
-                # go to next directory
+                # next directory
                 yield self.dv.cd(str(item), context=self._context)
                 self.directoryString.append(str(item))
                 self.directoryLabel.setText('\\'.join(self.directoryString))
                 self.populate()
             except:
-                # if no next directories, must be a dataset, so plot it
+                # plot if no directories left
                 path = yield self.dv.cd(context=self._context)
                 if self.root is not None:
                     yield self.root.do_plot((path, str(item)), self.tracename, False)

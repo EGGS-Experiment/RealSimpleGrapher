@@ -20,7 +20,7 @@ from DataVaultListWidget import Dataset
 class RSG_client(QMainWindow):
     """
     Client for the Real Simple Grapher.
-    Doesn't require the RSG to be running at all.
+    Doesn't require the RSG server to be running at all.
     """
 
     name = gethostname() + " RSG Client"
@@ -94,28 +94,51 @@ class RSG_client(QMainWindow):
     def make_dataset(self, dataset_location):
         """
         Create and initialize a dataset object.
+        # todo: is this really necessary? why is it separate?
         Arguments:
             dataset_location    ([str]): the dataset directory location in the data vault.
         """
         cxt = self.cxn.context()
-        ds = Dataset(self.dv, cxt, dataset_location, reactor)
-        return ds
+        return Dataset(self.dv, cxt, dataset_location, reactor)
 
     def do_plot(self, dataset_location, graph, send_to_current):
-        if (graph != 'current') and send_to_current:
-            # add the plot to the Current tab as well as an additional
-            # specified tab for later examination
-            ds = self.make_dataset(dataset_location)
-            # look in dict for existing
-            # if same name but different loc, then add new
-            self.gui.graphDict['current'].add_dataset(ds)
+        """
+        todo: document
+        Arguments:
+            dataset_location:
+            graph:
+            send_to_current:
+        """
+        # create a dataset object
         ds = self.make_dataset(dataset_location)
+
+        if (graph != 'current') and send_to_current:
+            # add plot to the "current" tab as well as additional specified tab for later examination
+            # look in dict for existing if same name but different loc, then add new
+            self.gui.graphDict['current'].add_dataset(ds)
+
         self.gui.graphDict[graph].add_dataset(ds)
 
     def plot_image(self, data, image_size, graph, name):
+        """
+        todo: document
+        Arguments:
+            data:
+            image_size:
+            graph:
+            name:
+        """
         self.gui.graphDict[graph].update_image(data, image_size, name)
 
     def plot_with_axis(self, c, dataset_location, graph, axis, send_to_current=True):
+        """
+        todo: document
+        Arguments:
+            dataset_location:
+            graph:
+            axis:
+            send_to_current:
+        """
         minim, maxim = min(axis), max(axis)
         if (graph != 'current') and send_to_current:
             self.gui.graphDict['current'].set_xlimits([minim[minim.units], maxim[maxim.units]])
