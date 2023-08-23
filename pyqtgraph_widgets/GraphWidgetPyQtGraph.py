@@ -26,6 +26,7 @@ class Graph_PyQtGraph(QWidget):
 
     # SETUP
     def __init__(self, reactor, config, cxn=None, parent=None, root=None):
+        # todo: clean up/modularize/document better
         super().__init__(parent)
         self.root = root
         from labrad.units import WithUnit as U
@@ -48,7 +49,7 @@ class Graph_PyQtGraph(QWidget):
         self.hline_name, self.hline_param = (config.hline, config.hline_param)
         # set background color
         self.setStyleSheet("background-color:black; color:white; border: 1px solid white")
-        # datasets is used to store datasets and active traces
+        # self.datasets is used to store datasets and active traces
         self.datasets = {}
         # live_update_loop continuously calls _update_figure,
         # which is where points are received from the dataset objects
@@ -67,10 +68,12 @@ class Graph_PyQtGraph(QWidget):
     def initUI(self):
         """
         Create the GUI.
+        # todo: more documentation/comments
         """
         layout = QHBoxLayout(self)
         splitter_widget = QSplitter()
         layout.addWidget(splitter_widget)
+
 
         # LHS displays datasets and active traces
         self.tracelist = TraceList(self, root=self.root)
@@ -142,6 +145,13 @@ class Graph_PyQtGraph(QWidget):
         self.pw.scene().sigMouseMoved.connect(self.mouseMoved)
         self.pw.sigRangeChanged.connect(self.rangeChanged)
         # self.pw.scene().sigMouseClicked.connect(self.mouseClicked)
+
+        # tmp remove
+        # further customization of plotwidget
+        # todo: idk
+        # make gridlines visible (note: can later be toggled on/off by user)
+        self.pw.showGrid(x=True, y=True, alpha=0.65)
+        # tmp remove
 
 
     # DATASETS/TRACE MANAGEMENT
