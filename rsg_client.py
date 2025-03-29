@@ -20,10 +20,10 @@ from DataVaultListWidget import Dataset
 class RSG_client(QMainWindow):
     """
     Client for the Real Simple Grapher.
-    Doesn't require the RSG server to be running at all.
+    Doesn't require any external RSG server - i.e. runs by itself.
     """
 
-    name = gethostname() + " RSG Client"
+    name = "RSG Client - {:s}".format(gethostname())
 
     def __init__(self, reactor, clipboard=None, parent=None):
         super(RSG_client, self).__init__(parent)
@@ -31,7 +31,7 @@ class RSG_client(QMainWindow):
         self.reactor = reactor
         self.cxn = None
         # create random client ID
-        self.ID = randrange(3e5, 1e6)
+        self.ID = randrange(int(3e5), int(1e6))
         self.setWindowTitle(self.name)
         self.setWindowIcon(QIcon('rsg_icon.JPG'))
         self.servers = ['Data Vault', 'Parameter Vault']

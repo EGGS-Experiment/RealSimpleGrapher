@@ -1,7 +1,7 @@
 import numpy as np
 import mpmath as mp
 from scipy.special import factorial
-from scipy.special.orthogonal import eval_genlaguerre as laguerre
+from scipy.special import eval_genlaguerre as laguerre
 
 # see Michael Ramm writeup on 'Displaced Coherent States' and references therein.
 
